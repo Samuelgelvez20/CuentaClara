@@ -1,5 +1,6 @@
 package co.cuentaclara.document;
 
+import co.cuentaclara.document.ocr.PdfAndOcrExtractionService;
 import co.cuentaclara.document.xml.DianUblXmlParser;
 import co.cuentaclara.security.rls.RlsDataSourceConfig;
 import java.nio.file.Files;
@@ -28,6 +29,7 @@ public class DocumentIngestionWorker {
     private final DocumentRepository documentRepository;
     private final DocumentExtractionRepository extractionRepository;
     private final DianUblXmlParser ublXmlParser;
+    private final PdfAndOcrExtractionService pdfAndOcrExtractionService;
     private final TransactionTemplate transactionTemplate;
     private final StringRedisTemplate redisTemplate;
 
@@ -35,12 +37,14 @@ public class DocumentIngestionWorker {
             DocumentRepository documentRepository,
             DocumentExtractionRepository extractionRepository,
             DianUblXmlParser ublXmlParser,
+            PdfAndOcrExtractionService pdfAndOcrExtractionService,
             TransactionTemplate transactionTemplate,
             @Autowired(required = false) StringRedisTemplate redisTemplate
     ) {
         this.documentRepository = documentRepository;
         this.extractionRepository = extractionRepository;
         this.ublXmlParser = ublXmlParser;
+        this.pdfAndOcrExtractionService = pdfAndOcrExtractionService;
         this.transactionTemplate = transactionTemplate;
         this.redisTemplate = redisTemplate;
     }
@@ -148,9 +152,50 @@ public class DocumentIngestionWorker {
                 extraction.setConfirmedByUser(false);
                 extractionRepository.save(extraction);
             } else {
-                // Para PDF e Imágenes (se completará en Día 3 con PDFBox + Tesseract OCR + estructuración JSON)
+                PdfAndOcrExtractionService.ExtractionOutcome outcome =
+                        pdfAndOcrExtractionService.extractFromPdfOrImage(fileBytes, doc.getSourceType());
+                DianUblXmlParser.ParsedUblInvoice parsed = outcome.parsedInvoice();
+
+                if (parsed.issuerValidForDuplicateCheck()) {
+                    documentRepository.findByUserIdAndIssuerNitAndInvoiceNumber(userId, parsed.merchantNit(), parsed.invoiceNumber())
+                            .filter(existing -> !existing.getId().equals(doc.getId()))
+                            .ifPresent(existing -> {
+                                throw new DuplicateInvoiceException(
+                                        "Factura duplicada detectada: ya existe la factura No. "
+                                                + parsed.invoiceNumber() + " del emisor NIT " + parsed.merchantNit() + "."
+                                );
+                            });
+                }
+
+                doc.setSourceType(outcome.resolvedSourceType());
+                doc.setPageCount(outcome.pageCount());
+                doc.setCufe(parsed.cufe());
+                doc.setInvoiceNumber(parsed.invoiceNumber());
+                doc.setIssuerNit(parsed.merchantNit());
+                doc.setIssuerName(parsed.merchantName());
                 doc.setStatus(DocumentStatus.AWAITING_CONFIRMATION);
                 documentRepository.save(doc);
+
+                DocumentExtraction extraction = extractionRepository.findByDocumentId(doc.getId())
+                        .orElseGet(DocumentExtraction::new);
+                extraction.setUserId(userId);
+                extraction.setDocumentId(doc.getId());
+                extraction.setMerchantName(parsed.merchantName());
+                extraction.setMerchantNit(parsed.merchantNit());
+                extraction.setInvoiceNumber(parsed.invoiceNumber());
+                extraction.setCufe(parsed.cufe());
+                extraction.setIssueDate(parsed.issueDate());
+                extraction.setSubtotalAmount(parsed.subtotalAmount());
+                extraction.setTaxAmount(parsed.taxAmount());
+                extraction.setDiscountAmount(parsed.discountAmount());
+                extraction.setTotalAmount(parsed.totalAmount());
+                extraction.setSuggestedCategory(parsed.suggestedCategory());
+                extraction.setSuggestedBudgetBlock(parsed.suggestedBudgetBlock());
+                extraction.setItemsJson(parsed.itemsJson());
+                extraction.setRawExtractedText(parsed.rawSummaryText());
+                extraction.setExtractionMethod(outcome.extractionMethod());
+                extraction.setConfirmedByUser(false);
+                extractionRepository.save(extraction);
             }
         } catch (DuplicateInvoiceException dupEx) {
             throw dupEx;
