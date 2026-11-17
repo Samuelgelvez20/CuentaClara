@@ -75,34 +75,34 @@
 
         <!-- Navigation Menu -->
         <div class="px-space-md py-space-sm">
-            <div class="px-space-sm pb-space-xs">
-                <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Módulos del Sistema</span>
+            <div class="px-space-sm pb-2">
+                <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Mi Espacio Personal</span>
             </div>
             <nav class="flex flex-col gap-1.5">
-                <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px]">dashboard</span>
-                    <span>Panel Principal</span>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
+                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                    <span>Mi Calendario del Mes</span>
                 </a>
-                <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
                     <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Cargar y Confirmar</span>
+                    <span>Historial de Gastos</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
+                    <span class="material-symbols-outlined text-[20px]">upload_file</span>
+                    <span>Subir Recibo o Factura</span>
                     <span th:if="${!#lists.isEmpty(pendingConfirmations)}" class="ml-auto px-2 py-0.5 rounded-full bg-secondary text-white text-[11px] font-bold" th:text="${#lists.size(pendingConfirmations)}"></span>
                 </a>
-                <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px]">pie_chart</span>
-                    <span>Presupuesto 50/30/20</span>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
+                    <span class="material-symbols-outlined text-[20px]">savings</span>
+                    <span>Mi Plan y Deudas Fijas</span>
                 </a>
-                <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px]">neurology</span>
-                    <span>Asistente RAG</span>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
+                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+                    <span>Pregúntale a tu Asistente</span>
                 </a>
-                <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard#historial-sql">
-                    <span class="material-symbols-outlined text-[20px]">history_edu</span>
-                    <span>Historial &amp; XMLs</span>
-                </a>
-                <a aria-current="page" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold bg-primary-container text-white shadow-sm transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">settings</span>
-                    <span>Configuración</span>
+                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold bg-primary-container text-white shadow-sm transition-all no-underline" href="/settings">
+                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">palette</span>
+                    <span>Colores y Configuración</span>
                 </a>
             </nav>
         </div>
@@ -343,6 +343,21 @@
                     <p class="text-[11px] text-on-surface-variant mt-1.5">Define cómo se redactan las respuestas del chat conversacional.</p>
                 </div>
             </div>
+
+            <!-- Botón de Confirmación de Idioma y Preferencias Regionales -->
+            <div class="pt-space-sm border-t border-outline-variant/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div id="lang-confirm-toast" class="hidden items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+                    <span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+                    <span id="lang-confirm-text">¡Idioma confirmado y aplicado en todo el sistema!</span>
+                </div>
+                <div class="ml-auto">
+                    <button type="button" onclick="confirmLanguageSelection()"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-secondary hover:bg-primary-container text-white text-xs font-extrabold shadow-md transition-all cursor-pointer border-0">
+                        <span class="material-symbols-outlined text-[18px]">translate</span>
+                        <span>Confirmar y Aplicar Idioma al Sistema</span>
+                    </button>
+                </div>
+            </div>
         </section>
 
         <!-- 3. PERFIL FINANCIERO Y REGLAS DE PRESUPUESTO EDITABLES (RF-16) -->
@@ -507,6 +522,26 @@
         updateActiveModeUI(mode);
     }
 
+    function confirmLanguageSelection() {
+        const langSelect = document.getElementById('pref-language');
+        const currSelect = document.getElementById('pref-currency');
+        const selectedLang = langSelect ? langSelect.value : 'es-CO';
+        const selectedCurr = currSelect ? currSelect.value : 'COP';
+
+        window.CuentaClaraTheme.setLanguage(selectedLang);
+        window.CuentaClaraTheme.setCurrency(selectedCurr);
+
+        const toast = document.getElementById('lang-confirm-toast');
+        const toastText = document.getElementById('lang-confirm-text');
+        if (toast && toastText) {
+            toastText.textContent = selectedLang === 'en-US'
+                ? '✓ System language confirmed and applied (English - US)!'
+                : '✓ ¡Idioma del sistema confirmado y aplicado (Español - Colombia)!';
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+        }
+    }
+
     function updateActiveThemeUI(currentTheme) {
         document.querySelectorAll('.theme-card').forEach(card => {
             card.classList.remove('border-primary', 'ring-2', 'ring-primary/30', 'bg-surface-container');
@@ -548,8 +583,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         const currentTheme = window.CuentaClaraTheme.getTheme();
         const currentMode = window.CuentaClaraTheme.getMode();
+        const currentLang = window.CuentaClaraTheme.getLanguage();
+        const currentCurr = window.CuentaClaraTheme.getCurrency();
         updateActiveThemeUI(currentTheme);
         updateActiveModeUI(currentMode);
+        const langSelect = document.getElementById('pref-language');
+        if (langSelect) langSelect.value = currentLang;
+        const currSelect = document.getElementById('pref-currency');
+        if (currSelect) currSelect.value = currentCurr;
     });
 
     window.addEventListener('cuentaclara:mode-changed', (e) => {
