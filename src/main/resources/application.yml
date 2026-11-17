@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: cuentaclara
+
+  # Datasource principal de la aplicación: usa el rol SIN privilegios de propietario para garantizar RLS (RNF-01)
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cuentaclara}
+    username: ${DB_APP_USER:cuentaclara_app}
+    password: ${DB_APP_PASSWORD:app_secret_dev}
+    driver-class-name: org.postgresql.Driver
+
+  # Flyway corre con el usuario propietario para crear tablas, índices y políticas RLS
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cuentaclara}
+    user: ${DB_ADMIN_USER:cuentaclara_owner}
+    password: ${DB_ADMIN_PASSWORD:owner_secret_dev}
+    locations: classpath:db/migration
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: America/Bogota
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  thymeleaf:
+    cache: false
+
+cuentaclara:
+  security:
+    jwt-secret: ${JWT_SECRET:c3VwZXItc2VjcmV0LWtleS1mb3ItY3VlbnRhY2xhcmEtZGV2LW1pbmltdW0tMzItYnl0ZXM=}
+    jwt-expiration-minutes: ${JWT_EXPIRATION_MINUTES:30}
+  storage:
+    temp-dir: ${TEMP_STORAGE_DIR:./tmp/uploads}
+  clamav:
+    enabled: ${CLAMAV_ENABLED:false}
+    host: ${CLAMAV_HOST:localhost}
+    port: ${CLAMAV_PORT:3310}
+  ai:
+    api-key: ${OPENAI_API_KEY:}
+    chat-model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+    embedding-model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+    embedding-version: ${OPENAI_EMBEDDING_VERSION:v1}
