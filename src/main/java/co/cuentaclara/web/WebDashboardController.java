@@ -41,6 +41,10 @@ public class WebDashboardController {
             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     };
 
+    private static final String[] SPANISH_DAY_NAMES = {
+            "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"
+    };
+
     private static final List<String> STANDARD_CATEGORIES = List.of(
             "Alimentación",
             "Domicilios y Restaurantes",
@@ -208,8 +212,14 @@ public class WebDashboardController {
             String merchant,
             Model model
     ) {
-        YearMonth resolvedYm = parseYearMonthOrDefault(month, YearMonth.of(2026, 10));
+        LocalDate today = LocalDate.now();
+        YearMonth currentRealYm = YearMonth.from(today);
+        YearMonth resolvedYm = parseYearMonthOrDefault(month, currentRealYm);
         String resolvedMonthStr = resolvedYm.toString();
+
+        String todayDayName = SPANISH_DAY_NAMES[today.getDayOfWeek().getValue()];
+        String todayFullLabel = todayDayName + " " + today.getDayOfMonth() + " de "
+                + SPANISH_MONTH_NAMES[today.getMonthValue()] + " de " + today.getYear();
 
         model.addAttribute("user", principal);
         model.addAttribute("budgetBlocks", BudgetBlock.values());
@@ -219,6 +229,12 @@ public class WebDashboardController {
         model.addAttribute("prevMonth", resolvedYm.minusMonths(1).toString());
         model.addAttribute("nextMonth", resolvedYm.plusMonths(1).toString());
         model.addAttribute("calendarMonthLabel", formatMonthLabel(resolvedYm));
+        model.addAttribute("todayIso", today.toString());
+        model.addAttribute("todayDayNumber", today.getDayOfMonth());
+        model.addAttribute("todayDayOfWeek", today.getDayOfWeek().getValue());
+        model.addAttribute("todayFullLabel", todayFullLabel);
+        model.addAttribute("currentRealMonth", currentRealYm.toString());
+        model.addAttribute("isCurrentRealMonth", resolvedYm.equals(currentRealYm));
 
         List<RecurringObligation> userObligations = new ArrayList<>();
         profileService.getCurrentProfileAndBudget(principal.userId()).ifPresent(p -> {
@@ -316,10 +332,13 @@ public class WebDashboardController {
             cells.add(CalendarDayCell.emptyCell());
         }
 
+        LocalDate today = LocalDate.now();
         int daysInMonth = ym.lengthOfMonth();
         for (int day = 1; day <= daysInMonth; day++) {
             LocalDate date = ym.atDay(day);
             final int currentDay = day;
+            boolean isToday = date.equals(today);
+            String dayOfWeekName = SPANISH_DAY_NAMES[date.getDayOfWeek().getValue()];
 
             List<TransactionEntity> dayTxs = monthTransactions.stream()
                     .filter(tx -> date.equals(tx.getTransactionDate()))
@@ -346,10 +365,13 @@ public class WebDashboardController {
                 }
             }
 
-            String fullDateLabel = day + " de " + SPANISH_MONTH_NAMES[ym.getMonthValue()] + " de " + ym.getYear();
+            String fullDateLabel = (isToday ? "Hoy, " : "") + dayOfWeekName + " " + day + " de "
+                    + SPANISH_MONTH_NAMES[ym.getMonthValue()] + " de " + ym.getYear();
             cells.add(new CalendarDayCell(
                     false,
+                    isToday,
                     day,
+                    dayOfWeekName,
                     date.toString(),
                     fullDateLabel,
                     dayTxs,
@@ -532,7 +554,9 @@ public class WebDashboardController {
 
     public record CalendarDayCell(
             boolean empty,
+            boolean today,
             int dayNumber,
+            String dayOfWeekName,
             String isoDate,
             String fullDateLabel,
             List<TransactionEntity> transactions,
@@ -540,7 +564,7 @@ public class WebDashboardController {
             List<DayObligationBadge> obligations
     ) {
         public static CalendarDayCell emptyCell() {
-            return new CalendarDayCell(true, 0, "", "", List.of(), BigDecimal.ZERO, List.of());
+            return new CalendarDayCell(true, false, 0, "", "", "", List.of(), BigDecimal.ZERO, List.of());
         }
     }
 }

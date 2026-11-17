@@ -321,18 +321,26 @@
                             <span class="material-symbols-outlined text-[26px]">calendar_month</span>
                         </div>
                         <div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
                                 <h2 class="text-xl font-extrabold text-primary m-0" th:text="'Calendario de Gastos — ' + ${calendarMonthLabel}">Calendario de Gastos</h2>
-                                <span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold">Interactivo</span>
+                                <span class="px-3 py-0.5 rounded-full bg-secondary text-white text-[11px] font-extrabold shadow-xs flex items-center gap-1"
+                                      th:text="'📍 Hoy: ' + ${todayFullLabel}">📍 Hoy</span>
                             </div>
                             <p class="text-xs text-on-surface-variant m-0 mt-0.5">
-                                Haz clic en cualquier día para anotar tus gastos diarios con su descripción, o para registrar tus pagos y deudas del mes.
+                                Enlazado en tiempo real con la fecha de hoy. Haz clic en cualquier día para anotar tus gastos diarios o registrar pagos.
                             </p>
                         </div>
                     </div>
 
                     <!-- Controles de Navegación de Mes en el Calendario -->
                     <div class="flex items-center gap-2 flex-wrap">
+                        <a th:href="@{/dashboard(month=${currentRealMonth})}"
+                           title="Saltar al mes y día de hoy"
+                           class="h-10 px-4 rounded-full bg-secondary text-white hover:opacity-95 text-xs font-extrabold flex items-center gap-1.5 no-underline shadow-sm">
+                            <span class="material-symbols-outlined text-[16px]">today</span>
+                            <span>Hoy</span>
+                        </a>
+
                         <a th:href="@{/dashboard(month=${prevMonth})}"
                            class="h-10 px-3.5 rounded-full bg-surface-container-low hover:bg-surface-container-high text-on-surface text-xs font-bold flex items-center gap-1 no-underline border border-outline-variant/30">
                             <span class="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -345,7 +353,7 @@
                                 <option th:each="entry : ${availableMonths}"
                                         th:value="${entry.key}"
                                         th:text="${entry.value}"
-                                        th:selected="${entry.key == selectedMonth}">Octubre 2026</option>
+                                        th:selected="${entry.key == selectedMonth}">Noviembre 2026</option>
                             </select>
                         </form>
 
@@ -360,51 +368,75 @@
                 <!-- Leyenda Amigable del Calendario -->
                 <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-on-surface-variant bg-surface-container-low/60 px-4 py-2.5 rounded-2xl">
                     <div class="flex flex-wrap items-center gap-4">
+                        <span class="flex items-center gap-1.5 font-extrabold text-secondary">
+                            <span class="w-3 h-3 rounded-full bg-secondary animate-pulse"></span>
+                            <span>📍 Día de Hoy (Actual)</span>
+                        </span>
                         <span class="flex items-center gap-1.5 font-semibold">
                             <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                            <span>📌 Pago Fijo / Deuda Pendiente del Mes</span>
+                            <span>📌 Pago Fijo / Deuda Pendiente</span>
                         </span>
                         <span class="flex items-center gap-1.5 font-semibold">
                             <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                             <span>✓ Pago Fijo al Día</span>
                         </span>
                         <span class="flex items-center gap-1.5 font-semibold">
-                            <span class="w-3 h-3 rounded-full bg-secondary"></span>
+                            <span class="w-3 h-3 rounded-full bg-primary-container"></span>
                             <span>🛍️ Gasto Diario Registrado</span>
                         </span>
                     </div>
-                    <span class="font-bold text-primary">💡 Tip: Toca cualquier casilla para abrir la ventana del día</span>
+                    <span class="font-bold text-primary">💡 Tip: Toca el día resaltado (Hoy) o cualquier casilla para anotar gastos</span>
                 </div>
 
-                <!-- Encabezado de Días de la Semana (Lunes a Domingo) -->
+                <!-- Encabezado de Días de la Semana (Lunes a Domingo - Resalta el día de la semana de hoy) -->
                 <div class="grid grid-cols-7 gap-2.5 text-center">
-                    <div class="py-2 rounded-xl bg-surface-container-low text-xs font-extrabold text-primary">Lun</div>
-                    <div class="py-2 rounded-xl bg-surface-container-low text-xs font-extrabold text-primary">Mar</div>
-                    <div class="py-2 rounded-xl bg-surface-container-low text-xs font-extrabold text-primary">Mié</div>
-                    <div class="py-2 rounded-xl bg-surface-container-low text-xs font-extrabold text-primary">Jue</div>
-                    <div class="py-2 rounded-xl bg-surface-container-low text-xs font-extrabold text-primary">Vie</div>
-                    <div class="py-2 rounded-xl bg-surface-container-low text-xs font-extrabold text-secondary">Sáb</div>
-                    <div class="py-2 rounded-xl bg-surface-container-low text-xs font-extrabold text-secondary">Dom</div>
+                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
+                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 1} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Lun</div>
+                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
+                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 2} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Mar</div>
+                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
+                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 3} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Mié</div>
+                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
+                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 4} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Jue</div>
+                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
+                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 5} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Vie</div>
+                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
+                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 6} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-secondary'">Sáb</div>
+                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
+                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 7} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-secondary'">Dom</div>
                 </div>
 
                 <!-- Cuadrícula del Mes (Días 1 a 30/31) -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
                     <th:block th:each="cell : ${calendarCells}">
                         <!-- Casilla vacía de relleno para alinear el día 1 -->
-                        <div th:if="${cell.empty}" class="hidden lg:block min-h-[125px] rounded-2xl bg-surface-container-low/25 border border-dashed border-outline-variant/20"></div>
+                        <div th:if="${cell.empty}" class="hidden lg:block min-h-[135px] rounded-2xl bg-surface-container-low/25 border border-dashed border-outline-variant/20"></div>
 
-                        <!-- Casilla de Día Real Interactiva -->
+                        <!-- Casilla de Día Real Interactiva (Resalta especialmente el Día de HOY) -->
                         <div th:if="${!cell.empty}"
-                             th:attr="onclick='openDayModal(' + ${cell.dayNumber} + ')'"
-                             class="calendar-day-card min-h-[130px] p-3 bg-surface-container-low/70 hover:bg-surface-container border border-outline-variant/35 cursor-pointer flex flex-col justify-between gap-1.5 relative group">
+                             th:attr="onclick='openDayModal(' + ${cell.dayNumber} + ')',data-cell-iso=${cell.isoDate}"
+                             class="calendar-day-card min-h-[135px] p-3 cursor-pointer flex flex-col justify-between gap-1.5 relative group"
+                             th:classappend="${cell.today} ? 'bg-secondary-container/35 ring-2 ring-secondary border-2 border-secondary shadow-md' : 'bg-surface-container-low/70 hover:bg-surface-container border border-outline-variant/35'">
 
-                            <!-- Fila superior: Número del día y botón + al pasar el mouse -->
-                            <div class="flex items-center justify-between">
-                                <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold"
-                                      th:classappend="${!#lists.isEmpty(cell.transactions) or !#lists.isEmpty(cell.obligations)} ? 'bg-primary-container text-on-primary shadow-xs' : 'bg-surface-container-lowest text-on-surface'"
-                                      th:text="${cell.dayNumber}">1</span>
+                            <!-- Fila superior: Número del día, Etiqueta HOY (si es hoy) y botón + al pasar el mouse -->
+                            <div class="flex items-center justify-between gap-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold"
+                                          th:classappend="${cell.today} ? 'bg-secondary text-white ring-4 ring-secondary/25 shadow-sm' : (${!#lists.isEmpty(cell.transactions) or !#lists.isEmpty(cell.obligations)} ? 'bg-primary-container text-on-primary shadow-xs' : 'bg-surface-container-lowest text-on-surface')"
+                                          th:text="${cell.dayNumber}">1</span>
 
-                                <span class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 rounded-full bg-secondary text-white text-[10px] font-bold flex items-center gap-0.5">
+                                    <!-- Insignia destacada cuando la casilla corresponde al Día de HOY -->
+                                    <span th:if="${cell.today}"
+                                          class="px-2 py-0.5 rounded-full bg-secondary text-white text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                                        <span th:text="'HOY • ' + ${cell.dayOfWeekName}">HOY</span>
+                                    </span>
+                                    <span th:if="${!cell.today}"
+                                          class="text-[10px] font-semibold text-on-surface-variant/75"
+                                          th:text="${cell.dayOfWeekName}">Mar</span>
+                                </div>
+
+                                <span class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 rounded-full bg-primary-container text-white text-[10px] font-bold flex items-center gap-0.5">
                                     <span class="material-symbols-outlined text-[12px]">add</span> Anotar
                                 </span>
                             </div>
