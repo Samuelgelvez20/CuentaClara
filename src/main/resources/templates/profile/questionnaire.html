@@ -28,9 +28,12 @@
             <h1 style="margin:0;">CuentaClara</h1>
             <small th:text="'Hola, ' + ${user.fullName} + ' (' + ${user.email} + ')'"></small>
         </div>
-        <form method="post" action="/auth/logout">
-            <button type="submit" style="padding:0.5rem 1rem; border-radius:6px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">Cerrar sesión</button>
-        </form>
+        <div style="display:flex; gap:0.75rem; align-items:center;">
+            <a href="/dashboard" style="text-decoration:none; padding:0.5rem 1rem; border-radius:6px; background:#2563eb; color:#fff; font-weight:600; font-size:0.9rem;">Ir al Panel Principal (Facturas, Chat e Informes) &rarr;</a>
+            <form method="post" action="/auth/logout" style="margin:0;">
+                <button type="submit" style="padding:0.5rem 1rem; border-radius:6px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">Cerrar sesión</button>
+            </form>
+        </div>
     </header>
 
     <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
