@@ -12,7 +12,7 @@
         if (stored === 'dark' || stored === 'light') {
             return stored;
         }
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return 'light';
     }
 
     function getPreferredTheme() {
@@ -21,31 +21,30 @@
 
     function applyTheme(themeName) {
         const root = document.documentElement;
-        if (themeName === 'vinotinto') {
+        if (!themeName || themeName === 'vinotinto') {
             root.removeAttribute('data-theme');
         } else {
             root.setAttribute('data-theme', themeName);
         }
-        localStorage.setItem(THEME_STORAGE_KEY, themeName);
-        window.dispatchEvent(new CustomEvent('cuentaclara:theme-changed', { detail: { theme: themeName } }));
+        localStorage.setItem(THEME_STORAGE_KEY, themeName || 'vinotinto');
+        window.dispatchEvent(new CustomEvent('cuentaclara:theme-changed', { detail: { theme: themeName || 'vinotinto' } }));
     }
 
     function applyMode(mode) {
         const root = document.documentElement;
-        if (mode === 'dark') {
+        const resolved = mode === 'dark' ? 'dark' : 'light';
+        if (resolved === 'dark') {
             root.classList.add('dark');
         } else {
             root.classList.remove('dark');
         }
-        localStorage.setItem(MODE_STORAGE_KEY, mode);
-        window.dispatchEvent(new CustomEvent('cuentaclara:mode-changed', { detail: { mode: mode } }));
+        localStorage.setItem(MODE_STORAGE_KEY, resolved);
+        window.dispatchEvent(new CustomEvent('cuentaclara:mode-changed', { detail: { mode: resolved } }));
     }
 
     // Apply immediately to avoid flash of unstyled content
-    const currentTheme = getPreferredTheme();
-    const currentMode = getPreferredMode();
-    applyTheme(currentTheme);
-    applyMode(currentMode);
+    applyTheme(getPreferredTheme());
+    applyMode(getPreferredMode());
 
     // Public API on window
     window.CuentaClaraTheme = {
