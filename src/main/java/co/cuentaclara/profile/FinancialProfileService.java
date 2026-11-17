@@ -69,10 +69,10 @@ public class FinancialProfileService {
 
         FinancialProfile savedProfile = profileRepository.save(profile);
 
-        // Reemplazar obligaciones recurrentes declaradas
-        obligationRepository.deleteByUserId(userId);
+        // Si se enviaron obligaciones recurrentes en el formulario, actualizarlas; si viene vacío, conservar las existentes
         List<RecurringObligation> savedObligations = new ArrayList<>();
-        if (request.obligations() != null) {
+        if (request.obligations() != null && !request.obligations().isEmpty()) {
+            obligationRepository.deleteByUserId(userId);
             for (ObligationInput item : request.obligations()) {
                 if (item.name() != null && !item.name().isBlank()
                         && item.estimatedAmount() != null
@@ -89,6 +89,8 @@ public class FinancialProfileService {
                     savedObligations.add(obligationRepository.save(obligation));
                 }
             }
+        } else {
+            savedObligations.addAll(obligationRepository.findByUserIdOrderByDueDayAsc(userId));
         }
 
         Budget initialBudget = buildAndSaveInitialEstimatedBudget(userId, savedProfile);
@@ -111,6 +113,38 @@ public class FinancialProfileService {
                     .orElseGet(() -> calculateVolatileInitialBudget(profile));
             List<String> recommendations = buildDeterministicInitialRecommendations(profile, obligations, budget);
             return new ProfileWithInitialBudget(profile, obligations, budget, recommendations);
+        });
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecurringObligation> listObligations(UUID userId) {
+        return obligationRepository.findByUserIdOrderByDueDayAsc(userId);
+    }
+
+    @Transactional
+    public RecurringObligation addRecurringObligation(UUID userId, ObligationInput item) {
+        if (item.name() == null || item.name().isBlank() || item.estimatedAmount() == null) {
+            throw new IllegalArgumentException("El nombre y el monto del compromiso o deuda mensual son obligatorios.");
+        }
+        int dueDay = item.dueDay() != null && item.dueDay() >= 1 && item.dueDay() <= 31 ? item.dueDay() : 5;
+        RecurringObligation obligation = new RecurringObligation(
+                userId,
+                item.name().trim(),
+                item.category() != null && !item.category().isBlank() ? item.category().trim() : "Deudas y Pagos Fijos",
+                item.budgetBlock() != null ? item.budgetBlock() : BudgetBlock.NEEDS,
+                item.estimatedAmount(),
+                dueDay,
+                item.essential() == null || item.essential()
+        );
+        return obligationRepository.save(obligation);
+    }
+
+    @Transactional
+    public void deleteRecurringObligation(UUID userId, UUID obligationId) {
+        obligationRepository.findById(obligationId).ifPresent(ob -> {
+            if (ob.getUserId().equals(userId)) {
+                obligationRepository.delete(ob);
+            }
         });
     }
 

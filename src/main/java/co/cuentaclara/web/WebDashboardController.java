@@ -5,13 +5,23 @@ import co.cuentaclara.document.DocumentIngestionService;
 import co.cuentaclara.document.DocumentStatus;
 import co.cuentaclara.profile.BudgetBlock;
 import co.cuentaclara.profile.FinancialProfileService;
+import co.cuentaclara.profile.PaymentFrequency;
+import co.cuentaclara.profile.RecurringObligation;
 import co.cuentaclara.report.MonthlyAnalysisAndReportService;
 import co.cuentaclara.security.jwt.AuthenticatedUserPrincipal;
+import co.cuentaclara.transaction.TransactionEntity;
 import co.cuentaclara.transaction.TransactionService;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -23,16 +33,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Controlador web Thymeleaf + HTMX en español que unifica:
- * - Carga y confirmación de facturas en 3 pasos o menos (RNF-12, RF-03, RF-05)
- * - Registro rápido de gastos manuales con adjunto opcional (RF-02)
- * - Historial filtrable por mes, categoría y comercio con totales SQL (RF-10)
- * - Chat conversacional con citas verificables (RF-12)
- * - Informe mensual/quincenal y plan sugerido editable (RF-13, RF-16)
- */
 @Controller
 public class WebDashboardController {
+
+    private static final String[] SPANISH_MONTH_NAMES = {
+            "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    };
+
+    private static final List<String> STANDARD_CATEGORIES = List.of(
+            "Alimentación",
+            "Domicilios y Restaurantes",
+            "Vivienda",
+            "Deudas y Préstamos",
+            "Servicios",
+            "Transporte",
+            "Salud",
+            "Entretenimiento",
+            "Educación",
+            "Panadería y Antojos",
+            "Otros"
+    );
 
     private final FinancialProfileService profileService;
     private final DocumentIngestionService ingestionService;
@@ -99,12 +120,12 @@ public class WebDashboardController {
     public String saveSettings(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam(required = false) BigDecimal netIncome,
-            @RequestParam(required = false) co.cuentaclara.profile.PaymentFrequency paymentFrequency,
-            @RequestParam(required = false) String payDay,
+            @RequestParam(required = false) PaymentFrequency paymentFrequency,
+            @RequestParam(required = false) String paymentDays,
             @RequestParam(required = false, defaultValue = "50") int needsPct,
             @RequestParam(required = false, defaultValue = "30") int wantsPct,
             @RequestParam(required = false, defaultValue = "20") int savingsPct,
-            @RequestParam(required = false) String primaryGoal,
+            @RequestParam(required = false) String financialGoals,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -113,21 +134,59 @@ public class WebDashboardController {
                         principal.userId(),
                         new FinancialProfileService.QuestionnaireRequest(
                                 netIncome,
-                                paymentFrequency != null ? paymentFrequency : co.cuentaclara.profile.PaymentFrequency.MONTHLY,
-                                payDay != null && !payDay.isBlank() ? payDay : "30",
+                                paymentFrequency != null ? paymentFrequency : PaymentFrequency.MONTHLY,
+                                paymentDays != null && !paymentDays.isBlank() ? paymentDays : "30",
                                 needsPct, wantsPct, savingsPct,
-                                primaryGoal != null && !primaryGoal.isBlank() ? primaryGoal : "Ahorrar e invertir",
+                                financialGoals != null && !financialGoals.isBlank() ? financialGoals : "Ahorrar y organizar mis finanzas",
                                 BigDecimal.ZERO,
                                 List.of()
                         )
                 );
             }
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Preferencias y parámetros financieros actualizados correctamente.");
+                    "¡Tus ajustes y preferencias quedaron guardados!");
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
         return "redirect:/settings";
+    }
+
+    @PostMapping("/dashboard/obligations")
+    public String addRecurringObligationFromWeb(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam String name,
+            @RequestParam BigDecimal estimatedAmount,
+            @RequestParam(defaultValue = "5") Integer dueDay,
+            @RequestParam(defaultValue = "Deudas y Préstamos") String category,
+            @RequestParam(defaultValue = "NEEDS") BudgetBlock budgetBlock,
+            @RequestParam(defaultValue = "/dashboard") String returnTo,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            profileService.addRecurringObligation(
+                    principal.userId(),
+                    new FinancialProfileService.ObligationInput(
+                            name, category, budgetBlock, estimatedAmount, dueDay, true
+                    )
+            );
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Compromiso mensual '" + name + "' programado automáticamente para el día " + dueDay + " de cada mes.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:" + (returnTo.startsWith("/") ? returnTo : "/dashboard");
+    }
+
+    @PostMapping("/dashboard/obligations/{obligationId}/delete")
+    public String deleteRecurringObligationFromWeb(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @PathVariable UUID obligationId,
+            @RequestParam(defaultValue = "/dashboard") String returnTo,
+            RedirectAttributes redirectAttributes
+    ) {
+        profileService.deleteRecurringObligation(principal.userId(), obligationId);
+        redirectAttributes.addFlashAttribute("successMessage", "Pago fijo mensual eliminado del calendario.");
+        return "redirect:" + (returnTo.startsWith("/") ? returnTo : "/dashboard");
     }
 
     @GetMapping("/history")
@@ -149,17 +208,31 @@ public class WebDashboardController {
             String merchant,
             Model model
     ) {
+        YearMonth resolvedYm = parseYearMonthOrDefault(month, YearMonth.of(2026, 10));
+        String resolvedMonthStr = resolvedYm.toString();
+
         model.addAttribute("user", principal);
         model.addAttribute("budgetBlocks", BudgetBlock.values());
-        model.addAttribute("selectedMonth", month != null && !month.isBlank() ? month : "2026-10");
+        model.addAttribute("selectedMonth", resolvedMonthStr);
         model.addAttribute("selectedCategory", category != null ? category : "");
         model.addAttribute("selectedMerchant", merchant != null ? merchant : "");
+        model.addAttribute("prevMonth", resolvedYm.minusMonths(1).toString());
+        model.addAttribute("nextMonth", resolvedYm.plusMonths(1).toString());
+        model.addAttribute("calendarMonthLabel", formatMonthLabel(resolvedYm));
 
+        List<RecurringObligation> userObligations = new ArrayList<>();
         profileService.getCurrentProfileAndBudget(principal.userId()).ifPresent(p -> {
             model.addAttribute("profile", p.profile());
             model.addAttribute("initialBudget", p.initialBudget());
             model.addAttribute("preliminaryRecommendations", p.preliminaryRecommendations());
+            if (p.obligations() != null) {
+                userObligations.addAll(p.obligations());
+            }
         });
+        if (userObligations.isEmpty()) {
+            userObligations.addAll(profileService.listObligations(principal.userId()));
+        }
+        model.addAttribute("obligations", userObligations);
 
         List<DocumentIngestionService.DocumentStatusView> allDocs = ingestionService.listUserDocuments(principal.userId());
         List<DocumentIngestionService.DocumentStatusView> pendingConfirmations = allDocs.stream()
@@ -168,11 +241,154 @@ public class WebDashboardController {
         model.addAttribute("documents", allDocs);
         model.addAttribute("pendingConfirmations", pendingConfirmations);
 
+        // Historial filtrado para la tabla de movimientos
         TransactionService.ExpenseHistorySummary history = transactionService.getExpenseHistory(
-                principal.userId(), month, category, merchant
+                principal.userId(), resolvedMonthStr, category, merchant
         );
         model.addAttribute("history", history);
+
+        // Historial completo del usuario para poblar desplegables óptimos (Meses, Categorías, Comercios)
+        TransactionService.ExpenseHistorySummary allUserHistory = transactionService.getExpenseHistory(
+                principal.userId(), null, null, null
+        );
+        populateFilterDropdownOptions(allUserHistory.transactions(), resolvedYm, model);
+
+        // Historial completo del mes seleccionado para construir el Calendario Interactivo día por día
+        TransactionService.ExpenseHistorySummary monthFullHistory = transactionService.getExpenseHistory(
+                principal.userId(), resolvedMonthStr, null, null
+        );
+        List<CalendarDayCell> calendarCells = buildMonthlyCalendarCells(
+                resolvedYm, monthFullHistory.transactions(), userObligations
+        );
+        model.addAttribute("calendarCells", calendarCells);
         model.addAttribute("reports", reportService.listReports(principal.userId()));
+    }
+
+    private void populateFilterDropdownOptions(
+            List<TransactionEntity> allTransactions,
+            YearMonth currentYm,
+            Model model
+    ) {
+        Map<String, String> monthOptions = new LinkedHashMap<>();
+        List<YearMonth> presetMonths = List.of(
+                YearMonth.of(2026, 8),
+                YearMonth.of(2026, 9),
+                YearMonth.of(2026, 10),
+                YearMonth.of(2026, 11),
+                YearMonth.of(2026, 12),
+                currentYm
+        );
+        for (YearMonth ym : presetMonths) {
+            monthOptions.put(ym.toString(), formatMonthLabel(ym));
+        }
+        for (TransactionEntity tx : allTransactions) {
+            if (tx.getTransactionDate() != null) {
+                YearMonth txYm = YearMonth.from(tx.getTransactionDate());
+                monthOptions.put(txYm.toString(), formatMonthLabel(txYm));
+            }
+        }
+
+        Set<String> categoryOptions = new LinkedHashSet<>(STANDARD_CATEGORIES);
+        Set<String> merchantOptions = new LinkedHashSet<>();
+        for (TransactionEntity tx : allTransactions) {
+            if (tx.getCategory() != null && !tx.getCategory().isBlank()) {
+                categoryOptions.add(tx.getCategory().trim());
+            }
+            if (tx.getMerchantName() != null && !tx.getMerchantName().isBlank()) {
+                merchantOptions.add(tx.getMerchantName().trim());
+            }
+        }
+
+        model.addAttribute("availableMonths", monthOptions);
+        model.addAttribute("availableCategories", categoryOptions);
+        model.addAttribute("availableMerchants", merchantOptions);
+    }
+
+    private List<CalendarDayCell> buildMonthlyCalendarCells(
+            YearMonth ym,
+            List<TransactionEntity> monthTransactions,
+            List<RecurringObligation> obligations
+    ) {
+        List<CalendarDayCell> cells = new ArrayList<>();
+        // Lunes = 1 ... Domingo = 7 -> leading empty cells = dayOfWeek - 1
+        int firstDayOfWeek = ym.atDay(1).getDayOfWeek().getValue();
+        for (int i = 1; i < firstDayOfWeek; i++) {
+            cells.add(CalendarDayCell.emptyCell());
+        }
+
+        int daysInMonth = ym.lengthOfMonth();
+        for (int day = 1; day <= daysInMonth; day++) {
+            LocalDate date = ym.atDay(day);
+            final int currentDay = day;
+
+            List<TransactionEntity> dayTxs = monthTransactions.stream()
+                    .filter(tx -> date.equals(tx.getTransactionDate()))
+                    .toList();
+
+            BigDecimal dayTotal = dayTxs.stream()
+                    .map(TransactionEntity::getTotalAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            List<DayObligationBadge> dayObs = new ArrayList<>();
+            for (RecurringObligation ob : obligations) {
+                int effectiveDueDay = Math.min(ob.getDueDay(), daysInMonth);
+                if (effectiveDueDay == currentDay) {
+                    boolean paid = isObligationPaidInMonth(ob, monthTransactions);
+                    dayObs.add(new DayObligationBadge(
+                            ob.getId(),
+                            ob.getName(),
+                            ob.getCategory(),
+                            ob.getBudgetBlock(),
+                            ob.getEstimatedAmount(),
+                            ob.getDueDay(),
+                            paid
+                    ));
+                }
+            }
+
+            String fullDateLabel = day + " de " + SPANISH_MONTH_NAMES[ym.getMonthValue()] + " de " + ym.getYear();
+            cells.add(new CalendarDayCell(
+                    false,
+                    day,
+                    date.toString(),
+                    fullDateLabel,
+                    dayTxs,
+                    dayTotal,
+                    dayObs
+            ));
+        }
+        return cells;
+    }
+
+    private boolean isObligationPaidInMonth(RecurringObligation ob, List<TransactionEntity> monthTransactions) {
+        String obNameLower = ob.getName().toLowerCase(Locale.ROOT);
+        String obCatLower = ob.getCategory().toLowerCase(Locale.ROOT);
+        for (TransactionEntity tx : monthTransactions) {
+            String merchantLower = tx.getMerchantName() != null ? tx.getMerchantName().toLowerCase(Locale.ROOT) : "";
+            String descLower = tx.getDescription() != null ? tx.getDescription().toLowerCase(Locale.ROOT) : "";
+            String catLower = tx.getCategory() != null ? tx.getCategory().toLowerCase(Locale.ROOT) : "";
+            if (merchantLower.contains(obNameLower) || obNameLower.contains(merchantLower)
+                    || descLower.contains(obNameLower)
+                    || (catLower.equals(obCatLower) && tx.getTotalAmount().compareTo(ob.getEstimatedAmount().multiply(new BigDecimal("0.5"))) >= 0)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private YearMonth parseYearMonthOrDefault(String month, YearMonth fallback) {
+        if (month == null || month.isBlank()) {
+            return fallback;
+        }
+        try {
+            return YearMonth.parse(month.trim());
+        } catch (Exception ex) {
+            return fallback;
+        }
+    }
+
+    private String formatMonthLabel(YearMonth ym) {
+        return SPANISH_MONTH_NAMES[ym.getMonthValue()] + " " + ym.getYear();
     }
 
     @PostMapping("/dashboard/upload")
@@ -191,11 +407,11 @@ public class WebDashboardController {
                     false
             );
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Documento procesado correctamente. Revisa y confirma los datos extraídos antes de guardar (RF-05).");
+                    "¡Tu recibo o factura fue leído! Revisa y confirma los datos antes de guardarlo.");
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/dashboard";
+        return "redirect:/upload";
     }
 
     @PostMapping("/dashboard/documents/{documentId}/confirm")
@@ -221,12 +437,14 @@ public class WebDashboardController {
                             category, budgetBlock, null, null
                     )
             );
+            String monthParam = transactionDate != null ? YearMonth.from(transactionDate).toString() : "2026-10";
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Factura confirmada, indexada en pgvector y copia temporal eliminada de forma segura (RF-05, RF-08).");
+                    "¡Gasto confirmado y agregado a tu calendario del mes!");
+            return "redirect:/dashboard?month=" + monthParam;
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/upload";
         }
-        return "redirect:/dashboard";
     }
 
     @PostMapping("/dashboard/manual-expense")
@@ -239,24 +457,31 @@ public class WebDashboardController {
             @RequestParam(required = false) BudgetBlock budgetBlock,
             @RequestParam(required = false) String description,
             @RequestParam(value = "attachment", required = false) MultipartFile attachment,
+            @RequestParam(value = "returnMonth", required = false) String returnMonth,
             RedirectAttributes redirectAttributes
     ) throws IOException {
         try {
             byte[] attBytes = attachment != null && !attachment.isEmpty() ? attachment.getBytes() : null;
             String attName = attachment != null ? attachment.getOriginalFilename() : null;
+            LocalDate resolvedDate = transactionDate != null ? transactionDate : LocalDate.now();
             transactionService.registerManualExpense(
                     principal.userId(),
                     new TransactionService.ManualExpenseRequest(
-                            merchantName, transactionDate, totalAmount, category, budgetBlock, description
+                            merchantName, resolvedDate, totalAmount, category, budgetBlock, description
                     ),
                     attName,
                     attBytes
             );
-            redirectAttributes.addFlashAttribute("successMessage", "Gasto manual registrado e indexado con éxito.");
+            String targetMonth = (returnMonth != null && !returnMonth.isBlank())
+                    ? returnMonth
+                    : YearMonth.from(resolvedDate).toString();
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "¡Gasto de $" + String.format("%,.0f", totalAmount) + " en " + merchantName + " guardado en el día " + resolvedDate.getDayOfMonth() + "!");
+            return "redirect:/dashboard?month=" + targetMonth + "#calendario-mes";
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/dashboard";
         }
-        return "redirect:/dashboard";
     }
 
     @PostMapping("/dashboard/chat")
@@ -287,10 +512,35 @@ public class WebDashboardController {
                     reportService.simulateFirstMonthAndGenerateReport(principal.userId(), month);
             redirectAttributes.addFlashAttribute("latestClosure", closure);
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Cierre del periodo " + month + " calculado en SQL con plan sugerido para el siguiente mes.");
+                    "¡Resumen del mes " + month + " listo con tus recomendaciones y calendario actualizado!");
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/dashboard";
+        return "redirect:/dashboard?month=" + month;
+    }
+
+    public record DayObligationBadge(
+            UUID id,
+            String name,
+            String category,
+            BudgetBlock budgetBlock,
+            BigDecimal estimatedAmount,
+            int dueDay,
+            boolean paidThisMonth
+    ) {
+    }
+
+    public record CalendarDayCell(
+            boolean empty,
+            int dayNumber,
+            String isoDate,
+            String fullDateLabel,
+            List<TransactionEntity> transactions,
+            BigDecimal dayTotal,
+            List<DayObligationBadge> obligations
+    ) {
+        public static CalendarDayCell emptyCell() {
+            return new CalendarDayCell(true, 0, "", "", List.of(), BigDecimal.ZERO, List.of());
+        }
     }
 }

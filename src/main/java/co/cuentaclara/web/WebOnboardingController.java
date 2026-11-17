@@ -110,6 +110,11 @@ public class WebOnboardingController {
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam(defaultValue = "false") boolean aiConsentAccepted,
+            @RequestParam(required = false) BigDecimal initialNetIncome,
+            @RequestParam(value = "obligationName", required = false) List<String> obligationNames,
+            @RequestParam(value = "obligationAmount", required = false) List<BigDecimal> obligationAmounts,
+            @RequestParam(value = "obligationDueDay", required = false) List<Integer> obligationDueDays,
+            @RequestParam(value = "obligationCategory", required = false) List<String> obligationCategories,
             HttpServletResponse response,
             RedirectAttributes redirectAttributes
     ) {
@@ -118,6 +123,39 @@ public class WebOnboardingController {
                     new AuthService.RegisterRequest(fullName, email, password, aiConsentAccepted)
             );
             AuthController.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+
+            // Si al crear la cuenta indicó sus ingresos o deudas/pagos mensuales con su día de pago, guardarlos de inmediato
+            final var userId = auth.userId();
+            RlsDataSourceConfig.runAsUser(userId, () -> {
+                List<FinancialProfileService.ObligationInput> obList = buildDynamicObligations(
+                        obligationNames, obligationAmounts, obligationDueDays, obligationCategories
+                );
+                BigDecimal income = (initialNetIncome != null && initialNetIncome.compareTo(BigDecimal.ZERO) > 0)
+                        ? initialNetIncome
+                        : new BigDecimal("3500000.00");
+                if (initialNetIncome != null || !obList.isEmpty()) {
+                    profileService.saveOrUpdateQuestionnaire(
+                            userId,
+                            new FinancialProfileService.QuestionnaireRequest(
+                                    income,
+                                    PaymentFrequency.MONTHLY,
+                                    "30",
+                                    50, 30, 20,
+                                    "Organizar mis gastos y pagar mis compromisos a tiempo",
+                                    BigDecimal.ZERO,
+                                    obList
+                            )
+                    );
+                }
+            });
+
+            if (obligationNames != null && !obligationNames.isEmpty()) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "¡Bienvenido(a)! Tus pagos y deudas mensuales quedaron marcados automáticamente en tu calendario cada mes."
+                );
+                return "redirect:/dashboard";
+            }
             return "redirect:/profile";
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
@@ -183,6 +221,10 @@ public class WebOnboardingController {
             @RequestParam(defaultValue = "18") Integer utilitiesDueDay,
             @RequestParam(required = false) BigDecimal foodAmount,
             @RequestParam(defaultValue = "15") Integer foodDueDay,
+            @RequestParam(value = "obligationName", required = false) List<String> obligationNames,
+            @RequestParam(value = "obligationAmount", required = false) List<BigDecimal> obligationAmounts,
+            @RequestParam(value = "obligationDueDay", required = false) List<Integer> obligationDueDays,
+            @RequestParam(value = "obligationCategory", required = false) List<String> obligationCategories,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -202,6 +244,9 @@ public class WebOnboardingController {
                         "Alimentación prioritaria", "Alimentación", BudgetBlock.NEEDS, foodAmount, foodDueDay, true
                 ));
             }
+            obligations.addAll(buildDynamicObligations(
+                    obligationNames, obligationAmounts, obligationDueDays, obligationCategories
+            ));
 
             profileService.saveOrUpdateQuestionnaire(
                     principal.userId(),
@@ -217,10 +262,38 @@ public class WebOnboardingController {
                             obligations
                     )
             );
-            redirectAttributes.addFlashAttribute("successMessage", "Perfil financiero y presupuesto inicial estimado actualizados.");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Perfil financiero y fechas de tus pagos/deudas mensuales actualizados en tu calendario.");
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
         return "redirect:/profile";
+    }
+
+    private List<FinancialProfileService.ObligationInput> buildDynamicObligations(
+            List<String> names,
+            List<BigDecimal> amounts,
+            List<Integer> dueDays,
+            List<String> categories
+    ) {
+        List<FinancialProfileService.ObligationInput> result = new ArrayList<>();
+        if (names == null || amounts == null) {
+            return result;
+        }
+        int count = Math.min(names.size(), amounts.size());
+        for (int i = 0; i < count; i++) {
+            String name = names.get(i);
+            BigDecimal amount = amounts.get(i);
+            if (name != null && !name.isBlank() && amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
+                int day = (dueDays != null && i < dueDays.size() && dueDays.get(i) != null) ? dueDays.get(i) : 5;
+                String cat = (categories != null && i < categories.size() && categories.get(i) != null && !categories.get(i).isBlank())
+                        ? categories.get(i)
+                        : "Deudas y Préstamos";
+                result.add(new FinancialProfileService.ObligationInput(
+                        name.trim(), cat.trim(), BudgetBlock.NEEDS, amount, day, true
+                ));
+            }
+        }
+        return result;
     }
 }

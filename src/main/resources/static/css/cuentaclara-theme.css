@@ -325,7 +325,31 @@ html.dark[data-theme="graphite"] {
     --outline-variant: #3f3f46;
 }
 
-/* Transiciones suaves al cambiar tema */
-body, aside, main, header, div, nav, button, input, select {
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+/* Transiciones suaves y estética amigable con esquinas redondeadas */
+body, aside, main, header, div, nav, button, input, select, textarea {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
+
+.rounded-lg { border-radius: 1rem !important; }
+.rounded-xl { border-radius: 1.35rem !important; }
+.rounded-2xl { border-radius: 1.75rem !important; }
+.rounded-3xl { border-radius: 2.15rem !important; }
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+    border-radius: 1rem !important;
+}
+
+.calendar-day-card {
+    border-radius: 1.35rem;
+    transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.calendar-day-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -8px rgba(99, 13, 50, 0.16);
+}
+html.dark .calendar-day-card:hover {
+    box-shadow: 0 12px 24px -8px rgba(255, 92, 124, 0.22);
+}
+
