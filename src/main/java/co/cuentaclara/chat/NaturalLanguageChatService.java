@@ -102,14 +102,13 @@ public class NaturalLanguageChatService {
                         toolsService.consultarTransacciones(userId, new HybridSearchAndChatToolsService.TransactionQueryFilters(detectedMonth, null, null, null, null, null));
                 List<String> citations = collectCitations(allTx.rows(), verifiedChunks);
                 String answer = String.format(
-                        "Según los cálculos en SQL, tu ingreso base declarado es $%,.2f COP con distribución %d%% Necesidades ($%,.2f COP), %d%% Deseos ($%,.2f COP) y %d%% Ahorro ($%,.2f COP). Gasto total confirmado acumulado: $%,.2f COP (%d movimientos). %s",
+                        "¡Hola! Tu ingreso base mensual registrado es de $%,.2f COP. Según tu distribución 50/30/20, tienes asignado un %d%% a Necesidades ($%,.2f COP), un %d%% a Deseos ($%,.2f COP) y un %d%% a Ahorro ($%,.2f COP). Hasta el momento llevas un gasto acumulado confirmado de $%,.2f COP en %d movimiento(s).",
                         p.profile().getNetIncome(),
                         p.profile().getNeedsPct(), p.initialBudget().getNeedsLimit(),
                         p.profile().getWantsPct(), p.initialBudget().getWantsLimit(),
                         p.profile().getSavingsPct(), p.initialBudget().getSavingsTarget(),
                         allTx.totalAmount(),
-                        allTx.count(),
-                        citations.isEmpty() ? "" : "Evidencia: " + String.join(" ; ", citations)
+                        allTx.count()
                 ).trim();
                 return new ChatAnswerResponse(question, answer, citations, allTx.totalAmount(), true);
             }
@@ -122,37 +121,60 @@ public class NaturalLanguageChatService {
 
             if (lower.contains("iva") || lower.contains("impuesto")) {
                 sb.append(String.format(
-                        "Según la consulta SQL sobre tus movimientos confirmados, el total de impuestos (IVA) es $%,.2f COP y el monto total pagado es $%,.2f COP en %d registro(s).",
+                        "En tus movimientos confirmados tienes registrado un total de IVA e impuestos de $%,.2f COP, con un monto total pagado de $%,.2f COP en %d comprobante(s).",
                         sqlResult.totalTaxAmount(),
+                        sqlResult.totalAmount(),
+                        sqlResult.count()
+                ));
+            } else if (detectedCategory != null) {
+                sb.append(String.format(
+                        "Encontré un total de $%,.2f COP registrado en la categoría de %s, correspondiente a %d movimiento(s).",
+                        sqlResult.totalAmount(),
+                        detectedCategory,
+                        sqlResult.count()
+                ));
+            } else if (detectedBlock != null) {
+                String blockName = "NEEDS".equalsIgnoreCase(detectedBlock) ? "Necesidades" : "Deseos";
+                sb.append(String.format(
+                        "En tus gastos del bloque de %s tienes un total acumulado de $%,.2f COP en %d movimiento(s).",
+                        blockName,
+                        sqlResult.totalAmount(),
+                        sqlResult.count()
+                ));
+            } else if (detectedMerchantOrCode != null) {
+                sb.append(String.format(
+                        "Encontré compras confirmadas para %s por un valor total de $%,.2f COP en %d comprobante(s).",
+                        detectedMerchantOrCode.toUpperCase(Locale.ROOT),
                         sqlResult.totalAmount(),
                         sqlResult.count()
                 ));
             } else {
                 sb.append(String.format(
-                        "Según la consulta SQL sobre tus movimientos confirmados, el total registrado es $%,.2f COP distribuido en %d movimiento(s).",
+                        "Revisé tus registros confirmados y encontré un total de $%,.2f COP en %d movimiento(s).",
                         sqlResult.totalAmount(),
                         sqlResult.count()
                 ));
             }
 
-            sb.append(" Detalle respaldado: ");
+            sb.append(" Los movimientos destacados son: ");
             int limit = Math.min(4, sqlResult.rows().size());
             for (int i = 0; i < limit; i++) {
                 var row = sqlResult.rows().get(i);
+                if (i > 0) sb.append(", ");
                 sb.append(String.format(
-                        "%s (%s) por $%,.2f COP el %s [Cita: %s]; ",
+                        "%s (%s) por $%,.2f COP el %s",
                         row.merchantName(),
                         row.category(),
                         row.totalAmount(),
-                        row.transactionDate(),
-                        row.citationReference()
+                        row.transactionDate()
                 ));
             }
+            sb.append(".");
 
+            // Si hay fragmento verificado de documento que añade contexto (ej. un ítem o descripción de factura)
             if (!verifiedChunks.isEmpty()) {
                 var topChunk = verifiedChunks.getFirst();
-                sb.append(" Fragmento documental recuperado: \"").append(topChunk.contentText())
-                        .append("\" [Cita: ").append(topChunk.sourceReference()).append("].");
+                sb.append(" Además, en el comprobante se detalla: \"").append(topChunk.contentText()).append("\".");
             }
 
             return new ChatAnswerResponse(
@@ -168,13 +190,14 @@ public class NaturalLanguageChatService {
         // (por ejemplo, consulta sobre un ítem específico de factura como "Café Molido" o sobre un Extracto Bancario PDF por página)
         if (!verifiedChunks.isEmpty()) {
             List<String> citations = new ArrayList<>();
-            StringBuilder sb = new StringBuilder("Evidencia encontrada en tus documentos indexados: ");
-            for (var chunk : verifiedChunks) {
+            StringBuilder sb = new StringBuilder("Encontré la información en tus documentos indexados: ");
+            for (int i = 0; i < verifiedChunks.size(); i++) {
+                var chunk = verifiedChunks.get(i);
                 if (!citations.contains(chunk.sourceReference())) {
                     citations.add(chunk.sourceReference());
                 }
-                sb.append("\"").append(chunk.contentText()).append("\" [Cita: ")
-                        .append(chunk.sourceReference()).append("]; ");
+                if (i > 0) sb.append(" ");
+                sb.append("\"").append(chunk.contentText()).append("\".");
             }
             return new ChatAnswerResponse(
                     question,
@@ -188,7 +211,7 @@ public class NaturalLanguageChatService {
         // 6. Sin evidencia -> Indicarlo claramente sin inventar cifras ni páginas (RF-12, RNF-06)
         return new ChatAnswerResponse(
                 question,
-                "No tengo evidencia en tus facturas, extractos ni gastos confirmados para responder a esa consulta.",
+                "No tengo evidencia en tus facturas, extractos ni gastos confirmados para responder a esa consulta. Si tienes el comprobante, puedes subirlo en la sección de Cargar y Confirmar.",
                 List.of(),
                 BigDecimal.ZERO,
                 false

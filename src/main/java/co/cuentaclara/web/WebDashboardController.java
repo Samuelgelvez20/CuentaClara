@@ -86,6 +86,62 @@ public class WebDashboardController {
         return "dashboard/assistant";
     }
 
+    @GetMapping("/settings")
+    public String settingsPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            Model model
+    ) {
+        populateCommonDashboardModel(principal, null, null, null, model);
+        return "dashboard/settings";
+    }
+
+    @PostMapping("/settings")
+    public String saveSettings(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam(required = false) BigDecimal netIncome,
+            @RequestParam(required = false) co.cuentaclara.profile.PaymentFrequency paymentFrequency,
+            @RequestParam(required = false) String payDay,
+            @RequestParam(required = false, defaultValue = "50") int needsPct,
+            @RequestParam(required = false, defaultValue = "30") int wantsPct,
+            @RequestParam(required = false, defaultValue = "20") int savingsPct,
+            @RequestParam(required = false) String primaryGoal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            if (netIncome != null && netIncome.compareTo(BigDecimal.ZERO) > 0) {
+                profileService.saveOrUpdateQuestionnaire(
+                        principal.userId(),
+                        new FinancialProfileService.QuestionnaireRequest(
+                                netIncome,
+                                paymentFrequency != null ? paymentFrequency : co.cuentaclara.profile.PaymentFrequency.MONTHLY,
+                                payDay != null && !payDay.isBlank() ? payDay : "30",
+                                needsPct, wantsPct, savingsPct,
+                                primaryGoal != null && !primaryGoal.isBlank() ? primaryGoal : "Ahorrar e invertir",
+                                BigDecimal.ZERO,
+                                List.of()
+                        )
+                );
+            }
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Preferencias y parámetros financieros actualizados correctamente.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/settings";
+    }
+
+    @GetMapping("/history")
+    public String historyPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam(value = "month", required = false) String month,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "merchant", required = false) String merchant,
+            Model model
+    ) {
+        populateCommonDashboardModel(principal, month, category, merchant, model);
+        return "dashboard/index";
+    }
+
     private void populateCommonDashboardModel(
             AuthenticatedUserPrincipal principal,
             String month,
