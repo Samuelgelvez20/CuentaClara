@@ -211,6 +211,22 @@ public class MonthlyAnalysisAndReportService {
         FinancialProfile profile = profileRepository.findByUserId(userId)
                 .orElseGet(() -> createDefaultProfileIfMissing(userId));
 
+        // Asegurar obligaciones recurrentes para el calendario mensual si aún no existen
+        Integer existingObligations = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM recurring_obligations WHERE user_id = ?",
+                Integer.class,
+                userId
+        );
+        if (existingObligations == null || existingObligations == 0) {
+            jdbcTemplate.update(
+                    "INSERT INTO recurring_obligations (user_id, name, category, budget_block, estimated_amount, due_day, is_essential) VALUES " +
+                            "(?, 'Alquiler / Arriendo', 'Vivienda', 'NEEDS', 1450000.00, 5, TRUE), " +
+                            "(?, 'Cuota Préstamo / Deuda', 'Deudas y Préstamos', 'NEEDS', 350000.00, 12, TRUE), " +
+                            "(?, 'Servicios e Internet', 'Servicios', 'NEEDS', 260000.00, 16, TRUE)",
+                    userId, userId, userId
+            );
+        }
+
         // Registrar ingreso simulado del mes
         jdbcTemplate.update(
                 "DELETE FROM incomes WHERE user_id = ? AND is_simulated = TRUE AND received_date >= ? AND received_date <= ?",

@@ -323,29 +323,108 @@
                     </div>
                 </div>
 
-                <!-- Compromisos Prioritarios Opcionales -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md pt-2 border-t border-surface-container">
-                    <div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between gap-2">
-                        <span class="font-label-sm text-primary font-semibold">Arriendo / Vivienda (COP):</span>
-                        <input type="number" step="0.01" name="housingAmount" placeholder="1500000" class="w-36 p-1.5 rounded bg-surface-container-lowest font-data-mono text-body-sm"/>
-                        <input type="hidden" name="housingDueDay" value="5"/>
+                <!-- Pagos Fijos y Deudas Importantes de Cada Mes (Se marcan en el Calendario) -->
+                <div class="p-5 rounded-2xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-4 mt-2">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider font-extrabold text-primary">04 • Tus Pagos Fijos y Deudas Importantes de Cada Mes</span>
+                            <p class="text-xs text-on-surface-variant m-0">Indica qué día del mes (1 al 31) debes pagar cada compromiso o deuda; se marcarán automáticamente cada mes en tu calendario.</p>
+                        </div>
+                        <button type="button" onclick="addProfileObligationRow()"
+                                class="px-3.5 py-1.5 rounded-full bg-secondary text-white text-xs font-bold hover:opacity-95 transition-opacity flex items-center gap-1 border-0 cursor-pointer">
+                            <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                            <span>+ Agregar otra deuda o pago fijo</span>
+                        </button>
                     </div>
-                    <div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between gap-2">
-                        <span class="font-label-sm text-primary font-semibold">Servicios Públicos (COP):</span>
-                        <input type="number" step="0.01" name="utilitiesAmount" placeholder="350000" class="w-36 p-1.5 rounded bg-surface-container-lowest font-data-mono text-body-sm"/>
-                        <input type="hidden" name="utilitiesDueDay" value="18"/>
-                    </div>
-                    <div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between gap-2">
-                        <span class="font-label-sm text-primary font-semibold">Alimentación Base (COP):</span>
-                        <input type="number" step="0.01" name="foodAmount" placeholder="600000" class="w-36 p-1.5 rounded bg-surface-container-lowest font-data-mono text-body-sm"/>
-                        <input type="hidden" name="foodDueDay" value="15"/>
+
+                    <div id="profile-obligations-rows" class="flex flex-col gap-2.5">
+                        <!-- Si ya tiene obligaciones guardadas, mostrarlas editables -->
+                        <div th:each="ob : ${obligations}" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30">
+                            <div class="sm:col-span-4">
+                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                                <input type="text" name="obligationName" th:value="${ob.name}"
+                                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                                    <option value="Vivienda" th:selected="${ob.category == 'Vivienda'}">🏠 Vivienda / Alquiler</option>
+                                    <option value="Deudas y Préstamos" th:selected="${ob.category == 'Deudas y Préstamos'}">💳 Deudas y Préstamos</option>
+                                    <option value="Servicios" th:selected="${ob.category == 'Servicios'}">💡 Servicios e Internet</option>
+                                    <option value="Alimentación" th:selected="${ob.category == 'Alimentación'}">🛒 Alimentación</option>
+                                    <option value="Otros" th:selected="${ob.category == 'Otros'}">📌 Otros</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                                <input type="number" step="1000" name="obligationAmount" th:value="${ob.estimatedAmount}"
+                                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                <input type="number" min="1" max="31" name="obligationDueDay" th:value="${ob.dueDay}"
+                                       class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                            </div>
+                        </div>
+
+                        <!-- Si aún no tiene obligaciones guardadas, mostrar 3 filas sugeridas listas para llenar -->
+                        <th:block th:if="${#lists.isEmpty(obligations)}">
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30">
+                                <div class="sm:col-span-4">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Pago</label>
+                                    <input type="text" name="obligationName" value="Alquiler / Vivienda"
+                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                    <input type="text" name="obligationCategory" value="Vivienda" readonly
+                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                                    <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 1450000"
+                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                    <input type="number" min="1" max="31" name="obligationDueDay" value="5"
+                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30">
+                                <div class="sm:col-span-4">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                                    <input type="text" name="obligationName" value="Cuota Préstamo / Deuda"
+                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                    <input type="text" name="obligationCategory" value="Deudas y Préstamos" readonly
+                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                                    <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 350000"
+                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                    <input type="number" min="1" max="31" name="obligationDueDay" value="12"
+                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                </div>
+                            </div>
+                        </th:block>
                     </div>
                 </div>
 
-                <div class="flex justify-end">
-                    <button type="submit" class="h-11 px-space-xl rounded-lg bg-primary-container hover:bg-primary text-on-primary font-title-md text-body-sm font-bold shadow-md transition-all flex items-center gap-space-xs">
+                <div class="flex justify-end gap-3">
+                    <a href="/dashboard" class="h-11 px-6 rounded-2xl bg-surface-container-high text-on-surface font-title-md text-body-sm font-bold flex items-center gap-2 no-underline">
+                        <span>Ver mi Calendario</span>
+                    </a>
+                    <button type="submit" class="h-11 px-space-xl rounded-2xl bg-primary-container hover:bg-primary text-on-primary font-title-md text-body-sm font-bold shadow-md transition-all flex items-center gap-space-xs">
                         <span class="material-symbols-outlined text-[18px] text-secondary-fixed">save</span>
-                        <span>Guardar Perfil y Recalcular Presupuesto Inicial</span>
+                        <span>Guardar mi Plan y Marcar Pagos en el Calendario</span>
                     </button>
                 </div>
             </form>
@@ -466,6 +545,40 @@
 
         updateUI();
     })();
+
+    function addProfileObligationRow() {
+        const container = document.getElementById('profile-obligations-rows');
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30';
+        row.innerHTML = `
+            <div class="sm:col-span-4">
+                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                <input type="text" name="obligationName" placeholder="Ej. Tarjeta, Crédito, Internet..."
+                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+            </div>
+            <div class="sm:col-span-3">
+                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                    <option value="Deudas y Préstamos">💳 Deudas y Préstamos</option>
+                    <option value="Vivienda">🏠 Vivienda / Alquiler</option>
+                    <option value="Servicios">💡 Servicios e Internet</option>
+                    <option value="Educación">📚 Educación</option>
+                    <option value="Otros">📌 Otros</option>
+                </select>
+            </div>
+            <div class="sm:col-span-3">
+                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 250000"
+                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+            </div>
+            <div class="sm:col-span-2">
+                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                <input type="number" min="1" max="31" name="obligationDueDay" value="15"
+                       class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+            </div>
+        `;
+        container.appendChild(row);
+    }
 </script>
 </body>
 </html>
