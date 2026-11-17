@@ -1,214 +1,733 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CuentaClara — Panel Principal, Facturas, Chat RAG e Informes</title>
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <title>CuentaClara — Panel Principal, Facturas, Presupuesto y Asistente RAG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #0f172a; margin: 0; padding: 1.25rem; }
-        .container { max-width: 1180px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1.25rem; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
-        @media (max-width: 840px) { .grid-2 { grid-template-columns: 1fr; } }
-        .card { background: #fff; padding: 1.35rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.25rem; }
-        h2 { margin-top: 0; font-size: 1.15rem; color: #1e293b; }
-        label { display: block; margin-top: 0.65rem; font-weight: 600; font-size: 0.85rem; }
-        input, select { width: 100%; padding: 0.55rem; margin-top: 0.25rem; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
-        button { padding: 0.6rem 1rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; }
-        .btn-blue { background: #2563eb; color: #fff; }
-        .btn-green { background: #16a34a; color: #fff; }
-        .btn-amber { background: #d97706; color: #fff; }
-        .alert-success { background: #dcfce7; color: #166534; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; }
-        .alert-error { background: #fee2e2; color: #991b1b; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 0.75rem; }
-        th, td { text-align: left; padding: 0.6rem; border-bottom: 1px solid #e2e8f0; }
-        .citation-pill { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 0.2rem 0.5rem; border-radius: 6px; font-family: monospace; font-size: 0.78rem; margin: 0.15rem; }
+        @layer base {
+            html, body { width: 100%; margin: 0; padding: 0; scroll-behavior: smooth; }
+            body { overscroll-behavior: none; }
+            .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+            .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+        }
+        ::-webkit-scrollbar { display: none; }
     </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#95d3ba",
+                        "surface-container-low": "#eff4ff",
+                        "primary-fixed": "#b0f0d6",
+                        "on-secondary-fixed": "#002113",
+                        "surface-tint": "#2b6954",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed-variant": "#005049",
+                        "on-secondary-container": "#00714d",
+                        "surface": "#f8f9ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary-fixed-variant": "#005236",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-container": "#064e3b",
+                        "background": "#f8f9ff",
+                        "inverse-surface": "#213145",
+                        "outline": "#707974",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#95d3ba",
+                        "secondary-container": "#6cf8bb",
+                        "on-tertiary-container": "#53c2b5",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#004d46",
+                        "on-background": "#0b1c30",
+                        "on-primary-fixed": "#002117",
+                        "outline-variant": "#bfc9c3",
+                        "on-primary-fixed-variant": "#0b513d",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-container": "#80bea6",
+                        "secondary": "#006c49",
+                        "on-surface-variant": "#404944",
+                        "surface-container-highest": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-surface": "#0b1c30",
+                        "tertiary": "#00342f",
+                        "tertiary-fixed": "#89f5e7",
+                        "surface-container": "#e5eeff",
+                        "surface-variant": "#d3e4fe",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#6bd8cb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#00201d",
+                        "primary": "#003527"
+                    },
+                    "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    "spacing": { "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "gutter": "1.5rem", "margin": "2rem" },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "numeric-hero-mobile": ["JetBrains Mono"],
+                        "numeric-table": ["JetBrains Mono"],
+                        "code-legal": ["JetBrains Mono"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "display-mobile": ["Plus Jakarta Sans"],
+                        "numeric-hero": ["JetBrains Mono"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["1.5rem", { "lineHeight": "2rem", "fontWeight": "700" }],
+                        "label-md": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "600" }],
+                        "numeric-hero-mobile": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
+                        "numeric-table": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+                        "code-legal": ["0.6875rem", { "lineHeight": "0.875rem", "fontWeight": "400" }],
+                        "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+                        "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+                        "headline-lg": ["2rem", { "lineHeight": "2.5rem", "fontWeight": "700" }],
+                        "body-md": ["0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+                        "display-mobile": ["2.25rem", { "lineHeight": "2.75rem", "fontWeight": "800" }],
+                        "numeric-hero": ["2.5rem", { "lineHeight": "3rem", "fontWeight": "700" }],
+                        "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+                        "display": ["3.5rem", { "lineHeight": "4rem", "fontWeight": "800" }]
+                    }
+                }
+            }
+        };
+    </script>
 </head>
-<body>
-<div class="container">
-    <header>
-        <div>
-            <strong style="font-size:1.3rem;">CuentaClara</strong>
-            <span style="margin-left:1rem; font-size:0.9rem; color:#475569;" th:text="${user.fullName + ' (' + user.email + ')'}"></span>
-        </div>
-        <div style="display:flex; gap:0.75rem;">
-            <a href="/profile" style="text-decoration:none; padding:0.5rem 0.9rem; background:#e2e8f0; color:#0f172a; border-radius:8px; font-weight:600; font-size:0.88rem;">Editar Cuestionario / 50-30-20</a>
-            <form method="post" action="/auth/logout" style="margin:0;">
-                <button type="submit" style="background:#fee2e2; color:#991b1b;">Salir</button>
-            </form>
-        </div>
-    </header>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col antialiased selection:bg-secondary-container selection:text-on-secondary-fixed">
 
-    <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert-error" th:text="${errorMessage}"></div>
-
-    <!-- PASO 1 y 2: Subir Factura (XML/PDF/Foto) y Confirmación en <= 3 pasos (RNF-12, RF-02..RF-05) -->
-    <div class="grid-2">
-        <div class="card">
-            <h2>Subir Factura (XML UBL 2.1, PDF o Foto) o Extracto PDF (RF-02, RF-04)</h2>
-            <form method="post" action="/dashboard/upload" enctype="multipart/form-data">
-                <label>Selecciona archivo (máx. 10 MB, validado con ClamAV y magic bytes)</label>
-                <input type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required>
-                <label style="font-weight:500; margin-top:0.5rem;">
-                    <input type="checkbox" name="statement" value="true" style="width:auto;">
-                    Es un extracto bancario PDF digital (se indexa por página para chat sin duplicar gastos)
-                </label>
-                <button type="submit" class="btn-blue" style="margin-top:0.85rem; width:100%;">1. Subir y Extraer Datos</button>
-            </form>
+<!-- Top Fixed Emerald Header -->
+<header class="fixed top-0 w-full z-50 pt-safe bg-primary-container/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
+    <div class="max-w-4xl mx-auto h-16 px-space-md flex items-center justify-between gap-space-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-secondary-fixed shadow-inner">
+                <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-headline-md text-headline-md tracking-tight text-on-primary flex items-center leading-none">
+                    Cuenta<span class="text-secondary-fixed font-bold">Clara</span>
+                </span>
+                <span class="font-code-legal text-code-legal text-on-primary-container truncate max-w-[180px]" th:text="${user.fullName + ' · ' + user.email}">Inicio</span>
+            </div>
         </div>
-
-        <div class="card">
-            <h2>Registrar Gasto Diario Manual en Segundos (RF-02)</h2>
-            <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data">
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem;">
-                    <div>
-                        <label>Comercio o concepto</label>
-                        <input type="text" name="merchantName" required placeholder="Ej. Rappi / Tienda D1">
-                    </div>
-                    <div>
-                        <label>Monto (COP)</label>
-                        <input type="number" step="0.01" name="totalAmount" required placeholder="45000">
-                    </div>
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:0.5rem;">
-                    <div>
-                        <label>Fecha</label>
-                        <input type="date" name="transactionDate">
-                    </div>
-                    <div>
-                        <label>Categoría (opcional, sugiere por similitud)</label>
-                        <input type="text" name="category" placeholder="Auto-sugerida">
-                    </div>
-                    <div>
-                        <label>Comprobante opcional</label>
-                        <input type="file" name="attachment" accept=".xml,.pdf,image/jpeg,image/png">
-                    </div>
-                </div>
-                <button type="submit" class="btn-green" style="margin-top:0.85rem; width:100%;">Guardar Gasto Manual</button>
+        <div class="flex items-center gap-space-sm">
+            <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-container/80 text-tertiary-fixed shadow-inner">
+                <span class="w-2 h-2 rounded-full bg-secondary-fixed-dim animate-pulse"></span>
+                <span class="font-code-legal text-code-legal tracking-wide uppercase">DIAN UBL 2.1</span>
+            </div>
+            <a href="/profile" title="Configurar Perfil 50/30/20" class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary hover:bg-tertiary transition-colors no-underline">
+                <span class="material-symbols-outlined text-[18px]">person</span>
+            </a>
+            <form method="post" action="/auth/logout" class="m-0">
+                <button title="Cerrar sesión" class="px-3 py-1.5 rounded-full bg-primary text-on-primary font-code-legal text-code-legal flex items-center gap-1 hover:bg-tertiary transition-colors" type="submit">
+                    <span class="material-symbols-outlined text-[16px]">logout</span>
+                    <span class="hidden sm:inline">Salir</span>
+                </button>
             </form>
         </div>
     </div>
+</header>
 
-    <!-- Pantalla de Confirmación antes de guardar e indexar (RF-05) -->
-    <div class="card" th:if="${!#lists.isEmpty(pendingConfirmations)}" style="border: 2px solid #f59e0b;">
-        <h2>2. Facturas Pendientes por Confirmar antes de Indexar en pgvector (RF-05, RF-08)</h2>
-        <div th:each="item : ${pendingConfirmations}" style="padding:0.85rem; background:#fffbeb; border-radius:8px; margin-bottom:0.75rem;">
-            <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}">
-                <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:0.5rem;">
-                    <div>
-                        <label>Comercio</label>
-                        <input type="text" name="merchantName" th:value="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}" required>
-                    </div>
-                    <div>
-                        <label>NIT</label>
-                        <input type="text" name="merchantNit" th:value="${item.extraction != null ? item.extraction.merchantNit : '0'}">
-                    </div>
-                    <div>
-                        <label>Fecha</label>
-                        <input type="date" name="transactionDate" th:value="${item.extraction != null ? item.extraction.issueDate : ''}">
-                    </div>
-                    <div>
-                        <label>Total (COP)</label>
-                        <input type="number" step="0.01" name="totalAmount" th:value="${item.extraction != null ? item.extraction.totalAmount : 0}" required>
-                    </div>
-                    <div>
-                        <label>Categoría</label>
-                        <input type="text" name="category" th:value="${item.extraction != null ? item.extraction.suggestedCategory : 'Alimentación'}" required>
+<main class="flex flex-col relative w-full pt-16 pb-28 bg-surface min-h-screen" id="seccion-inicio">
+    <div class="flex flex-col w-full max-w-4xl mx-auto px-space-md py-space-sm gap-space-md">
+
+        <!-- Alertas Flash -->
+        <div th:if="${successMessage}" class="p-3.5 rounded-xl bg-secondary-container text-on-secondary-fixed font-body-sm text-body-sm flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-[20px]">done_all</span>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="p-3.5 rounded-xl bg-error-container text-on-error-container font-body-sm text-body-sm flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-[20px]">error</span>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Active Period & System Health Header Strip -->
+        <div class="flex items-center justify-between gap-space-sm bg-surface-container-low px-space-sm py-2 rounded-xl">
+            <div class="flex items-center gap-2">
+                <span class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface text-on-surface shadow-sm">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">calendar_month</span>
+                    <span class="font-headline-md text-label-md font-bold" th:text="'Periodo ' + ${selectedMonth}">Octubre 2026</span>
+                </span>
+                <span class="font-code-legal text-code-legal text-on-surface-variant hidden sm:inline">RLS Activo por Usuario</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-secondary">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+                </span>
+                <span class="font-code-legal text-code-legal font-bold tracking-tight text-on-surface-variant">PostgreSQL + pgvector</span>
+            </div>
+        </div>
+
+        <!-- KPI Row: Master Cards Vault Style -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
+            <!-- Card 1: Ingreso Base & Rule -->
+            <div class="relative overflow-hidden rounded-xl bg-primary-container p-4 text-on-primary shadow-md flex flex-col justify-between">
+                <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-secondary-container/10 blur-xl pointer-events-none"></div>
+                <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md tracking-wider uppercase text-primary-fixed-dim">Ingreso Base / Meta</span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/40 text-secondary-fixed font-code-legal text-code-legal font-semibold">
+                        <span class="material-symbols-outlined text-[11px]">balance</span>
+                        <span th:text="${profile != null ? 'Regla ' + profile.needsPct + '/' + profile.wantsPct + '/' + profile.savingsPct : 'Regla 50/30/20'}">50/30/20</span>
+                    </span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-1.5">
+                    <span class="font-numeric-hero-mobile text-numeric-hero-mobile text-on-primary"
+                          th:text="'$ ' + ${#numbers.formatDecimal(profile != null ? profile.netIncome : 4000000, 1, 'POINT', 0, 'COMMA')}">$ 4.000.000</span>
+                    <span class="font-code-legal text-code-legal text-primary-fixed-dim uppercase">COP</span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between text-on-primary-container font-body-sm text-body-sm">
+                    <span>Presupuesto inicial</span>
+                    <a href="/profile" class="font-code-legal text-code-legal text-secondary-fixed font-medium underline">Calibrar regla</a>
+                </div>
+            </div>
+
+            <!-- Card 2: Gasto Confirmado en SQL -->
+            <div class="rounded-xl bg-primary-container p-4 text-on-primary shadow-md flex flex-col justify-between">
+                <div class="flex items-center justify-between">
+                    <span class="font-code-legal text-code-legal text-primary-fixed-dim uppercase">Gasto Confirmado (SQL)</span>
+                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">payments</span>
+                </div>
+                <div class="mt-2">
+                    <div class="font-numeric-hero-mobile text-numeric-hero-mobile font-bold text-on-primary leading-tight"
+                         th:text="'$ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</div>
+                    <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded bg-secondary-fixed/15 text-secondary-fixed font-code-legal text-code-legal font-bold"
+                         th:text="${#lists.size(history.transactions)} + ' movimientos confirmados'">
+                        0 movimientos
                     </div>
                 </div>
-                <input type="hidden" name="budgetBlock" value="NEEDS">
-                <button type="submit" class="btn-amber" style="margin-top:0.65rem;">3. Confirmar, Indexar en pgvector y Borrar Temporal</button>
+                <span class="font-code-legal text-code-legal text-on-primary-container mt-2">Cifras 100% desde PostgreSQL</span>
+            </div>
+
+            <!-- Card 3: Facturas Pendientes por Confirmar -->
+            <div class="rounded-xl bg-primary-container p-4 text-on-primary shadow-md flex flex-col justify-between">
+                <div class="flex items-center justify-between">
+                    <span class="font-code-legal text-code-legal text-primary-fixed-dim uppercase">Por Confirmar (RF-05)</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-secondary-container animate-pulse"></span>
+                </div>
+                <div class="mt-2">
+                    <div class="font-numeric-hero-mobile text-numeric-hero-mobile font-bold text-on-primary leading-tight"
+                         th:text="${#lists.size(pendingConfirmations)} + ' Factura(s)'">0 Facturas</div>
+                    <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded bg-secondary-container/20 text-secondary-fixed font-code-legal text-code-legal font-semibold">
+                        Paso 2 / 3 antes de indexar
+                    </div>
+                </div>
+                <a href="#seccion-confirmacion" class="mt-2 text-left font-label-md text-label-md text-secondary-fixed hover:text-on-primary transition-colors flex items-center gap-0.5 no-underline">
+                    <span>Revisar borradores</span>
+                    <span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ======================================================================================== -->
+        <!-- SECCIÓN PASO 2: VOUCHER BANCARIO DE CONFIRMACIÓN (Aparece cuando hay facturas pendientes) -->
+        <!-- ======================================================================================== -->
+        <div id="seccion-confirmacion" th:if="${!#lists.isEmpty(pendingConfirmations)}" class="flex flex-col space-y-3">
+            <div class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Paso 2 de 3: Revisa y Confirma antes de Indexar en pgvector</h2>
+                </div>
+                <span class="font-code-legal text-code-legal text-secondary font-semibold bg-surface-container-low px-2.5 py-1 rounded-full">
+                    Extracción Automática Lista
+                </span>
+            </div>
+
+            <div th:each="item : ${pendingConfirmations}" class="relative bg-surface-container-lowest rounded-2xl shadow-xl overflow-hidden border border-secondary/20">
+                <div class="h-2 w-full bg-gradient-to-r from-primary-container via-secondary to-primary-fixed"></div>
+                <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" class="p-space-md space-y-4">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0 text-primary">
+                                <span class="material-symbols-outlined text-[22px]">receipt_long</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-headline-md text-headline-md font-bold text-on-surface leading-tight"
+                                      th:text="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}">
+                                    Comercio Extraído
+                                </span>
+                                <span class="font-code-legal text-code-legal text-on-surface-variant"
+                                      th:text="'Archivo: ' + ${item.document.originalFilename} + ' · Método: ' + ${item.extraction != null ? item.extraction.extractionMethod : item.document.sourceType}">
+                                    UBL 2.1
+                                </span>
+                            </div>
+                        </div>
+                        <span class="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed/40 text-on-primary-fixed-variant font-code-legal text-code-legal font-bold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            Por Confirmar (RF-05)
+                        </span>
+                    </div>
+
+                    <!-- Campos editables antes de confirmar -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-surface-container-low p-3 rounded-xl">
+                        <div>
+                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Comercio / Emisor</label>
+                            <input type="text" name="merchantName" required
+                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface"
+                                   th:value="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}"/>
+                        </div>
+                        <div>
+                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">NIT Emisor</label>
+                            <input type="text" name="merchantNit"
+                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"
+                                   th:value="${item.extraction != null ? item.extraction.merchantNit : '0'}"/>
+                        </div>
+                        <div>
+                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Número Factura</label>
+                            <input type="text" name="invoiceNumber"
+                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"
+                                   th:value="${item.extraction != null ? item.extraction.invoiceNumber : 'SIN-NUMERO'}"/>
+                        </div>
+                        <div>
+                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Fecha Emisión</label>
+                            <input type="date" name="transactionDate"
+                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"
+                                   th:value="${item.extraction != null ? item.extraction.issueDate : ''}"/>
+                        </div>
+                        <div>
+                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Categoría Sugerida (RF-09)</label>
+                            <input type="text" name="category" required
+                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-secondary font-bold"
+                                   th:value="${item.extraction != null ? item.extraction.suggestedCategory : 'Alimentación'}"/>
+                        </div>
+                        <div>
+                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Bloque 50/30/20</label>
+                            <select name="budgetBlock" class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface">
+                                <option th:each="blk : ${budgetBlocks}"
+                                        th:value="${blk}"
+                                        th:text="${blk.label}"
+                                        th:selected="${item.extraction != null and item.extraction.suggestedBudgetBlock == blk}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-1 bg-surface-container-low p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-0.5 font-code-legal text-code-legal text-on-surface-variant">
+                            <div>Subtotal extraído: <strong class="text-on-surface" th:text="'$ ' + ${item.extraction != null ? item.extraction.subtotalAmount : 0} + ' COP'"></strong></div>
+                            <div>IVA / Impuestos: <strong class="text-on-surface" th:text="'$ ' + ${item.extraction != null ? item.extraction.taxAmount : 0} + ' COP'"></strong></div>
+                            <div th:if="${item.document.cufe != null}" class="truncate max-w-md" th:text="'CUFE: ' + ${item.document.cufe}"></div>
+                        </div>
+                        <div class="text-right">
+                            <label class="font-code-legal text-code-legal text-on-surface-variant block">Total Liquidado (COP)</label>
+                            <input type="number" step="0.01" name="totalAmount" required
+                                   class="mt-1 w-44 p-2 rounded-lg bg-surface-container-lowest font-numeric-hero-mobile text-numeric-hero-mobile font-bold text-secondary text-right"
+                                   th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
+                        </div>
+                    </div>
+
+                    <button class="w-full py-3.5 px-space-md rounded-xl bg-secondary text-on-secondary shadow-lg shadow-secondary/25 hover:bg-secondary/95 active:scale-[0.99] transition-all flex items-center justify-center gap-2" type="submit">
+                        <span class="material-symbols-outlined text-[22px]">database</span>
+                        <span class="font-headline-md text-headline-md font-semibold">Paso 3: Confirmar, Indexar en pgvector y Eliminar Temporal</span>
+                        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ======================================================================================== -->
+        <!-- SECCIÓN CARGA DE FACTURAS Y GASTO RÁPIDO MANUAL (Con Switch de Pestañas)                -->
+        <!-- ======================================================================================== -->
+        <div id="seccion-carga" class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm space-y-space-md">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[22px] text-secondary">add_circle</span>
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Registrar Factura Electrónica o Gasto Diario</h2>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-code-legal text-code-legal">
+                    <span class="material-symbols-outlined text-[14px]">document_scanner</span>
+                    XML UBL 2.1 · PDF · OCR
+                </span>
+            </div>
+
+            <!-- Mode Switcher Tabs -->
+            <div class="w-full bg-surface-container-high p-1 rounded-xl flex items-center justify-between">
+                <button class="flex-1 py-2 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                        id="tab-voucher" onclick="switchUploadMode('voucher')" type="button">
+                    <span class="material-symbols-outlined text-[18px] text-secondary">cloud_upload</span>
+                    <span>Subir Factura / Extracto</span>
+                </button>
+                <button class="flex-1 py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 transition-all"
+                        id="tab-manual" onclick="switchUploadMode('manual')" type="button">
+                    <span class="material-symbols-outlined text-[18px]">edit_note</span>
+                    <span>Gasto Rápido Manual (Segundos)</span>
+                </button>
+            </div>
+
+            <!-- Panel A: Subir Factura XML/PDF/Foto -->
+            <form id="panel-voucher" method="post" action="/dashboard/upload" enctype="multipart/form-data"
+                  class="relative group rounded-xl p-space-md transition-all duration-300 bg-secondary-container/20 hover:bg-secondary-container/30 overflow-hidden shadow-sm">
+                <div class="relative z-10 flex flex-col items-center text-center space-y-3">
+                    <div class="relative w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-md flex items-center justify-center text-secondary">
+                        <span class="material-symbols-outlined text-[30px]">receipt_long</span>
+                        <span class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary-container text-on-primary-fixed flex items-center justify-center shadow">
+                            <span class="material-symbols-outlined text-[14px]">cloud_upload</span>
+                        </span>
+                    </div>
+                    <div class="space-y-1 max-w-md">
+                        <h3 class="font-headline-md text-headline-md text-on-surface font-semibold leading-tight">
+                            Selecciona o arrastra tu factura electrónica
+                        </h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">
+                            Formatos validados por contenido real y ClamAV (máx. 10 MB): <span class="font-code-legal text-code-legal font-medium text-secondary">XML (UBL 2.1)</span>, PDF o Foto JPG/PNG.
+                        </p>
+                    </div>
+
+                    <input type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required
+                           class="w-full max-w-md p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"/>
+
+                    <label class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface cursor-pointer">
+                        <input type="checkbox" name="statement" value="true" class="w-4 h-4 accent-secondary rounded"/>
+                        <span>Es un extracto bancario PDF digital (se indexa por página para chat sin duplicar gastos)</span>
+                    </label>
+
+                    <button type="submit" class="w-full max-w-md py-3 px-4 rounded-xl bg-secondary text-on-secondary font-headline-md text-headline-md shadow-md hover:bg-secondary/95 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">upload_file</span>
+                        <span>Paso 1: Subir y Extraer Datos</span>
+                    </button>
+
+                    <div class="flex items-start gap-1.5 pt-1 text-left bg-surface-container-lowest/80 p-2.5 rounded-lg max-w-md">
+                        <span class="material-symbols-outlined text-secondary text-[16px] mt-0.5 shrink-0">verified_user</span>
+                        <p class="font-code-legal text-code-legal text-on-surface-variant leading-relaxed">
+                            Privacidad Ley 1581: El archivo original se elimina automáticamente del servidor tras verificar su indexación vectorial en pgvector (RF-08).
+                        </p>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Panel B: Gasto Rápido Manual con Adjunto Opcional -->
+            <form id="panel-manual" method="post" action="/dashboard/manual-expense" enctype="multipart/form-data"
+                  class="hidden flex-col gap-3 bg-surface-container-low p-space-md rounded-xl">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="font-label-md text-label-md text-on-surface-variant">Comercio o Concepto *</label>
+                        <input type="text" name="merchantName" required placeholder="Ej. Rappi / Panadería Masa Madre"
+                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm"/>
+                    </div>
+                    <div>
+                        <label class="font-label-md text-label-md text-on-surface-variant">Monto Total (COP) *</label>
+                        <input type="number" step="0.01" name="totalAmount" required placeholder="45000"
+                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-numeric-table text-numeric-table font-bold text-primary"/>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="font-label-md text-label-md text-on-surface-variant">Fecha del Gasto</label>
+                        <input type="date" name="transactionDate"
+                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal"/>
+                    </div>
+                    <div>
+                        <label class="font-label-md text-label-md text-on-surface-variant">Categoría (Dejar vacío para auto-sugerir RF-09)</label>
+                        <input type="text" name="category" placeholder="Ej. Domicilios y Restaurantes"
+                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm"/>
+                    </div>
+                    <div>
+                        <label class="font-label-md text-label-md text-on-surface-variant">Bloque 50/30/20</label>
+                        <select name="budgetBlock" class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm">
+                            <option value="">Auto-asignar según categoría</option>
+                            <option th:each="blk : ${budgetBlocks}" th:value="${blk}" th:text="${blk.label}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="font-label-md text-label-md text-on-surface-variant">Descripción / Notas</label>
+                        <input type="text" name="description" placeholder="Ej. Almuerzo de trabajo"
+                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm"/>
+                    </div>
+                    <div>
+                        <label class="font-label-md text-label-md text-on-surface-variant">Comprobante de respaldo (Opcional RF-02)</label>
+                        <input type="file" name="attachment" accept=".xml,.pdf,image/jpeg,image/png"
+                               class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal"/>
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-secondary text-on-secondary font-headline-md text-headline-md shadow-md hover:bg-secondary/95 flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">bolt</span>
+                    <span>Guardar Gasto Manual en Segundos</span>
+                </button>
             </form>
         </div>
-    </div>
 
-    <!-- Chat RAG Híbrido con Citas Verificables (RF-12) e Informe Mensual (RF-13) -->
-    <div class="grid-2">
-        <div class="card">
-            <h2>Chat en Lenguaje Natural con Búsqueda Híbrida y Citas (RF-12, RNF-06)</h2>
-            <form method="post" action="/dashboard/chat">
-                <label>Pregunta sobre tus facturas, extractos o gastos</label>
-                <input type="text" name="question" required placeholder="Ej. ¿Cuánto gasté en domicilios en octubre?">
-                <button type="submit" class="btn-blue" style="margin-top:0.65rem;">Consultar con Evidencia</button>
+        <!-- ======================================================================================== -->
+        <!-- SECCIÓN ASISTENTE RAG CON CITAS VERIFICABLES Y CHIPS DE 1 CLIC (RF-12, RNF-06)           -->
+        <!-- ======================================================================================== -->
+        <div id="seccion-asistente" class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm space-y-space-md">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-space-sm">
+                    <div class="relative w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-secondary-fixed shadow-inner">
+                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-secondary-fixed border-2 border-surface-container-lowest animate-pulse"></span>
+                    </div>
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface leading-tight">Asistente CuentaClara (RAG Híbrido + SQL)</h2>
+                        <p class="font-code-legal text-code-legal text-secondary font-medium tracking-wide flex items-center gap-1">
+                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            Reciprocal Rank Fusion (pgvector + tsvector) · Citas Obligatorias
+                        </p>
+                    </div>
+                </div>
+                <span class="bg-surface-container px-2.5 py-1 rounded-full text-on-surface-variant font-code-legal text-code-legal flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-secondary">verified_user</span>
+                    Cero Alucinación Numérica
+                </span>
+            </div>
+
+            <!-- Chips de Preguntas Rápidas de 1 Toque -->
+            <div class="flex flex-col space-y-1.5">
+                <div class="flex items-center justify-between px-1">
+                    <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Preguntas rápidas sugeridas (1 clic)</span>
+                </div>
+                <div class="flex flex-wrap gap-2 pt-1">
+                    <button class="bg-surface-container-low hover:bg-surface-container text-on-surface active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
+                            onclick="submitSuggestedQuestion('¿Cuánto gasté en domicilios en octubre?')" type="button">
+                        <span class="material-symbols-outlined text-secondary text-[16px]">delivery_dining</span>
+                        <span class="font-body-sm text-body-sm font-medium">¿Cuánto gasté en domicilios en octubre?</span>
+                    </button>
+                    <button class="bg-secondary-fixed/30 hover:bg-secondary-fixed/50 text-on-secondary-fixed active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
+                            onclick="submitSuggestedQuestion('¿En qué factura compré Café Molido Gourmet?')" type="button">
+                        <span class="material-symbols-outlined text-secondary text-[16px]">coffee</span>
+                        <span class="font-body-sm text-body-sm font-semibold">¿En qué factura compré Café Molido Gourmet?</span>
+                    </button>
+                    <button class="bg-surface-container-low hover:bg-surface-container text-on-surface active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
+                            onclick="submitSuggestedQuestion('¿Cuánto gasté en Almacenes Éxito?')" type="button">
+                        <span class="material-symbols-outlined text-secondary text-[16px]">storefront</span>
+                        <span class="font-body-sm text-body-sm font-medium">¿Cuánto gasté en Almacenes Éxito?</span>
+                    </button>
+                    <button class="bg-surface-container-low hover:bg-surface-container text-on-surface active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
+                            onclick="submitSuggestedQuestion('¿Cuál es mi presupuesto inicial y distribución 50/30/20?')" type="button">
+                        <span class="material-symbols-outlined text-secondary text-[16px]">pie_chart</span>
+                        <span class="font-body-sm text-body-sm font-medium">¿Cuál es mi presupuesto y distribución 50/30/20?</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Respuesta Verificada del Chat (Cuando el usuario envía una consulta) -->
+            <div th:if="${chatResponse != null}" class="flex flex-col space-y-2 pt-2">
+                <div class="self-end max-w-[85%] bg-primary text-on-primary px-space-md py-2.5 rounded-2xl rounded-tr-xs shadow-sm">
+                    <p class="font-body-sm text-body-sm m-0" th:text="${chatResponse.question}"></p>
+                </div>
+                <div class="self-start w-full bg-surface-container-low rounded-2xl rounded-tl-xs p-space-md shadow-sm space-y-3 border-l-4 border-secondary">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-5 h-5 rounded-full bg-primary-container flex items-center justify-center">
+                                <span class="material-symbols-outlined text-secondary-fixed text-[12px]">auto_awesome</span>
+                            </div>
+                            <span class="font-label-md text-label-md font-bold text-primary">Respuesta Verificada con SQL + pgvector</span>
+                        </div>
+                        <span class="font-code-legal text-code-legal text-secondary bg-surface-container-lowest px-2 py-0.5 rounded-full"
+                              th:text="${chatResponse.hasEvidence ? 'Evidencia Confirmada' : 'Sin Evidencia Registrada'}"></span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-on-surface leading-relaxed m-0" th:text="${chatResponse.answer}"></p>
+
+                    <div th:if="${!#lists.isEmpty(chatResponse.citations)}" class="pt-1 space-y-1.5">
+                        <span class="font-label-md text-label-md font-bold text-on-surface-variant flex items-center gap-1 uppercase tracking-wide">
+                            <span class="material-symbols-outlined text-[16px] text-secondary">policy</span> Citas Verificables de Respaldo:
+                        </span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span th:each="cit : ${chatResponse.citations}"
+                                  class="bg-secondary-fixed/50 text-on-secondary-fixed px-2.5 py-1 rounded-lg font-code-legal text-code-legal font-bold flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[13px]">verified</span>
+                                <span th:text="${cit}"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de entrada del Chat -->
+            <form id="chat-form" method="post" action="/dashboard/chat"
+                  class="bg-surface-container-low rounded-2xl p-2 shadow-inner flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px] text-secondary ml-2">search</span>
+                <input id="chat-input" name="question" type="text" required autocomplete="off"
+                       class="flex-1 bg-transparent px-2 py-2 text-on-surface placeholder:text-outline text-body-sm font-body-sm focus:outline-none"
+                       placeholder="Haz una pregunta sobre tus gastos, facturas XML, PDF o extractos..."/>
+                <button aria-label="Enviar pregunta" class="w-10 h-10 rounded-xl bg-secondary text-on-secondary shadow-[0_4px_12px_rgba(0,108,73,0.3)] hover:bg-secondary/90 flex items-center justify-center flex-shrink-0 transition-transform active:scale-90" type="submit">
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">send</span>
+                </button>
             </form>
-            <div th:if="${chatResponse != null}" style="margin-top:1rem; padding:0.9rem; background:#f8fafc; border-left:4px solid #2563eb; border-radius:6px;">
-                <p style="margin:0 0 0.5rem 0;"><strong th:text="${chatResponse.question}"></strong></p>
-                <p style="margin:0 0 0.5rem 0;" th:text="${chatResponse.answer}"></p>
-                <div th:if="${!#lists.isEmpty(chatResponse.citations)}">
-                    <small><strong>Citas verificables:</strong></small><br>
-                    <span class="citation-pill" th:each="cit : ${chatResponse.citations}" th:text="${cit}"></span>
+        </div>
+
+        <!-- ======================================================================================== -->
+        <!-- SECCIÓN INFORME MENSUAL / QUINCENAL Y SIMULADOR DEL PRIMER MES (RF-13, RF-16)            -->
+        <!-- ======================================================================================== -->
+        <div id="seccion-informe" class="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-3.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[22px] text-secondary">donut_large</span>
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface">Informe de Cierre de Periodo y Plan Sugerido (RF-13, RF-16)</h2>
+                        <span class="font-code-legal text-code-legal text-on-surface-variant">Compara perfil declarado vs. gastos reales confirmados en SQL</span>
+                    </div>
+                </div>
+                <form method="post" action="/dashboard/simulate-month" class="flex items-center gap-2 m-0">
+                    <input type="text" name="month" th:value="${selectedMonth}" class="w-28 p-2 rounded-lg bg-surface-container-low font-code-legal text-code-legal text-center"/>
+                    <button type="submit" class="py-2 px-3 rounded-xl bg-primary-container text-secondary-fixed font-label-md text-label-md flex items-center gap-1.5 shadow-sm hover:bg-primary transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">science</span>
+                        <span>Simular 1er Mes / Generar Informe</span>
+                    </button>
+                </form>
+            </div>
+
+            <div th:if="${latestClosure != null}" class="p-space-md rounded-xl bg-surface-container-low space-y-3 border-l-4 border-primary-container">
+                <p class="font-body-sm text-body-sm font-semibold text-primary m-0" th:text="${latestClosure.report.verdictSummary}"></p>
+                <div class="space-y-2">
+                    <div th:each="rec : ${latestClosure.recommendations}" class="p-3 rounded-xl bg-surface-container-lowest shadow-xs space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="font-code-legal text-code-legal font-bold text-secondary uppercase" th:text="'Bloque ' + ${rec.block}"></span>
+                        </div>
+                        <p class="font-body-sm text-body-sm text-on-surface m-0" th:text="${rec.explanation}"></p>
+                        <div class="flex flex-wrap gap-1 pt-1" th:if="${!#lists.isEmpty(rec.backingCitations)}">
+                            <span th:each="c : ${rec.backingCitations}"
+                                  class="px-2 py-0.5 rounded bg-secondary-fixed/40 text-on-secondary-fixed font-code-legal text-code-legal"
+                                  th:text="${c}"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <h2>Informe Mensual / Quincenal y Plan Sugerido (RF-13, RF-16)</h2>
-            <form method="post" action="/dashboard/simulate-month">
-                <label>Periodo a cerrar / simular (YYYY-MM)</label>
-                <input type="text" name="month" value="2026-10">
-                <button type="submit" class="btn-green" style="margin-top:0.65rem;">Simular Primer Mes y Generar Informe SQL</button>
+        <!-- ======================================================================================== -->
+        <!-- SECCIÓN HISTORIAL DE GASTOS CONFIRMADOS Y TOTALES SQL POR CATEGORÍA (RF-10)              -->
+        <!-- ======================================================================================== -->
+        <div class="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-3.5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-secondary">receipt</span>
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Historial de Movimientos Confirmados (RF-10)</h2>
+                </div>
+                <span class="font-numeric-table text-numeric-table font-bold text-secondary"
+                      th:text="'Total SQL: $ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+            </div>
+
+            <!-- Filtros por Mes, Categoría y Comercio -->
+            <form method="get" action="/dashboard" class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                <input type="text" name="month" th:value="${selectedMonth}" placeholder="Mes (2026-10)"
+                       class="p-2 rounded-lg bg-surface-container-low font-code-legal text-code-legal"/>
+                <input type="text" name="category" th:value="${selectedCategory}" placeholder="Filtrar categoría..."
+                       class="p-2 rounded-lg bg-surface-container-low font-body-sm text-body-sm"/>
+                <input type="text" name="merchant" th:value="${selectedMerchant}" placeholder="Filtrar comercio..."
+                       class="p-2 rounded-lg bg-surface-container-low font-body-sm text-body-sm"/>
+                <button type="submit" class="py-2 px-4 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">filter_alt</span>
+                    <span>Filtrar SQL</span>
+                </button>
             </form>
-            <div th:if="${latestClosure != null}" style="margin-top:1rem; font-size:0.88rem;">
-                <p th:text="${latestClosure.report.verdictSummary}"></p>
-                <ul>
-                    <li th:each="rec : ${latestClosure.recommendations}">
-                        <span th:text="${rec.explanation}"></span>
-                        <span class="citation-pill" th:each="c : ${rec.backingCitations}" th:text="${c}"></span>
-                    </li>
-                </ul>
+
+            <!-- Totales por Categoría en Píldoras -->
+            <div th:if="${!#maps.isEmpty(history.totalsByCategory)}" class="flex flex-wrap gap-2">
+                <div th:each="entry : ${history.totalsByCategory}"
+                     class="px-3 py-1.5 rounded-xl bg-surface-container-low font-code-legal text-code-legal flex items-center gap-2">
+                    <span class="font-bold text-primary" th:text="${entry.key + ':'}"></span>
+                    <span class="text-secondary font-bold" th:text="'$ ' + ${#numbers.formatDecimal(entry.value, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                </div>
+            </div>
+
+            <!-- Lista de Transacciones -->
+            <div class="space-y-2">
+                <div th:if="${#lists.isEmpty(history.transactions)}" class="p-6 text-center text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low rounded-xl">
+                    Aún no hay movimientos confirmados para este filtro. Sube una factura XML/PDF o registra un gasto manual arriba.
+                </div>
+                <div th:each="tx : ${history.transactions}"
+                     class="p-3 rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-primary-container text-secondary-fixed flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">verified</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-label-md text-label-md font-bold text-on-surface" th:text="${tx.merchantName}"></span>
+                                <span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-code-legal text-code-legal font-semibold" th:text="${tx.category}"></span>
+                            </div>
+                            <span class="font-code-legal text-code-legal text-on-surface-variant block mt-0.5"
+                                  th:text="${tx.transactionDate + ' · Bloque: ' + tx.budgetBlock + ' · Cita: ' + tx.citationReference}"></span>
+                        </div>
+                    </div>
+                    <div class="font-numeric-table text-numeric-table font-bold text-primary text-right shrink-0"
+                         th:text="'$ ' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Footer Insight Banner -->
+        <div class="p-3 rounded-xl bg-surface-container-high/60 flex items-center gap-2.5 text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px] text-secondary shrink-0">verified_user</span>
+            <p class="font-code-legal text-code-legal leading-relaxed m-0">
+                Tus datos están aislados con PostgreSQL Row Level Security (RNF-01) y protegidos bajo la Ley 1581 de 2012.
+            </p>
+        </div>
     </div>
+</main>
 
-    <!-- Historial de Gastos con Filtros y Totales SQL por Categoría (RF-10) -->
-    <div class="card">
-        <h2>Historial de Gastos Confirmados y Totales SQL por Categoría (RF-10)</h2>
-        <form method="get" action="/dashboard" style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:0.65rem; align-items:end;">
-            <div>
-                <label>Mes (YYYY-MM)</label>
-                <input type="text" name="month" th:value="${selectedMonth}" placeholder="2026-10">
-            </div>
-            <div>
-                <label>Categoría</label>
-                <input type="text" name="category" th:value="${selectedCategory}" placeholder="Ej. Alimentación">
-            </div>
-            <div>
-                <label>Comercio</label>
-                <input type="text" name="merchant" th:value="${selectedMerchant}" placeholder="Ej. Éxito">
-            </div>
-            <button type="submit" class="btn-blue">Filtrar</button>
-        </form>
-
-        <p style="margin-top:0.85rem;">
-            <strong>Total confirmado en SQL:</strong>
-            $<span th:text="${#numbers.formatDecimal(history.grandTotal, 1, 'COMMA', 2, 'POINT')}"></span> COP
-        </p>
-
-        <table>
-            <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Comercio</th>
-                <th>Categoría</th>
-                <th>Bloque</th>
-                <th>Total (COP)</th>
-                <th>Cita / Evidencia</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="tx : ${history.transactions}">
-                <td th:text="${tx.transactionDate}"></td>
-                <td th:text="${tx.merchantName}"></td>
-                <td th:text="${tx.category}"></td>
-                <td th:text="${tx.budgetBlock}"></td>
-                <td th:text="'$' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'COMMA', 2, 'POINT')}"></td>
-                <td><span class="citation-pill" th:text="${tx.citationReference}"></span></td>
-            </tr>
-            </tbody>
-        </table>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,53,39,0.06)]">
+    <div class="max-w-4xl mx-auto h-16 px-space-sm flex items-center justify-around">
+        <a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] transition-colors text-secondary font-semibold no-underline" href="#seccion-inicio">
+            <span class="material-symbols-outlined text-[22px]">dashboard</span>
+            <span class="font-label-md text-label-md mt-0.5">Inicio</span>
+        </a>
+        <div class="relative -top-3 flex flex-col items-center">
+            <a class="w-12 h-12 rounded-full bg-secondary text-on-secondary shadow-[0_8px_16px_rgba(0,108,73,0.3)] flex items-center justify-center transition-transform active:scale-95 hover:bg-secondary/90 no-underline" href="#seccion-carga">
+                <span class="material-symbols-outlined text-[26px]">add</span>
+            </a>
+            <span class="font-label-md text-label-md text-on-surface-variant mt-1">+ Cargar</span>
+        </div>
+        <a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-secondary transition-colors no-underline" href="/profile">
+            <span class="material-symbols-outlined text-[22px]">pie_chart</span>
+            <span class="font-label-md text-label-md mt-0.5">Presupuesto</span>
+        </a>
+        <a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-secondary transition-colors no-underline" href="#seccion-asistente">
+            <span class="material-symbols-outlined text-[22px]">smart_toy</span>
+            <span class="font-label-md text-label-md mt-0.5">Asistente</span>
+        </a>
     </div>
-</div>
+</nav>
+
+<script>
+    function switchUploadMode(mode) {
+        const panelVoucher = document.getElementById('panel-voucher');
+        const panelManual = document.getElementById('panel-manual');
+        const tabVoucher = document.getElementById('tab-voucher');
+        const tabManual = document.getElementById('tab-manual');
+
+        if (mode === 'manual') {
+            panelVoucher.classList.add('hidden');
+            panelManual.classList.remove('hidden');
+            panelManual.classList.add('flex');
+            tabManual.className = 'flex-1 py-2 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm transition-all';
+            tabVoucher.className = 'flex-1 py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 transition-all';
+        } else {
+            panelManual.classList.add('hidden');
+            panelManual.classList.remove('flex');
+            panelVoucher.classList.remove('hidden');
+            tabVoucher.className = 'flex-1 py-2 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm transition-all';
+            tabManual.className = 'flex-1 py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 transition-all';
+        }
+    }
+
+    function submitSuggestedQuestion(text) {
+        const input = document.getElementById('chat-input');
+        const form = document.getElementById('chat-form');
+        if (input && form) {
+            input.value = text;
+            form.submit();
+        }
+    }
+</script>
 </body>
 </html>

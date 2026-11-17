@@ -5,8 +5,10 @@ import co.cuentaclara.auth.AuthService;
 import co.cuentaclara.profile.BudgetBlock;
 import co.cuentaclara.profile.FinancialProfileService;
 import co.cuentaclara.profile.PaymentFrequency;
+import co.cuentaclara.report.MonthlyAnalysisAndReportService;
 import co.cuentaclara.security.jwt.AuthenticatedUserPrincipal;
 import co.cuentaclara.security.jwt.JwtTokenService;
+import co.cuentaclara.security.rls.RlsDataSourceConfig;
 import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,15 +27,18 @@ public class WebOnboardingController {
     private final AuthService authService;
     private final JwtTokenService jwtTokenService;
     private final FinancialProfileService profileService;
+    private final MonthlyAnalysisAndReportService reportService;
 
     public WebOnboardingController(
             AuthService authService,
             JwtTokenService jwtTokenService,
-            FinancialProfileService profileService
+            FinancialProfileService profileService,
+            MonthlyAnalysisAndReportService reportService
     ) {
         this.authService = authService;
         this.jwtTokenService = jwtTokenService;
         this.profileService = profileService;
+        this.reportService = reportService;
     }
 
     @GetMapping("/")
@@ -41,23 +46,62 @@ public class WebOnboardingController {
         if (principal == null) {
             return "redirect:/auth/login";
         }
-        return "redirect:/profile";
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/auth/login")
-    public String loginPage(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
+    public String loginPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam(value = "mode", required = false) String mode,
+            Model model
+    ) {
         if (principal != null) {
-            return "redirect:/profile";
+            return "redirect:/dashboard";
         }
+        model.addAttribute("registerMode", "register".equalsIgnoreCase(mode));
         return "auth/login";
     }
 
     @GetMapping("/auth/register")
-    public String registerPage(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
+    public String registerPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            Model model
+    ) {
         if (principal != null) {
-            return "redirect:/profile";
+            return "redirect:/dashboard";
         }
-        return "auth/register";
+        model.addAttribute("registerMode", true);
+        return "auth/login";
+    }
+
+    @PostMapping("/auth/demo")
+    public String handleDemoLogin(
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        String demoEmail = "demo.profesional@cuentaclara.co";
+        String demoPass = "UBL2.1-Demo-2026";
+        AuthService.AuthResponse auth;
+        try {
+            auth = authService.login(new AuthService.LoginRequest(demoEmail, demoPass));
+        } catch (Exception ex) {
+            auth = authService.register(new AuthService.RegisterRequest(
+                    "Camila Morales (Demo)",
+                    demoEmail,
+                    demoPass,
+                    true
+            ));
+        }
+        AuthController.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+        final var userId = auth.userId();
+        RlsDataSourceConfig.runAsUser(userId, () -> {
+            reportService.simulateFirstMonthAndGenerateReport(userId, "2026-10");
+        });
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "¡Entorno Demo activado! Se cargó el primer mes simulado (2026-10) con movimientos e informe SQL listos."
+        );
+        return "redirect:/dashboard";
     }
 
     @PostMapping("/auth/register")
@@ -91,7 +135,7 @@ public class WebOnboardingController {
         try {
             AuthService.AuthResponse auth = authService.login(new AuthService.LoginRequest(email, password));
             AuthController.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
-            return "redirect:/profile";
+            return "redirect:/dashboard";
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
             return "redirect:/auth/login";
