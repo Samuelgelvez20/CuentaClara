@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuentaClara — Cuestionario y Presupuesto Inicial</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; margin: 0; padding: 1.5rem; }
+        .container { max-width: 980px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        label { display: block; margin-top: 0.85rem; font-weight: 600; font-size: 0.88rem; }
+        input, select, textarea { width: 100%; padding: 0.6rem; margin-top: 0.3rem; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+        .pct-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+        .badge-estimate { display: inline-block; background: #fef3c7; color: #92400e; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+        .alert-success { background: #dcfce7; color: #166534; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; }
+        .alert-error { background: #fee2e2; color: #991b1b; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; }
+        button.primary { margin-top: 1.25rem; width: 100%; padding: 0.75rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1 style="margin:0;">CuentaClara</h1>
+            <small th:text="'Hola, ' + ${user.fullName} + ' (' + ${user.email} + ')'"></small>
+        </div>
+        <form method="post" action="/auth/logout">
+            <button type="submit" style="padding:0.5rem 1rem; border-radius:6px; border:1px solid #cbd5e1; background:#fff; cursor:pointer;">Cerrar sesión</button>
+        </form>
+    </header>
+
+    <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert-error" th:text="${errorMessage}"></div>
+
+    <div class="grid">
+        <div class="card">
+            <h2 style="margin-top:0;">1. Cuestionario y Perfil Financiero (RF-11, RF-15, RF-17)</h2>
+            <form method="post" action="/profile">
+                <label>Ingreso neto por periodo (COP)</label>
+                <input type="number" step="0.01" name="netIncome" required
+                       th:value="${profile != null ? profile.netIncome : 4000000}">
+
+                <label>Frecuencia de pago</label>
+                <select name="paymentFrequency">
+                    <option th:each="freq : ${frequencies}"
+                            th:value="${freq}"
+                            th:text="${freq.label}"
+                            th:selected="${profile != null and profile.paymentFrequency == freq}">
+                    </option>
+                </select>
+
+                <label>Días de recepción del pago (ej. 15,30 o 30)</label>
+                <input type="text" name="paymentDays" required
+                       th:value="${profile != null ? profile.paymentDays : '15,30'}">
+
+                <label>Distribución presupuestaria personalizable (Debe sumar 100 %)</label>
+                <div class="pct-row">
+                    <div>
+                        <small>Necesidades (%)</small>
+                        <input type="number" name="needsPct" min="0" max="100" required
+                               th:value="${profile != null ? profile.needsPct : 50}">
+                    </div>
+                    <div>
+                        <small>Deseos (%)</small>
+                        <input type="number" name="wantsPct" min="0" max="100" required
+                               th:value="${profile != null ? profile.wantsPct : 30}">
+                    </div>
+                    <div>
+                        <small>Ahorro/Deuda (%)</small>
+                        <input type="number" name="savingsPct" min="0" max="100" required
+                               th:value="${profile != null ? profile.savingsPct : 20}">
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom:0.25rem;">Compromisos prioritarios recurrentes (opcionales)</h3>
+                <label>Vivienda / Arriendo (COP) y día de vencimiento</label>
+                <div class="pct-row" style="grid-template-columns: 2fr 1fr;">
+                    <input type="number" step="0.01" name="housingAmount" placeholder="Ej. 1200000">
+                    <input type="number" name="housingDueDay" min="1" max="31" value="5" placeholder="Día">
+                </div>
+
+                <label>Servicios Públicos / Internet (COP) y día de vencimiento</label>
+                <div class="pct-row" style="grid-template-columns: 2fr 1fr;">
+                    <input type="number" step="0.01" name="utilitiesAmount" placeholder="Ej. 280000">
+                    <input type="number" name="utilitiesDueDay" min="1" max="31" value="18" placeholder="Día">
+                </div>
+
+                <label>Alimentación básica estimada (COP)</label>
+                <input type="number" step="0.01" name="foodAmount" placeholder="Ej. 650000">
+
+                <label>Deudas totales actuales (opcional, COP)</label>
+                <input type="number" step="0.01" name="totalDebts"
+                       th:value="${profile != null ? profile.totalDebts : 0}">
+
+                <label>Objetivos financieros (opcional)</label>
+                <textarea name="financialGoals" rows="2"
+                          th:text="${profile != null ? profile.financialGoals : 'Fondo de emergencia y control de domicilios'}"></textarea>
+
+                <button type="submit" class="primary">Guardar Perfil y Calcular Presupuesto Inicial</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-top:0;">2. Presupuesto Inicial desde el Día 1 (RF-13, RF-16)</h2>
+            <div th:if="${initialBudget == null}">
+                <p>Completa el cuestionario a la izquierda para obtener tu presupuesto estimado desde el primer día.</p>
+            </div>
+            <div th:if="${initialBudget != null}">
+                <span class="badge-estimate">ESTIMADO (Basado en perfil declarado)</span>
+                <p style="margin-top:0.75rem;">
+                    <strong>Periodo:</strong> <span th:text="${initialBudget.periodLabel}"></span><br>
+                    <strong>Ingreso base declarado:</strong> $<span th:text="${#numbers.formatDecimal(initialBudget.referenceIncome, 1, 'COMMA', 2, 'POINT')}"></span> COP
+                </p>
+                <ul>
+                    <li>
+                        <strong>Necesidades (<span th:text="${initialBudget.needsPct}"></span> %):</strong>
+                        $<span th:text="${#numbers.formatDecimal(initialBudget.needsLimit, 1, 'COMMA', 2, 'POINT')}"></span> COP
+                    </li>
+                    <li>
+                        <strong>Deseos (<span th:text="${initialBudget.wantsPct}"></span> %):</strong>
+                        $<span th:text="${#numbers.formatDecimal(initialBudget.wantsLimit, 1, 'COMMA', 2, 'POINT')}"></span> COP
+                    </li>
+                    <li>
+                        <strong>Ahorro y Objetivos (<span th:text="${initialBudget.savingsPct}"></span> %):</strong>
+                        $<span th:text="${#numbers.formatDecimal(initialBudget.savingsTarget, 1, 'COMMA', 2, 'POINT')}"></span> COP
+                    </li>
+                </ul>
+
+                <h3>Recomendaciones preliminares deterministas</h3>
+                <ul>
+                    <li th:each="rec : ${recommendations}" th:text="${rec}" style="margin-bottom:0.5rem;"></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
