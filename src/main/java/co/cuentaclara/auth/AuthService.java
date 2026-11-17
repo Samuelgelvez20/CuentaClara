@@ -69,6 +69,49 @@ public class AuthService {
     }
 
     /**
+     * Inicia sesión o registra automáticamente al usuario mediante su cuenta de Google (OAuth2 / Google Identity).
+     */
+    @Transactional
+    public GoogleAuthResult loginOrRegisterWithGoogle(String email, String fullName) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("El correo de la cuenta de Google es obligatorio.");
+        }
+        String normalizedEmail = email.trim().toLowerCase();
+        String resolvedName = (fullName != null && !fullName.isBlank())
+                ? fullName.trim()
+                : normalizedEmail.split("@")[0];
+
+        var existingOpt = userRepository.findByEmailIgnoreCase(normalizedEmail);
+        if (existingOpt.isPresent()) {
+            User existing = existingOpt.get();
+            String token = jwtTokenService.generateToken(existing.getId(), existing.getEmail(), existing.getFullName());
+            return new GoogleAuthResult(
+                    new AuthResponse(existing.getId(), existing.getEmail(), existing.getFullName(), token),
+                    false
+            );
+        }
+
+        String randomSecretHash = passwordEncoder.encode("GOOGLE_OAUTH2_" + UUID.randomUUID());
+        User created = userRepository.save(new User(
+                normalizedEmail,
+                randomSecretHash,
+                resolvedName,
+                true
+        ));
+        String token = jwtTokenService.generateToken(created.getId(), created.getEmail(), created.getFullName());
+        return new GoogleAuthResult(
+                new AuthResponse(created.getId(), created.getEmail(), created.getFullName(), token),
+                true
+        );
+    }
+
+    public record GoogleAuthResult(
+            AuthResponse authResponse,
+            boolean newUser
+    ) {
+    }
+
+    /**
      * Elimina la cuenta del usuario y todos sus datos relacionados en cascada (RF-14, RNF-04).
      */
     @Transactional

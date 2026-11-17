@@ -9,10 +9,15 @@ import co.cuentaclara.report.MonthlyAnalysisAndReportService;
 import co.cuentaclara.security.jwt.AuthenticatedUserPrincipal;
 import co.cuentaclara.security.jwt.JwtTokenService;
 import co.cuentaclara.security.rls.RlsDataSourceConfig;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,17 +33,23 @@ public class WebOnboardingController {
     private final JwtTokenService jwtTokenService;
     private final FinancialProfileService profileService;
     private final MonthlyAnalysisAndReportService reportService;
+    private final ObjectMapper objectMapper;
+    private final String googleClientId;
 
     public WebOnboardingController(
             AuthService authService,
             JwtTokenService jwtTokenService,
             FinancialProfileService profileService,
-            MonthlyAnalysisAndReportService reportService
+            MonthlyAnalysisAndReportService reportService,
+            ObjectMapper objectMapper,
+            @Value("${cuentaclara.security.google-client-id:}") String googleClientId
     ) {
         this.authService = authService;
         this.jwtTokenService = jwtTokenService;
         this.profileService = profileService;
         this.reportService = reportService;
+        this.objectMapper = objectMapper;
+        this.googleClientId = googleClientId;
     }
 
     @GetMapping("/")
@@ -59,6 +70,7 @@ public class WebOnboardingController {
             return "redirect:/dashboard";
         }
         model.addAttribute("registerMode", "register".equalsIgnoreCase(mode));
+        model.addAttribute("googleClientId", googleClientId);
         return "auth/login";
     }
 
@@ -71,7 +83,58 @@ public class WebOnboardingController {
             return "redirect:/dashboard";
         }
         model.addAttribute("registerMode", true);
+        model.addAttribute("googleClientId", googleClientId);
         return "auth/login";
+    }
+
+    @PostMapping("/auth/google")
+    public String handleGoogleSignIn(
+            @RequestParam(value = "credential", required = false) String googleIdTokenCredential,
+            @RequestParam(value = "googleEmail", required = false) String googleEmail,
+            @RequestParam(value = "googleName", required = false) String googleName,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            String resolvedEmail = googleEmail;
+            String resolvedName = googleName;
+
+            // Si viene un ID Token oficial de Google Identity Services (JWT de 3 partes), extraer email y name verificados
+            if (googleIdTokenCredential != null && !googleIdTokenCredential.isBlank()) {
+                String[] parts = googleIdTokenCredential.split("\\.");
+                if (parts.length >= 2) {
+                    String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+                    JsonNode node = objectMapper.readTree(payloadJson);
+                    if (node.hasNonNull("email")) {
+                        resolvedEmail = node.get("email").asText();
+                    }
+                    if (node.hasNonNull("name")) {
+                        resolvedName = node.get("name").asText();
+                    }
+                }
+            }
+
+            AuthService.GoogleAuthResult result = authService.loginOrRegisterWithGoogle(resolvedEmail, resolvedName);
+            AuthService.AuthResponse auth = result.authResponse();
+            AuthController.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+
+            if (result.newUser()) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "¡Conectado con tu cuenta de Google (" + auth.email() + ")! Configura aquí tu ingreso y tus deudas o pagos de cada mes para tu calendario."
+                );
+                return "redirect:/profile";
+            }
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "¡Bienvenido(a) de nuevo, " + auth.fullName() + "! Iniciaste sesión con tu cuenta de Google."
+            );
+            return "redirect:/dashboard";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "No se pudo iniciar sesión con Google: " + ex.getMessage());
+            return "redirect:/auth/login";
+        }
     }
 
     @PostMapping("/auth/demo")

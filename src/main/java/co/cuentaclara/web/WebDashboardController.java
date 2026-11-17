@@ -198,7 +198,7 @@ public class WebDashboardController {
             Model model
     ) {
         populateCommonDashboardModel(principal, month, category, merchant, model);
-        return "dashboard/index";
+        return "dashboard/history";
     }
 
     private void populateCommonDashboardModel(

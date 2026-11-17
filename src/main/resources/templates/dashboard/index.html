@@ -110,10 +110,14 @@
             <nav class="flex flex-col gap-1.5">
                 <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all bg-primary-container text-on-primary font-bold shadow-sm no-underline" href="/dashboard">
                     <span class="material-symbols-outlined text-[20px] text-secondary-fixed">calendar_month</span>
-                    <span>Mi Calendario y Gastos</span>
+                    <span>Mi Calendario del Mes</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
+                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                    <span>Historial de Gastos</span>
                 </a>
                 <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                    <span class="material-symbols-outlined text-[20px]">upload_file</span>
                     <span>Subir Recibo o Factura</span>
                     <span th:if="${!#lists.isEmpty(pendingConfirmations)}" class="ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold" th:text="${#lists.size(pendingConfirmations)}"></span>
                 </a>
@@ -124,10 +128,6 @@
                 <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
                     <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
                     <span>Pregúntale a tu Asistente</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="#historial-sql">
-                    <span class="material-symbols-outlined text-[20px]">filter_list</span>
-                    <span>Buscar en mis Gastos</span>
                 </a>
                 <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
                     <span class="material-symbols-outlined text-[20px]">palette</span>
@@ -521,91 +521,56 @@
                         </form>
                     </article>
 
-                    <!-- b) Historial de Gastos con Filtros Desplegables Óptimos (RF-10) -->
-                    <section id="historial-sql" class="bg-surface-container-lowest rounded-3xl p-6 sm:p-8 shadow-sm border border-outline-variant/30 flex flex-col gap-5">
+                    <!-- b) Mis Pagos y Deudas Fijas de Cada Mes -->
+                    <section class="bg-surface-container-lowest rounded-3xl p-6 sm:p-8 shadow-sm border border-outline-variant/30 flex flex-col gap-4">
                         <div class="flex items-center justify-between flex-wrap gap-2">
                             <div>
-                                <h3 class="text-lg text-primary font-extrabold m-0">Tus Movimientos y Gastos Anotados</h3>
-                                <span class="text-xs text-on-surface-variant">Filtra fácilmente usando las listas desplegables de mes, categoría o lugar</span>
+                                <h3 class="text-lg text-primary font-extrabold m-0">📌 Pagos Fijos y Deudas de Cada Mes</h3>
+                                <p class="text-xs text-on-surface-variant m-0">Se marcan automáticamente el mismo día en todos los meses de tu calendario</p>
                             </div>
-                            <span class="px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-extrabold"
-                                  th:text="'Total Filtrado: $ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                            <button type="button" onclick="openObligationModal()"
+                                    class="px-4 py-2 rounded-full bg-secondary text-white text-xs font-bold hover:opacity-95 transition-opacity cursor-pointer border-0">
+                                + Programar Nuevo Pago o Deuda
+                            </button>
                         </div>
 
-                        <!-- BARRA DE FILTROS CON DESPLEGABLES (<select>) -->
-                        <form method="get" action="/dashboard#historial-sql" class="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-surface-container-low/70 p-3.5 rounded-2xl border border-outline-variant/25 m-0">
-                            <!-- Desplegable 1: Mes -->
-                            <div class="sm:col-span-3 flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant px-1">Mes</label>
-                                <select name="month" onchange="this.form.submit()"
-                                        class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-xs font-bold text-on-surface cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary">
-                                    <option th:each="entry : ${availableMonths}"
-                                            th:value="${entry.key}"
-                                            th:text="${entry.value}"
-                                            th:selected="${entry.key == selectedMonth}">Octubre 2026</option>
-                                </select>
-                            </div>
+                        <div th:if="${#lists.isEmpty(obligations)}" class="p-5 rounded-2xl bg-surface-container-low text-xs text-on-surface-variant text-center">
+                            Aún no has programado pagos fijos (como el alquiler o cuotas de deudas). Haz clic en "+ Programar Nuevo Pago o Deuda" para que se marquen cada mes.
+                        </div>
 
-                            <!-- Desplegable 2: Categoría -->
-                            <div class="sm:col-span-4 flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant px-1">Categoría</label>
-                                <select name="category" onchange="this.form.submit()"
-                                        class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-xs font-semibold text-on-surface cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary">
-                                    <option value="" th:selected="${selectedCategory == null or selectedCategory == ''}">Todas las categorías</option>
-                                    <option th:each="cat : ${availableCategories}"
-                                            th:value="${cat}"
-                                            th:text="${cat}"
-                                            th:selected="${cat == selectedCategory}">Alimentación</option>
-                                </select>
-                            </div>
-
-                            <!-- Desplegable 3: Lugar / Comercio -->
-                            <div class="sm:col-span-3 flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant px-1">Lugar o Concepto</label>
-                                <select name="merchant" onchange="this.form.submit()"
-                                        class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-xs font-semibold text-on-surface cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary">
-                                    <option value="" th:selected="${selectedMerchant == null or selectedMerchant == ''}">Todos los lugares</option>
-                                    <option th:each="merch : ${availableMerchants}"
-                                            th:value="${merch}"
-                                            th:text="${merch}"
-                                            th:selected="${merch == selectedMerchant}">Éxito</option>
-                                </select>
-                            </div>
-
-                            <!-- Botones Filtrar / Limpiar -->
-                            <div class="sm:col-span-2 flex items-end gap-1.5">
-                                <button type="submit" class="flex-1 h-10 px-3 rounded-xl bg-secondary text-on-secondary text-xs font-bold shadow-xs hover:opacity-95 transition-opacity">
-                                    Filtrar
-                                </button>
-                                <a th:if="${(selectedCategory != null and selectedCategory != '') or (selectedMerchant != null and selectedMerchant != '')}"
-                                   th:href="@{/dashboard(month=${selectedMonth})}"
-                                   title="Limpiar filtros"
-                                   class="h-10 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-on-surface-variant hover:text-primary flex items-center justify-center no-underline">
-                                    <span class="material-symbols-outlined text-[16px]">close</span>
-                                </a>
-                            </div>
-                        </form>
-
-                        <!-- Lista de Movimientos -->
-                        <div class="divide-y divide-outline-variant/20">
-                            <div th:if="${#lists.isEmpty(history.transactions)}" class="py-8 text-center text-on-surface-variant text-sm flex flex-col items-center gap-2">
-                                <span class="material-symbols-outlined text-[32px] text-secondary">event_note</span>
-                                <span>Aún no tienes gastos anotados con este filtro. ¡Haz clic en un día del calendario arriba para anotar un gasto!</span>
-                            </div>
-                            <div th:each="tx : ${history.transactions}" class="py-3.5 flex items-center justify-between gap-3 hover:bg-surface-container-low/40 px-3 rounded-2xl transition-colors">
-                                <div class="flex flex-col min-w-0 gap-0.5">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="text-sm text-primary font-extrabold" th:text="${tx.merchantName}"></span>
-                                        <span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary text-[11px] font-bold" th:text="${tx.category}"></span>
-                                        <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[10px] font-semibold" th:text="${tx.budgetBlock.label}"></span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" th:if="${!#lists.isEmpty(obligations)}">
+                            <div th:each="ob : ${obligations}" class="p-4 rounded-2xl bg-surface-container-low/80 border border-outline-variant/25 flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-11 h-11 rounded-2xl bg-primary-container text-white flex flex-col items-center justify-center flex-shrink-0 leading-none shadow-xs">
+                                        <span class="text-[9px] uppercase font-bold opacity-80">Día</span>
+                                        <span class="text-sm font-extrabold" th:text="${ob.dueDay}">5</span>
                                     </div>
-                                    <span th:if="${tx.description != null and !tx.description.isEmpty()}"
-                                          class="text-xs text-on-surface font-medium" th:text="${tx.description}"></span>
-                                    <span class="text-[11px] text-on-surface-variant" th:text="'📅 Fecha: ' + ${tx.transactionDate}"></span>
+                                    <div class="flex flex-col truncate">
+                                        <span class="text-xs font-extrabold text-on-surface truncate" th:text="${ob.name}">Alquiler</span>
+                                        <span class="text-[11px] text-on-surface-variant" th:text="${ob.category + ' • Día ' + ob.dueDay + ' de cada mes'}">Vivienda</span>
+                                    </div>
                                 </div>
-                                <span class="text-base text-primary font-extrabold flex-shrink-0"
-                                      th:text="'$ ' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    <span class="text-xs font-extrabold text-secondary"
+                                          th:text="'$ ' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}">$ 1.200.000</span>
+                                    <form method="post" th:action="@{'/dashboard/obligations/' + ${ob.id} + '/delete'}" class="m-0">
+                                        <input type="hidden" name="returnTo" th:value="'/dashboard?month=' + ${selectedMonth}"/>
+                                        <button type="submit" title="Eliminar pago fijo" class="p-1.5 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors">
+                                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Enlace directo a la sección independiente de Historial de Gastos del Mes -->
+                        <div class="pt-2 border-t border-outline-variant/20 flex items-center justify-between flex-wrap gap-2">
+                            <span class="text-xs text-on-surface-variant">¿Quieres buscar o filtrar todos los gastos registrados en este mes?</span>
+                            <a th:href="@{/history(month=${selectedMonth})}"
+                               class="px-4 py-2 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-white text-primary text-xs font-bold no-underline transition-all flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                                <span>Ir a Historial de Gastos del Mes &rarr;</span>
+                            </a>
                         </div>
                     </section>
                 </div>
@@ -685,50 +650,7 @@
                         </div>
                     </section>
 
-                    <!-- b) Mis Pagos y Deudas Fijas de Cada Mes -->
-                    <section class="bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-outline-variant/30 flex flex-col gap-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-base text-primary font-extrabold m-0">📌 Pagos Fijos y Deudas de Cada Mes</h3>
-                                <p class="text-xs text-on-surface-variant m-0">Se repiten automáticamente el mismo día en tu calendario</p>
-                            </div>
-                            <button type="button" onclick="openObligationModal()"
-                                    class="px-3 py-1.5 rounded-full bg-secondary text-white text-xs font-bold hover:opacity-95 transition-opacity">
-                                + Nuevo Pago
-                            </button>
-                        </div>
-
-                        <div th:if="${#lists.isEmpty(obligations)}" class="p-4 rounded-2xl bg-surface-container-low text-xs text-on-surface-variant text-center">
-                            Aún no has programado pagos fijos (como el alquiler o cuotas de deudas). Haz clic en "+ Nuevo Pago" para que se marquen cada mes.
-                        </div>
-
-                        <div class="flex flex-col gap-2.5" th:if="${!#lists.isEmpty(obligations)}">
-                            <div th:each="ob : ${obligations}" class="p-3.5 rounded-2xl bg-surface-container-low/80 border border-outline-variant/25 flex items-center justify-between gap-2">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-2xl bg-primary-container text-white flex flex-col items-center justify-center flex-shrink-0 leading-none">
-                                        <span class="text-[9px] uppercase font-bold opacity-80">Día</span>
-                                        <span class="text-sm font-extrabold" th:text="${ob.dueDay}">5</span>
-                                    </div>
-                                    <div class="flex flex-col truncate">
-                                        <span class="text-xs font-extrabold text-on-surface truncate" th:text="${ob.name}">Alquiler</span>
-                                        <span class="text-[11px] text-on-surface-variant" th:text="${ob.category + ' • Cada mes el día ' + ob.dueDay}">Vivienda</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2 flex-shrink-0">
-                                    <span class="text-xs font-extrabold text-secondary"
-                                          th:text="'$ ' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}">$ 1.200.000</span>
-                                    <form method="post" th:action="@{'/dashboard/obligations/' + ${ob.id} + '/delete'}" class="m-0">
-                                        <input type="hidden" name="returnTo" th:value="'/dashboard?month=' + ${selectedMonth}"/>
-                                        <button type="submit" title="Eliminar pago fijo" class="p-1.5 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors">
-                                            <span class="material-symbols-outlined text-[16px]">delete</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- c) Tu Asistente Personal Amigable -->
+                    <!-- b) Tu Asistente Personal Amigable -->
                     <section aria-label="Asistente Personal" class="bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-outline-variant/30 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2.5">
@@ -832,9 +754,16 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-on-surface mb-1">Valor del Gasto ($ COP)</label>
-                        <input type="number" step="100" min="1" name="totalAmount" id="modal-input-amount" required
+                        <input type="number" step="1000" min="0" name="totalAmount" id="modal-input-amount" required
                                placeholder="Ej. 45000"
+                               oninput="this.setCustomValidity('')"
                                class="w-full h-10 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-extrabold text-secondary focus:outline-none focus:ring-2 focus:ring-secondary"/>
+                        <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                            <button type="button" onclick="addQuickAmount(1000)" class="px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-[10px] font-bold text-primary border border-outline-variant/30 cursor-pointer">+1.000</button>
+                            <button type="button" onclick="addQuickAmount(5000)" class="px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-[10px] font-bold text-primary border border-outline-variant/30 cursor-pointer">+5.000</button>
+                            <button type="button" onclick="addQuickAmount(10000)" class="px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-[10px] font-bold text-primary border border-outline-variant/30 cursor-pointer">+10.000</button>
+                            <button type="button" onclick="addQuickAmount(50000)" class="px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-[10px] font-bold text-primary border border-outline-variant/30 cursor-pointer">+50.000</button>
+                        </div>
                     </div>
                 </div>
 
@@ -902,7 +831,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-on-surface mb-1">Monto Mensual ($ COP)</label>
-                    <input type="number" step="1000" min="1" name="estimatedAmount" required placeholder="1200000"
+                    <input type="number" step="1000" min="0" name="estimatedAmount" required placeholder="1200000"
                            class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-extrabold text-secondary"/>
                 </div>
                 <div>
@@ -1048,6 +977,24 @@
         backdrop.classList.add('hidden');
         backdrop.classList.remove('flex');
     }
+
+    function addQuickAmount(delta) {
+        const input = document.getElementById('modal-input-amount');
+        if (!input) return;
+        const current = parseInt(input.value, 10) || 0;
+        input.value = current + delta;
+    }
+
+    // Permitir cualquier valor escrito manualmente al enviar formularios, mientras las flechas suben de 1.000 en 1.000 desde 0
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', () => {
+            form.querySelectorAll('input[type="number"]').forEach(numInput => {
+                if (numInput.name !== 'dueDay') {
+                    numInput.setAttribute('step', 'any');
+                }
+            });
+        });
+    });
 
     // Cerrar modales al hacer clic fuera de la tarjeta
     document.getElementById('day-modal-backdrop').addEventListener('click', (e) => {
