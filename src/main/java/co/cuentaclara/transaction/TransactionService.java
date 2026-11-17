@@ -162,7 +162,7 @@ public class TransactionService {
         tx.setCitationReference(buildCitationReference(doc, null));
         tx.setConfirmed(true);
 
-        TransactionEntity savedTx = transactionRepository.save(tx);
+        TransactionEntity savedTx = transactionRepository.saveAndFlush(tx);
 
         boolean categoryChangedOrConfirmed = originalSuggestedCategory == null
                 || !originalSuggestedCategory.equalsIgnoreCase(category)
@@ -239,12 +239,12 @@ public class TransactionService {
         tx.setCitationReference("MANUAL:PENDIENTE");
         tx.setConfirmed(true);
 
-        TransactionEntity saved = transactionRepository.save(tx);
+        TransactionEntity saved = transactionRepository.saveAndFlush(tx);
         String finalCitation = attachedDoc != null
                 ? "MANUAL:" + saved.getId() + " | Respaldo: " + buildCitationReference(attachedDoc, null)
                 : "MANUAL:" + saved.getId();
         saved.setCitationReference(finalCitation);
-        saved = transactionRepository.save(saved);
+        saved = transactionRepository.saveAndFlush(saved);
 
         if (confirmationHook != null) {
             confirmationHook.onManualExpenseRegistered(
