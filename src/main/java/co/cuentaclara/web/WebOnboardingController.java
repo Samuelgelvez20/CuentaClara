@@ -157,12 +157,16 @@ public class WebOnboardingController {
         }
         AuthController.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
         final var userId = auth.userId();
+        final String currentMonthStr = java.time.YearMonth.now().toString();
         RlsDataSourceConfig.runAsUser(userId, () -> {
             reportService.simulateFirstMonthAndGenerateReport(userId, "2026-10");
+            if (!"2026-10".equals(currentMonthStr)) {
+                reportService.simulateFirstMonthAndGenerateReport(userId, currentMonthStr);
+            }
         });
         redirectAttributes.addFlashAttribute(
                 "successMessage",
-                "¡Entorno Demo activado! Se cargó el primer mes simulado (2026-10) con movimientos e informe SQL listos."
+                "¡Entorno Demo activado! Tu calendario está sincronizado con el mes y día de hoy."
         );
         return "redirect:/dashboard";
     }
