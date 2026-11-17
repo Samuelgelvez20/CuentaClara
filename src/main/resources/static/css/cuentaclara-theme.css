@@ -1,0 +1,303 @@
+/* ==========================================================================
+   CuentaClara Theme Engine — Dynamic Palette & Dark/Light Mode Module
+   ========================================================================== */
+
+:root {
+    /* DEFAULT PALETTE: VINO TINTO (Elegante, Distintivo, Fintech Premium) */
+    --primary: #3b0019;
+    --primary-container: #5b0e2d;
+    --on-primary: #ffffff;
+    --on-primary-container: #ffd9e1;
+    --secondary: #b32446;
+    --secondary-container: #fe5e7a;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #ffffff;
+    --secondary-fixed: #ffd9dc;
+    --secondary-fixed-dim: #ffb2ba;
+    --on-secondary-fixed: #400010;
+    --tertiary: #003530;
+    --tertiary-container: #004d46;
+    --tertiary-fixed: #89f5e7;
+    --surface: #fff8f7;
+    --surface-bright: #ffffff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #fff0f1;
+    --surface-container: #ffe9eb;
+    --surface-container-high: #ffe1e5;
+    --surface-container-highest: #ffd9df;
+    --on-surface: #3f0017;
+    --on-surface-variant: #544246;
+    --outline: #867276;
+    --outline-variant: #d9c0c5;
+    --brand-glow: rgba(179, 36, 70, 0.15);
+    --border-subtle: rgba(91, 14, 45, 0.08);
+}
+
+/* PALETTE 2: VERDE ESMERALDA (Finanzas Clásicas & Crecimiento) */
+[data-theme="emerald"] {
+    --primary: #003527;
+    --primary-container: #064e3b;
+    --on-primary: #ffffff;
+    --on-primary-container: #80bea6;
+    --secondary: #006c49;
+    --secondary-container: #6cf8bb;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #002113;
+    --secondary-fixed: #6ffbbe;
+    --secondary-fixed-dim: #4edea3;
+    --on-secondary-fixed: #002113;
+    --tertiary: #00342f;
+    --tertiary-container: #004d46;
+    --tertiary-fixed: #89f5e7;
+    --surface: #f8fbf9;
+    --surface-bright: #ffffff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #eff7f3;
+    --surface-container: #e2f1ea;
+    --surface-container-high: #d5e9df;
+    --surface-container-highest: #c8e0d4;
+    --on-surface: #0b1c15;
+    --on-surface-variant: #404944;
+    --outline: #707974;
+    --outline-variant: #bfc9c3;
+    --brand-glow: rgba(0, 108, 73, 0.15);
+    --border-subtle: rgba(6, 78, 59, 0.08);
+}
+
+/* PALETTE 3: AZUL ZAFIRO (Corporativo, Solidez & Confianza) */
+[data-theme="ocean"] {
+    --primary: #0a2540;
+    --primary-container: #123e6b;
+    --on-primary: #ffffff;
+    --on-primary-container: #b8d9fc;
+    --secondary: #0284c7;
+    --secondary-container: #38bdf8;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #082f49;
+    --secondary-fixed: #bae6fd;
+    --secondary-fixed-dim: #7dd3fc;
+    --on-secondary-fixed: #082f49;
+    --tertiary: #0369a1;
+    --tertiary-container: #075985;
+    --tertiary-fixed: #7dd3fc;
+    --surface: #f8fafc;
+    --surface-bright: #ffffff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #f0f6fa;
+    --surface-container: #e2eef7;
+    --surface-container-high: #d3e5f2;
+    --surface-container-highest: #c3dced;
+    --on-surface: #0f172a;
+    --on-surface-variant: #475569;
+    --outline: #64748b;
+    --outline-variant: #cbd5e1;
+    --brand-glow: rgba(2, 132, 199, 0.15);
+    --border-subtle: rgba(10, 37, 64, 0.08);
+}
+
+/* PALETTE 4: MORADO AMATISTA (Moderno, Creativo & Exclusivo) */
+[data-theme="amethyst"] {
+    --primary: #3b0764;
+    --primary-container: #581c87;
+    --on-primary: #ffffff;
+    --on-primary-container: #f3e8ff;
+    --secondary: #9333ea;
+    --secondary-container: #c084fc;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #3b0764;
+    --secondary-fixed: #e9d5ff;
+    --secondary-fixed-dim: #d8b4fe;
+    --on-secondary-fixed: #3b0764;
+    --tertiary: #6b21a8;
+    --tertiary-container: #581c87;
+    --tertiary-fixed: #e9d5ff;
+    --surface: #faf7fd;
+    --surface-bright: #ffffff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #f5eeff;
+    --surface-container: #ede0fd;
+    --surface-container-high: #e2d0fa;
+    --surface-container-highest: #d7bff7;
+    --on-surface: #1e0933;
+    --on-surface-variant: #58446e;
+    --outline: #7c6894;
+    --outline-variant: #d6cae3;
+    --brand-glow: rgba(147, 51, 234, 0.15);
+    --border-subtle: rgba(59, 7, 100, 0.08);
+}
+
+/* PALETTE 5: GRAFITO EJECUTIVO (Minimalista & Sobrio) */
+[data-theme="graphite"] {
+    --primary: #18181b;
+    --primary-container: #27272a;
+    --on-primary: #ffffff;
+    --on-primary-container: #e4e4e7;
+    --secondary: #4f46e5;
+    --secondary-container: #818cf8;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #1e1b4b;
+    --secondary-fixed: #e0e7ff;
+    --secondary-fixed-dim: #c7d2fe;
+    --on-secondary-fixed: #1e1b4b;
+    --tertiary: #374151;
+    --tertiary-container: #4b5563;
+    --tertiary-fixed: #d1d5db;
+    --surface: #fafafa;
+    --surface-bright: #ffffff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #f4f4f5;
+    --surface-container: #e4e4e7;
+    --surface-container-high: #d4d4d8;
+    --surface-container-highest: #a1a1aa;
+    --on-surface: #09090b;
+    --on-surface-variant: #52525b;
+    --outline: #71717a;
+    --outline-variant: #d4d4d8;
+    --brand-glow: rgba(79, 70, 229, 0.15);
+    --border-subtle: rgba(24, 24, 27, 0.08);
+}
+
+/* ==========================================================================
+   MODO OSCURO (DARK MODE) — Elegante, Alto Contraste y Descanso Visual
+   ========================================================================== */
+
+html.dark {
+    /* Vino Tinto Dark (Default) */
+    --primary: #ffb1c5;
+    --primary-container: #5b0e2d;
+    --on-primary: #3b0019;
+    --on-primary-container: #ffd9e1;
+    --secondary: #fe5e7a;
+    --secondary-container: #85002a;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #ffd9dc;
+    --secondary-fixed: #5c071d;
+    --secondary-fixed-dim: #ffb2ba;
+    --on-secondary-fixed: #ffd9dc;
+    --surface: #140d10;
+    --surface-bright: #201419;
+    --surface-container-lowest: #100a0d;
+    --surface-container-low: #1a1115;
+    --surface-container: #22171c;
+    --surface-container-high: #2c1e25;
+    --surface-container-highest: #38262f;
+    --on-surface: #f9eef1;
+    --on-surface-variant: #d8c2c8;
+    --outline: #9e878e;
+    --outline-variant: #4f3b42;
+    --brand-glow: rgba(254, 94, 122, 0.25);
+    --border-subtle: rgba(255, 177, 197, 0.12);
+}
+
+html.dark[data-theme="emerald"] {
+    --primary: #80bea6;
+    --primary-container: #064e3b;
+    --on-primary: #002117;
+    --on-primary-container: #b0f0d6;
+    --secondary: #4edea3;
+    --secondary-container: #005236;
+    --on-secondary: #002113;
+    --on-secondary-container: #6ffbbe;
+    --secondary-fixed: #003a25;
+    --secondary-fixed-dim: #4edea3;
+    --on-secondary-fixed: #6ffbbe;
+    --surface: #0d1512;
+    --surface-bright: #15221d;
+    --surface-container-lowest: #090e0c;
+    --surface-container-low: #121c18;
+    --surface-container: #17241f;
+    --surface-container-high: #1f3029;
+    --surface-container-highest: #283e35;
+    --on-surface: #eaf6f0;
+    --on-surface-variant: #c0d1c9;
+    --outline: #869b91;
+    --outline-variant: #344840;
+    --brand-glow: rgba(78, 222, 163, 0.25);
+    --border-subtle: rgba(128, 190, 166, 0.12);
+}
+
+html.dark[data-theme="ocean"] {
+    --primary: #93c5fd;
+    --primary-container: #1e3a8a;
+    --on-primary: #082f49;
+    --on-primary-container: #dbeafe;
+    --secondary: #38bdf8;
+    --secondary-container: #0369a1;
+    --on-secondary: #082f49;
+    --on-secondary-container: #e0f2fe;
+    --secondary-fixed: #075985;
+    --secondary-fixed-dim: #7dd3fc;
+    --on-secondary-fixed: #e0f2fe;
+    --surface: #0b1118;
+    --surface-bright: #121c27;
+    --surface-container-lowest: #070c12;
+    --surface-container-low: #101923;
+    --surface-container: #15212e;
+    --surface-container-high: #1d2c3d;
+    --surface-container-highest: #26394e;
+    --on-surface: #e8f1fa;
+    --on-surface-variant: #bfd0e0;
+    --outline: #7b94aa;
+    --outline-variant: #2d4257;
+    --brand-glow: rgba(56, 189, 248, 0.25);
+    --border-subtle: rgba(147, 197, 253, 0.12);
+}
+
+html.dark[data-theme="amethyst"] {
+    --primary: #d8b4fe;
+    --primary-container: #581c87;
+    --on-primary: #250543;
+    --on-primary-container: #f3e8ff;
+    --secondary: #c084fc;
+    --secondary-container: #7e22ce;
+    --on-secondary: #250543;
+    --on-secondary-container: #fae8ff;
+    --secondary-fixed: #581c87;
+    --secondary-fixed-dim: #d8b4fe;
+    --on-secondary-fixed: #fae8ff;
+    --surface: #110917;
+    --surface-bright: #1b1024;
+    --surface-container-lowest: #0c0610;
+    --surface-container-low: #160e1f;
+    --surface-container: #1c1228;
+    --surface-container-high: #261937;
+    --surface-container-highest: #332249;
+    --on-surface: #f4ecfb;
+    --on-surface-variant: #d5c4e6;
+    --outline: #9581a9;
+    --outline-variant: #433157;
+    --brand-glow: rgba(192, 132, 252, 0.25);
+    --border-subtle: rgba(216, 180, 254, 0.12);
+}
+
+html.dark[data-theme="graphite"] {
+    --primary: #f4f4f5;
+    --primary-container: #27272a;
+    --on-primary: #18181b;
+    --on-primary-container: #fafafa;
+    --secondary: #818cf8;
+    --secondary-container: #3730a3;
+    --on-secondary: #1e1b4b;
+    --on-secondary-container: #e0e7ff;
+    --secondary-fixed: #312e81;
+    --secondary-fixed-dim: #a5b4fc;
+    --on-secondary-fixed: #e0e7ff;
+    --surface: #09090b;
+    --surface-bright: #18181b;
+    --surface-container-lowest: #050507;
+    --surface-container-low: #121214;
+    --surface-container: #18181b;
+    --surface-container-high: #222226;
+    --surface-container-highest: #2e2e34;
+    --on-surface: #fafafa;
+    --on-surface-variant: #d4d4d8;
+    --outline: #a1a1aa;
+    --outline-variant: #3f3f46;
+    --brand-glow: rgba(129, 140, 248, 0.25);
+    --border-subtle: rgba(244, 244, 245, 0.12);
+}
+
+/* Transiciones suaves al cambiar tema */
+body, aside, main, header, div, nav, button, input, select {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}

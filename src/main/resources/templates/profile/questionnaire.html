@@ -4,8 +4,10 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>CuentaClara — Presupuesto 50/30/20 (PC)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/cuentaclara-theme.css"/>
+    <script src="/js/cuentaclara-theme.js"></script>
     <style>
         @layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } }
         ::-webkit-scrollbar { display: none; }
@@ -16,48 +18,56 @@
             darkMode: "class",
             theme: {
                 extend: {
-                    "colors": {
-                        "on-surface": "#0b1c30",
-                        "outline": "#707974",
-                        "surface-bright": "#f8f9ff",
-                        "error": "#ba1a1a",
-                        "surface": "#f8f9ff",
-                        "on-primary-fixed": "#002117",
-                        "on-tertiary-fixed-variant": "#005049",
-                        "tertiary": "#00342f",
-                        "secondary-fixed-dim": "#4edea3",
-                        "on-primary": "#ffffff",
-                        "on-surface-variant": "#404944",
-                        "surface-dim": "#cbdbf5",
-                        "outline-variant": "#bfc9c3",
-                        "tertiary-container": "#004d46",
-                        "on-secondary": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "inverse-primary": "#95d3ba",
-                        "on-secondary-fixed-variant": "#005236",
-                        "surface-container-low": "#eff4ff",
-                        "tertiary-fixed": "#89f5e7",
-                        "surface-container-high": "#dce9ff",
-                        "on-tertiary": "#ffffff",
-                        "on-tertiary-container": "#53c2b5",
-                        "primary": "#003527",
-                        "surface-container-highest": "#d3e4fe",
-                        "surface-variant": "#d3e4fe",
-                        "background": "#f8f9ff",
-                        "surface-tint": "#2b6954",
-                        "on-secondary-container": "#00714d",
-                        "surface-container": "#e5eeff",
-                        "on-background": "#0b1c30",
-                        "secondary": "#006c49",
-                        "primary-fixed": "#b0f0d6",
-                        "tertiary-fixed-dim": "#6bd8cb",
-                        "primary-fixed-dim": "#95d3ba",
-                        "secondary-fixed": "#6ffbbe",
-                        "surface-container-lowest": "#ffffff",
-                        "on-primary-fixed-variant": "#0b513d",
-                        "inverse-on-surface": "#eaf1ff",
-                        "primary-container": "#064e3b",
-                        "on-error": "#ffffff",
+                    colors: {
+                        "primary": "var(--primary)",
+                        "primary-container": "var(--primary-container)",
+                        "on-primary": "var(--on-primary)",
+                        "on-primary-container": "var(--on-primary-container)",
+                        "secondary": "var(--secondary)",
+                        "secondary-container": "var(--secondary-container)",
+                        "on-secondary": "var(--on-secondary)",
+                        "on-secondary-container": "var(--on-secondary-container)",
+                        "secondary-fixed": "var(--secondary-fixed)",
+                        "secondary-fixed-dim": "var(--secondary-fixed-dim)",
+                        "on-secondary-fixed": "var(--on-secondary-fixed)",
+                        "tertiary": "var(--tertiary)",
+                        "tertiary-container": "var(--tertiary-container)",
+                        "tertiary-fixed": "var(--tertiary-fixed)",
+                        "surface": "var(--surface)",
+                        "surface-bright": "var(--surface-bright)",
+                        "surface-container-lowest": "var(--surface-container-lowest)",
+                        "surface-container-low": "var(--surface-container-low)",
+                        "surface-container": "var(--surface-container)",
+                        "surface-container-high": "var(--surface-container-high)",
+                        "surface-container-highest": "var(--surface-container-highest)",
+                        "on-surface": "var(--on-surface)",
+                        "on-surface-variant": "var(--on-surface-variant)",
+                        "outline": "var(--outline)",
+                        "outline-variant": "var(--outline-variant)"
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    spacing: { "space-2xl": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "gutter-sm": "1rem", "margin-lg": "3rem", "margin-sm": "1rem", "gutter-lg": "2rem", "gutter": "1.5rem", "space-xxs": "0.25rem", "space-xs": "0.5rem", "margin": "2rem", "space-md": "1rem" },
+                    fontFamily: {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "data-mono": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "title-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"]
+                    }
+                }
+            }
+        };
+    </script>
+</head>
                         "on-secondary-fixed": "#002113",
                         "on-tertiary-fixed": "#00201d",
                         "inverse-surface": "#213145",
@@ -143,6 +153,10 @@
                     <span class="material-symbols-outlined text-[20px]">history_edu</span>
                     <span>Historial &amp; XMLs</span>
                 </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/settings">
+                    <span class="material-symbols-outlined text-[20px]">settings</span>
+                    <span>Configuración</span>
+                </a>
             </nav>
         </div>
     </div>
@@ -175,10 +189,23 @@
                 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
                 <span class="text-primary font-semibold">Perfil Financiero y Regla 50 / 30 / 20</span>
             </div>
-            <a href="/dashboard" class="h-10 px-space-md bg-primary-container hover:bg-primary text-on-primary rounded-lg font-title-md text-body-sm flex items-center gap-space-xs shadow-sm transition-colors no-underline">
-                <span class="material-symbols-outlined text-[18px] text-secondary-fixed">dashboard</span>
-                <span>Ir al Panel Principal</span>
-            </a>
+            <div class="flex items-center gap-space-sm">
+                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
+                        title="Alternar Modo Claro / Oscuro"
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all shadow-sm">
+                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
+                    <span>Modo Visual</span>
+                </button>
+                <a href="/settings" title="Personalizar Colores y Preferencias"
+                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all shadow-sm no-underline">
+                    <span class="material-symbols-outlined text-[18px] text-secondary">palette</span>
+                    <span>Temas</span>
+                </a>
+                <a href="/dashboard" class="h-10 px-space-md bg-primary-container hover:opacity-95 text-on-primary rounded-xl font-title-md text-body-sm flex items-center gap-space-xs shadow-md transition-all no-underline">
+                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">dashboard</span>
+                    <span>Ir al Panel</span>
+                </a>
+            </div>
         </div>
     </header>
 
