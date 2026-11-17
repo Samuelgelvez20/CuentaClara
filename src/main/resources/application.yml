@@ -43,7 +43,7 @@ spring:
 cuentaclara:
   security:
     jwt-secret: ${JWT_SECRET:c3VwZXItc2VjcmV0LWtleS1mb3ItY3VlbnRhY2xhcmEtZGV2LW1pbmltdW0tMzItYnl0ZXM=}
-    jwt-expiration-minutes: ${JWT_EXPIRATION_MINUTES:30}
+    jwt-expiration-minutes: ${JWT_EXPIRATION_MINUTES:720}
   storage:
     temp-dir: ${TEMP_STORAGE_DIR:./tmp/uploads}
   clamav:
