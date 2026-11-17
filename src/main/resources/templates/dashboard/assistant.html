@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CuentaClara — Asistente RAG con Citas (PC)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <style>
+        @layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#0b1c30",
+                        "outline": "#707974",
+                        "surface-bright": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed": "#002117",
+                        "on-tertiary-fixed-variant": "#005049",
+                        "tertiary": "#00342f",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#404944",
+                        "surface-dim": "#cbdbf5",
+                        "outline-variant": "#bfc9c3",
+                        "tertiary-container": "#004d46",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#95d3ba",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary-fixed": "#89f5e7",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#53c2b5",
+                        "primary": "#003527",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-variant": "#d3e4fe",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#2b6954",
+                        "on-secondary-container": "#00714d",
+                        "surface-container": "#e5eeff",
+                        "on-background": "#0b1c30",
+                        "secondary": "#006c49",
+                        "primary-fixed": "#b0f0d6",
+                        "tertiary-fixed-dim": "#6bd8cb",
+                        "primary-fixed-dim": "#95d3ba",
+                        "secondary-fixed": "#6ffbbe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#0b513d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-container": "#064e3b",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#002113",
+                        "on-tertiary-fixed": "#00201d",
+                        "inverse-surface": "#213145",
+                        "secondary-container": "#6cf8bb",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#80bea6"
+                    },
+                    "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    "spacing": { "space-2xl": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "gutter-sm": "1rem", "margin-lg": "3rem", "margin-sm": "1rem", "gutter-lg": "2rem", "gutter": "1.5rem", "space-xxs": "0.25rem", "space-xs": "0.5rem", "margin": "2rem", "space-md": "1rem" },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "data-mono": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "title-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+
+<!-- LEFT FIXED SIDEBAR (PC) -->
+<aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,53,39,0.06)]">
+    <div class="flex flex-col flex-1 overflow-y-auto">
+        <div class="p-space-lg flex items-center gap-space-sm">
+            <div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shadow-sm">
+                <span class="material-symbols-outlined text-secondary-fixed text-[22px]">account_balance</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-title-md text-title-md text-primary leading-tight tracking-tight font-bold">CuentaClara</span>
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Finanzas &amp; RAG DIAN</span>
+            </div>
+        </div>
+        <div class="px-space-md py-space-xs">
+            <div class="px-space-sm pb-space-xs">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Módulos Fiscales</span>
+            </div>
+            <nav class="flex flex-col gap-space-xxs">
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/dashboard">
+                    <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                    <span>Panel Principal</span>
+                </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/upload">
+                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                    <span>Cargar y Confirmar</span>
+                </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/profile">
+                    <span class="material-symbols-outlined text-[20px]">pie_chart</span>
+                    <span>Presupuesto 50/30/20</span>
+                </a>
+                <a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg transition-colors bg-primary-container text-on-primary font-bold shadow-sm no-underline" href="/assistant">
+                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">neurology</span>
+                    <span>Asistente RAG</span>
+                </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/dashboard#historial-sql">
+                    <span class="material-symbols-outlined text-[20px]">history_edu</span>
+                    <span>Historial &amp; XMLs</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/40">
+        <div class="flex items-center justify-between p-space-xs rounded-lg bg-surface-container-lowest shadow-sm">
+            <div class="flex items-center gap-space-xs overflow-hidden">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
+                </div>
+                <div class="flex flex-col truncate">
+                    <span class="font-title-md text-body-sm text-on-surface truncate font-semibold" th:text="${user.fullName}">Usuario</span>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
+                </div>
+            </div>
+            <form method="post" action="/auth/logout" class="m-0">
+                <button class="p-1.5 rounded text-on-surface-variant hover:text-error transition-colors" title="Cerrar sesión" type="submit">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- RIGHT DESKTOP WORKSPACE -->
+<div class="pl-72 flex flex-col min-h-screen">
+    <header class="fixed top-0 left-72 right-0 h-20 bg-surface/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,53,39,0.04)]">
+        <div class="h-20 w-full px-space-xl flex items-center justify-between gap-space-md">
+            <div class="flex items-center gap-space-xxs text-on-surface-variant font-label-md text-label-md">
+                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary">Inicio</a>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                <span class="text-primary font-semibold">Asistente Conversacional RAG Híbrido con Citas</span>
+            </div>
+            <a href="/upload" class="h-10 px-space-md bg-primary-container hover:bg-primary text-on-primary rounded-lg font-title-md text-body-sm flex items-center gap-space-xs shadow-sm transition-colors no-underline">
+                <span class="material-symbols-outlined text-[18px] text-secondary-fixed">add</span>
+                <span>Subir Factura</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="w-full pt-20 bg-surface flex-1">
+        <div class="flex flex-col w-full px-space-xl py-space-lg gap-space-lg max-w-[1600px] mx-auto">
+            <div class="flex flex-col lg:flex-row gap-space-lg w-full items-start">
+
+                <!-- LEFT PANEL: Índice de Evidencias (pgvector) - width 320px -->
+                <aside class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-space-md">
+                    <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-space-xs">
+                                <span class="material-symbols-outlined text-[20px] text-secondary">dataset</span>
+                                <span class="font-title-md text-title-md text-primary font-bold">Índice de Evidencias</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px] uppercase font-bold">pgvector</span>
+                        </div>
+                        <div class="bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-space-xxs">
+                            <div class="flex items-center gap-space-xs">
+                                <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                                <span class="font-label-sm text-label-sm text-on-surface font-semibold"
+                                      th:text="${#lists.size(history.transactions)} + ' movimientos confirmados'">0 movimientos</span>
+                            </div>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug m-0">
+                                Búsqueda Híbrida HNSW + tsvector con Reciprocal Rank Fusion (RRF).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm">
+                        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Comprobantes Confirmados Recientes</span>
+                        <div class="flex flex-col gap-space-xs">
+                            <div th:if="${#lists.isEmpty(history.transactions)}" class="p-3 rounded-lg bg-surface-container-low text-on-surface-variant font-body-sm">
+                                Sin comprobantes confirmados aún.
+                            </div>
+                            <div th:each="tx : ${history.transactions}" class="p-space-sm rounded-lg bg-surface-container-low/70 flex flex-col gap-space-xxs">
+                                <div class="flex items-start justify-between">
+                                    <span class="font-title-md text-body-sm text-on-surface font-bold truncate" th:text="${tx.merchantName}"></span>
+                                    <span class="font-data-mono text-body-sm text-secondary font-bold"
+                                          th:text="'$' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span>
+                                </div>
+                                <div class="flex items-center justify-between text-on-surface-variant font-label-sm text-[11px]">
+                                    <span class="truncate" th:text="${tx.citationReference}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- CENTRAL MAIN CHAT WORKSPACE -->
+                <div class="flex-1 w-full flex flex-col gap-space-md min-w-0">
+                    <div class="bg-surface-container-lowest rounded-xl shadow-sm flex flex-col overflow-hidden min-h-[680px] justify-between">
+                        <div>
+                            <!-- Chat Canvas Header -->
+                            <div class="px-space-lg py-space-md bg-surface-container-low flex flex-wrap items-center justify-between gap-space-md">
+                                <div class="flex items-center gap-space-sm">
+                                    <div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-secondary-fixed shadow-sm">
+                                        <span class="material-symbols-outlined text-[22px]">neurology</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-space-xs">
+                                            <h1 class="font-title-lg text-title-lg text-primary font-bold m-0">Asistente CuentaClara</h1>
+                                            <span class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">SQL + RAG Híbrido</span>
+                                        </div>
+                                        <span class="font-body-sm text-body-sm text-on-surface-variant">Las cifras provienen 100% de SQL y toda respuesta cita su factura, extracto o gasto de respaldo (RF-12, RNF-06).</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Suggested 1-Click Query Chips Row -->
+                            <div class="px-space-lg py-space-sm bg-surface-container-high/30 flex flex-wrap items-center gap-space-xs">
+                                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-secondary">bolt</span> Sugeridos (1 clic):
+                                </span>
+                                <button type="button" onclick="askPreset('¿Cuánto gasté en domicilios en octubre?')"
+                                        class="px-space-sm py-1 rounded-full bg-surface-container-lowest text-primary hover:bg-secondary-fixed font-body-sm text-body-sm shadow-sm transition-all">
+                                    ¿Cuánto gasté en domicilios en octubre?
+                                </button>
+                                <button type="button" onclick="askPreset('¿En qué factura compré Café Molido Gourmet?')"
+                                        class="px-space-sm py-1 rounded-full bg-surface-container-lowest text-primary hover:bg-secondary-fixed font-body-sm text-body-sm shadow-sm transition-all">
+                                    ¿En qué factura compré Café Molido Gourmet?
+                                </button>
+                                <button type="button" onclick="askPreset('¿Cuánto gasté en Almacenes Éxito?')"
+                                        class="px-space-sm py-1 rounded-full bg-surface-container-lowest text-primary hover:bg-secondary-fixed font-body-sm text-body-sm shadow-sm transition-all">
+                                    ¿Cuánto gasté en Almacenes Éxito?
+                                </button>
+                                <button type="button" onclick="askPreset('¿Cuál es mi presupuesto inicial y distribución 50/30/20?')"
+                                        class="px-space-sm py-1 rounded-full bg-surface-container-lowest text-primary hover:bg-secondary-fixed font-body-sm text-body-sm shadow-sm transition-all">
+                                    ¿Cuál es mi presupuesto y distribución 50/30/20?
+                                </button>
+                            </div>
+
+                            <!-- Conversation Stream -->
+                            <div class="p-space-lg flex flex-col gap-space-xl">
+                                <div th:if="${chatResponse == null}" class="p-space-xl rounded-2xl bg-surface-container-low/60 text-center space-y-2">
+                                    <span class="material-symbols-outlined text-[36px] text-secondary">chat</span>
+                                    <h3 class="font-title-lg text-primary font-bold m-0">Haz una pregunta o selecciona una sugerencia arriba</h3>
+                                    <p class="font-body-sm text-on-surface-variant max-w-lg mx-auto m-0">
+                                        El agente consultará tus transacciones confirmadas en SQL (`consultar_transacciones`) y tus fragmentos indexados en `pgvector` + `tsvector` (`buscar_documentos`).
+                                    </p>
+                                </div>
+
+                                <div th:if="${chatResponse != null}" class="flex flex-col gap-space-md">
+                                    <!-- User Question Bubble -->
+                                    <div class="flex justify-end items-start gap-space-sm max-w-2xl ml-auto">
+                                        <div class="bg-primary-container text-on-primary rounded-2xl rounded-tr-none px-space-md py-space-sm shadow-sm">
+                                            <p class="font-body-md text-body-md leading-relaxed text-on-primary m-0" th:text="${chatResponse.question}"></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Assistant RAG Detailed Response with Verified Citations -->
+                                    <div class="flex justify-start items-start gap-space-sm max-w-3xl">
+                                        <div class="w-9 h-9 rounded-xl bg-primary-container text-secondary-fixed flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
+                                            <span class="material-symbols-outlined text-[20px]">neurology</span>
+                                        </div>
+                                        <div class="bg-surface-container-low rounded-2xl rounded-tl-none p-space-lg shadow-sm flex flex-col gap-space-md flex-1 border-l-4 border-secondary">
+                                            <div class="flex items-center justify-between flex-wrap gap-space-xs">
+                                                <div class="inline-flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-lowest text-primary">
+                                                    <span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
+                                                    <span class="font-label-sm text-label-sm font-bold"
+                                                          th:text="${chatResponse.hasEvidence ? 'Respuesta Verificada con Evidencia' : 'Sin Evidencia Registrada'}">Respuesta Verificada</span>
+                                                </div>
+                                                <span class="font-data-mono text-label-sm text-secondary font-bold"
+                                                      th:text="'Total SQL: $ ' + ${#numbers.formatDecimal(chatResponse.sqlComputedTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                                            </div>
+
+                                            <p class="text-on-surface font-body-md text-body-md leading-relaxed m-0" th:text="${chatResponse.answer}"></p>
+
+                                            <!-- Citas Verificables Reales -->
+                                            <div th:if="${!#lists.isEmpty(chatResponse.citations)}" class="flex flex-col gap-space-xs pt-space-xs">
+                                                <div class="flex items-center gap-space-xs">
+                                                    <span class="material-symbols-outlined text-[16px] text-secondary">link</span>
+                                                    <span class="font-label-sm text-label-sm text-primary font-bold uppercase tracking-wider">Citas Verificables Reales (RAG Grounding)</span>
+                                                </div>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
+                                                    <div th:each="cit : ${chatResponse.citations}"
+                                                         class="p-space-md rounded-xl bg-surface-container-lowest flex flex-col justify-between gap-space-xs shadow-xs border border-secondary/20">
+                                                        <div class="flex items-center justify-between">
+                                                            <span class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] font-bold">Fuente Verificada</span>
+                                                            <span class="material-symbols-outlined text-[18px] text-secondary">verified</span>
+                                                        </div>
+                                                        <span class="font-data-mono text-body-sm text-primary font-bold break-all mt-1" th:text="${cit}"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Desktop Input Bar at Bottom -->
+                        <form id="assistant-form" method="post" action="/dashboard/chat" class="p-space-md bg-surface-container-low flex flex-col gap-space-xs m-0">
+                            <input type="hidden" name="returnTo" value="/assistant"/>
+                            <div class="relative flex items-center bg-surface-container-lowest rounded-xl shadow-sm p-space-xs">
+                                <span class="material-symbols-outlined text-[22px] text-secondary mx-2">search</span>
+                                <input id="assistant-input" name="question" required autocomplete="off"
+                                       class="flex-1 h-11 px-space-sm bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none"
+                                       placeholder="Haz una pregunta sobre tus facturas, gastos o extractos en lenguaje natural..." type="text"/>
+                                <button type="submit" class="h-10 px-space-md bg-primary-container hover:bg-primary text-on-primary rounded-lg font-title-md text-body-sm font-semibold flex items-center gap-space-xs shadow-md transition-all flex-shrink-0">
+                                    <span>Consultar</span>
+                                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">send</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function askPreset(questionText) {
+        const input = document.getElementById('assistant-input');
+        const form = document.getElementById('assistant-form');
+        if (input && form) {
+            input.value = questionText;
+            form.submit();
+        }
+    }
+</script>
+</body>
+</html>

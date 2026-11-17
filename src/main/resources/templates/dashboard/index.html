@@ -2,19 +2,12 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
-    <title>CuentaClara — Panel Principal, Facturas, Presupuesto y Asistente RAG</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CuentaClara — Panel Principal (PC)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <style>
-        @layer base {
-            html, body { width: 100%; margin: 0; padding: 0; scroll-behavior: smooth; }
-            body { overscroll-behavior: none; }
-            .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
-            .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
-        }
+        @layer base { html, body { margin: 0; padding: 0; scroll-behavior: smooth; } body { overscroll-behavior: none; } }
         ::-webkit-scrollbar { display: none; }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,710 +17,626 @@
             theme: {
                 extend: {
                     "colors": {
-                        "primary-fixed-dim": "#95d3ba",
-                        "surface-container-low": "#eff4ff",
-                        "primary-fixed": "#b0f0d6",
-                        "on-secondary-fixed": "#002113",
-                        "surface-tint": "#2b6954",
-                        "secondary-fixed-dim": "#4edea3",
-                        "on-tertiary-fixed-variant": "#005049",
-                        "on-secondary-container": "#00714d",
-                        "surface": "#f8f9ff",
-                        "surface-bright": "#f8f9ff",
-                        "on-error": "#ffffff",
-                        "surface-container-high": "#dce9ff",
-                        "on-secondary-fixed-variant": "#005236",
-                        "inverse-on-surface": "#eaf1ff",
-                        "primary-container": "#064e3b",
-                        "background": "#f8f9ff",
-                        "inverse-surface": "#213145",
+                        "on-surface": "#0b1c30",
                         "outline": "#707974",
+                        "surface-bright": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed": "#002117",
+                        "on-tertiary-fixed-variant": "#005049",
+                        "tertiary": "#00342f",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#404944",
+                        "surface-dim": "#cbdbf5",
+                        "outline-variant": "#bfc9c3",
+                        "tertiary-container": "#004d46",
+                        "on-secondary": "#ffffff",
                         "error-container": "#ffdad6",
                         "inverse-primary": "#95d3ba",
-                        "secondary-container": "#6cf8bb",
-                        "on-tertiary-container": "#53c2b5",
-                        "on-primary": "#ffffff",
-                        "tertiary-container": "#004d46",
-                        "on-background": "#0b1c30",
-                        "on-primary-fixed": "#002117",
-                        "outline-variant": "#bfc9c3",
-                        "on-primary-fixed-variant": "#0b513d",
-                        "surface-dim": "#cbdbf5",
-                        "on-primary-container": "#80bea6",
-                        "secondary": "#006c49",
-                        "on-surface-variant": "#404944",
-                        "surface-container-highest": "#d3e4fe",
-                        "error": "#ba1a1a",
-                        "secondary-fixed": "#6ffbbe",
-                        "on-surface": "#0b1c30",
-                        "tertiary": "#00342f",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container-low": "#eff4ff",
                         "tertiary-fixed": "#89f5e7",
-                        "surface-container": "#e5eeff",
-                        "surface-variant": "#d3e4fe",
-                        "on-error-container": "#93000a",
-                        "tertiary-fixed-dim": "#6bd8cb",
-                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#dce9ff",
                         "on-tertiary": "#ffffff",
-                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#53c2b5",
+                        "primary": "#003527",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-variant": "#d3e4fe",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#2b6954",
+                        "on-secondary-container": "#00714d",
+                        "surface-container": "#e5eeff",
+                        "on-background": "#0b1c30",
+                        "secondary": "#006c49",
+                        "primary-fixed": "#b0f0d6",
+                        "tertiary-fixed-dim": "#6bd8cb",
+                        "primary-fixed-dim": "#95d3ba",
+                        "secondary-fixed": "#6ffbbe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#0b513d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-container": "#064e3b",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#002113",
                         "on-tertiary-fixed": "#00201d",
-                        "primary": "#003527"
+                        "inverse-surface": "#213145",
+                        "secondary-container": "#6cf8bb",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#80bea6"
                     },
-                    "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                    "spacing": { "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "gutter": "1.5rem", "margin": "2rem" },
+                    "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    "spacing": { "space-2xl": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "gutter-sm": "1rem", "margin-lg": "3rem", "margin-sm": "1rem", "gutter-lg": "2rem", "gutter": "1.5rem", "space-xxs": "0.25rem", "space-xs": "0.5rem", "margin": "2rem", "space-md": "1rem" },
                     "fontFamily": {
-                        "headline-lg-mobile": ["Plus Jakarta Sans"],
-                        "label-md": ["Plus Jakarta Sans"],
-                        "numeric-hero-mobile": ["JetBrains Mono"],
-                        "numeric-table": ["JetBrains Mono"],
-                        "code-legal": ["JetBrains Mono"],
-                        "headline-md": ["Plus Jakarta Sans"],
                         "body-lg": ["Plus Jakarta Sans"],
+                        "data-mono": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
                         "headline-lg": ["Plus Jakarta Sans"],
-                        "body-md": ["Plus Jakarta Sans"],
-                        "display-mobile": ["Plus Jakarta Sans"],
-                        "numeric-hero": ["JetBrains Mono"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
                         "body-sm": ["Plus Jakarta Sans"],
-                        "display": ["Plus Jakarta Sans"]
+                        "title-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"]
                     },
                     "fontSize": {
-                        "headline-lg-mobile": ["1.5rem", { "lineHeight": "2rem", "fontWeight": "700" }],
-                        "label-md": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "600" }],
-                        "numeric-hero-mobile": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
-                        "numeric-table": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
-                        "code-legal": ["0.6875rem", { "lineHeight": "0.875rem", "fontWeight": "400" }],
-                        "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
-                        "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
-                        "headline-lg": ["2rem", { "lineHeight": "2.5rem", "fontWeight": "700" }],
-                        "body-md": ["0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
-                        "display-mobile": ["2.25rem", { "lineHeight": "2.75rem", "fontWeight": "800" }],
-                        "numeric-hero": ["2.5rem", { "lineHeight": "3rem", "fontWeight": "700" }],
-                        "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
-                        "display": ["3.5rem", { "lineHeight": "4rem", "fontWeight": "800" }]
+                        "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "fontWeight": "700" }]
                     }
                 }
             }
         };
     </script>
 </head>
-<body class="bg-surface text-on-surface min-h-screen flex flex-col antialiased selection:bg-secondary-container selection:text-on-secondary-fixed">
+<body class="bg-surface font-body-md text-on-surface">
 
-<!-- Top Fixed Emerald Header -->
-<header class="fixed top-0 w-full z-50 pt-safe bg-primary-container/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
-    <div class="max-w-4xl mx-auto h-16 px-space-md flex items-center justify-between gap-space-sm">
-        <div class="flex items-center gap-2">
-            <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-secondary-fixed shadow-inner">
-                <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+<!-- LEFT FIXED SIDEBAR (PC) -->
+<aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,53,39,0.06)]">
+    <div class="flex flex-col flex-1 overflow-y-auto">
+        <div class="p-space-lg flex items-center gap-space-sm">
+            <div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shadow-[0_1px_8px_rgba(0,53,39,0.12)]">
+                <span class="material-symbols-outlined text-secondary-fixed text-[22px]">account_balance</span>
             </div>
             <div class="flex flex-col">
-                <span class="font-headline-md text-headline-md tracking-tight text-on-primary flex items-center leading-none">
-                    Cuenta<span class="text-secondary-fixed font-bold">Clara</span>
-                </span>
-                <span class="font-code-legal text-code-legal text-on-primary-container truncate max-w-[180px]" th:text="${user.fullName + ' · ' + user.email}">Inicio</span>
+                <span class="font-title-md text-title-md text-primary leading-tight tracking-tight font-bold">CuentaClara</span>
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Finanzas &amp; RAG DIAN</span>
             </div>
         </div>
-        <div class="flex items-center gap-space-sm">
-            <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-container/80 text-tertiary-fixed shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-secondary-fixed-dim animate-pulse"></span>
-                <span class="font-code-legal text-code-legal tracking-wide uppercase">DIAN UBL 2.1</span>
+        <div class="px-space-md py-space-xs">
+            <div class="px-space-sm pb-space-xs">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Módulos Fiscales</span>
             </div>
-            <a href="/profile" title="Configurar Perfil 50/30/20" class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary hover:bg-tertiary transition-colors no-underline">
-                <span class="material-symbols-outlined text-[18px]">person</span>
-            </a>
+            <nav class="flex flex-col gap-space-xxs">
+                <a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg transition-colors bg-primary-container text-on-primary font-bold shadow-sm no-underline" href="/dashboard">
+                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">dashboard</span>
+                    <span>Panel Principal</span>
+                </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/upload">
+                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                    <span>Cargar y Confirmar</span>
+                    <span th:if="${!#lists.isEmpty(pendingConfirmations)}" class="ml-auto px-2 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold" th:text="${#lists.size(pendingConfirmations)}"></span>
+                </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/profile">
+                    <span class="material-symbols-outlined text-[20px]">pie_chart</span>
+                    <span>Presupuesto 50/30/20</span>
+                </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="/assistant">
+                    <span class="material-symbols-outlined text-[20px]">neurology</span>
+                    <span>Asistente RAG</span>
+                </a>
+                <a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors no-underline" href="#historial-sql">
+                    <span class="material-symbols-outlined text-[20px]">history_edu</span>
+                    <span>Historial &amp; XMLs</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/40">
+        <div class="flex flex-col gap-space-xxs p-space-sm bg-surface-container-lowest rounded-lg shadow-sm">
+            <div class="flex items-center gap-space-xs">
+                <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                <span class="font-label-sm text-label-sm text-on-surface font-semibold">PostgreSQL + pgvector</span>
+            </div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant">Row Level Security Activo</span>
+            <div class="mt-space-xxs inline-flex items-center gap-space-xxs text-secondary">
+                <span class="material-symbols-outlined text-[14px]">verified_user</span>
+                <span class="font-label-sm text-label-sm font-semibold">DIAN UBL 2.1 Compliant</span>
+            </div>
+        </div>
+        <div class="flex items-center justify-between p-space-xs rounded-lg bg-surface-container-lowest shadow-sm">
+            <div class="flex items-center gap-space-xs overflow-hidden">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
+                </div>
+                <div class="flex flex-col truncate">
+                    <span class="font-title-md text-body-sm text-on-surface truncate font-semibold" th:text="${user.fullName}">Usuario</span>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
+                </div>
+            </div>
             <form method="post" action="/auth/logout" class="m-0">
-                <button title="Cerrar sesión" class="px-3 py-1.5 rounded-full bg-primary text-on-primary font-code-legal text-code-legal flex items-center gap-1 hover:bg-tertiary transition-colors" type="submit">
-                    <span class="material-symbols-outlined text-[16px]">logout</span>
-                    <span class="hidden sm:inline">Salir</span>
+                <button class="p-1.5 rounded text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" title="Cerrar sesión" type="submit">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
                 </button>
             </form>
         </div>
     </div>
-</header>
+</aside>
 
-<main class="flex flex-col relative w-full pt-16 pb-28 bg-surface min-h-screen" id="seccion-inicio">
-    <div class="flex flex-col w-full max-w-4xl mx-auto px-space-md py-space-sm gap-space-md">
-
-        <!-- Alertas Flash -->
-        <div th:if="${successMessage}" class="p-3.5 rounded-xl bg-secondary-container text-on-secondary-fixed font-body-sm text-body-sm flex items-center gap-2 shadow-sm">
-            <span class="material-symbols-outlined text-[20px]">done_all</span>
-            <span th:text="${successMessage}"></span>
-        </div>
-        <div th:if="${errorMessage}" class="p-3.5 rounded-xl bg-error-container text-on-error-container font-body-sm text-body-sm flex items-center gap-2 shadow-sm">
-            <span class="material-symbols-outlined text-[20px]">error</span>
-            <span th:text="${errorMessage}"></span>
-        </div>
-
-        <!-- Active Period & System Health Header Strip -->
-        <div class="flex items-center justify-between gap-space-sm bg-surface-container-low px-space-sm py-2 rounded-xl">
-            <div class="flex items-center gap-2">
-                <span class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface text-on-surface shadow-sm">
-                    <span class="material-symbols-outlined text-[16px] text-secondary">calendar_month</span>
-                    <span class="font-headline-md text-label-md font-bold" th:text="'Periodo ' + ${selectedMonth}">Octubre 2026</span>
-                </span>
-                <span class="font-code-legal text-code-legal text-on-surface-variant hidden sm:inline">RLS Activo por Usuario</span>
-            </div>
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-secondary">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
-                </span>
-                <span class="font-code-legal text-code-legal font-bold tracking-tight text-on-surface-variant">PostgreSQL + pgvector</span>
-            </div>
-        </div>
-
-        <!-- KPI Row: Master Cards Vault Style -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
-            <!-- Card 1: Ingreso Base & Rule -->
-            <div class="relative overflow-hidden rounded-xl bg-primary-container p-4 text-on-primary shadow-md flex flex-col justify-between">
-                <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-secondary-container/10 blur-xl pointer-events-none"></div>
-                <div class="flex items-center justify-between">
-                    <span class="font-label-md text-label-md tracking-wider uppercase text-primary-fixed-dim">Ingreso Base / Meta</span>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/40 text-secondary-fixed font-code-legal text-code-legal font-semibold">
-                        <span class="material-symbols-outlined text-[11px]">balance</span>
-                        <span th:text="${profile != null ? 'Regla ' + profile.needsPct + '/' + profile.wantsPct + '/' + profile.savingsPct : 'Regla 50/30/20'}">50/30/20</span>
-                    </span>
+<!-- RIGHT DESKTOP WORKSPACE -->
+<div class="pl-72 flex flex-col min-h-screen">
+    <!-- Top Desktop Header Bar -->
+    <header class="fixed top-0 left-72 right-0 h-20 bg-surface/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,53,39,0.04)]">
+        <div class="h-20 w-full px-space-xl flex items-center justify-between gap-space-md">
+            <form method="post" action="/dashboard/chat" class="flex-1 max-w-xl m-0">
+                <input type="hidden" name="returnTo" value="/assistant"/>
+                <div class="relative flex items-center">
+                    <span class="material-symbols-outlined absolute left-space-md text-on-surface-variant text-[20px]">search</span>
+                    <input name="question" class="w-full h-10 pl-10 pr-space-md bg-surface-container-lowest rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary shadow-sm" placeholder="Pregunta en lenguaje natural sobre tus facturas o gastos y presiona Enter..." type="text"/>
                 </div>
-                <div class="mt-2 flex items-baseline gap-1.5">
-                    <span class="font-numeric-hero-mobile text-numeric-hero-mobile text-on-primary"
-                          th:text="'$ ' + ${#numbers.formatDecimal(profile != null ? profile.netIncome : 4000000, 1, 'POINT', 0, 'COMMA')}">$ 4.000.000</span>
-                    <span class="font-code-legal text-code-legal text-primary-fixed-dim uppercase">COP</span>
+            </form>
+            <div class="flex items-center gap-space-md">
+                <div class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container-lowest shadow-sm">
+                    <span class="material-symbols-outlined text-[18px] text-secondary">calendar_today</span>
+                    <span class="font-title-md text-body-sm text-on-surface font-semibold" th:text="'Periodo ' + ${selectedMonth}">Octubre 2026</span>
                 </div>
-                <div class="mt-2.5 flex items-center justify-between text-on-primary-container font-body-sm text-body-sm">
-                    <span>Presupuesto inicial</span>
-                    <a href="/profile" class="font-code-legal text-code-legal text-secondary-fixed font-medium underline">Calibrar regla</a>
-                </div>
-            </div>
-
-            <!-- Card 2: Gasto Confirmado en SQL -->
-            <div class="rounded-xl bg-primary-container p-4 text-on-primary shadow-md flex flex-col justify-between">
-                <div class="flex items-center justify-between">
-                    <span class="font-code-legal text-code-legal text-primary-fixed-dim uppercase">Gasto Confirmado (SQL)</span>
-                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">payments</span>
-                </div>
-                <div class="mt-2">
-                    <div class="font-numeric-hero-mobile text-numeric-hero-mobile font-bold text-on-primary leading-tight"
-                         th:text="'$ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</div>
-                    <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded bg-secondary-fixed/15 text-secondary-fixed font-code-legal text-code-legal font-bold"
-                         th:text="${#lists.size(history.transactions)} + ' movimientos confirmados'">
-                        0 movimientos
-                    </div>
-                </div>
-                <span class="font-code-legal text-code-legal text-on-primary-container mt-2">Cifras 100% desde PostgreSQL</span>
-            </div>
-
-            <!-- Card 3: Facturas Pendientes por Confirmar -->
-            <div class="rounded-xl bg-primary-container p-4 text-on-primary shadow-md flex flex-col justify-between">
-                <div class="flex items-center justify-between">
-                    <span class="font-code-legal text-code-legal text-primary-fixed-dim uppercase">Por Confirmar (RF-05)</span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-secondary-container animate-pulse"></span>
-                </div>
-                <div class="mt-2">
-                    <div class="font-numeric-hero-mobile text-numeric-hero-mobile font-bold text-on-primary leading-tight"
-                         th:text="${#lists.size(pendingConfirmations)} + ' Factura(s)'">0 Facturas</div>
-                    <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded bg-secondary-container/20 text-secondary-fixed font-code-legal text-code-legal font-semibold">
-                        Paso 2 / 3 antes de indexar
-                    </div>
-                </div>
-                <a href="#seccion-confirmacion" class="mt-2 text-left font-label-md text-label-md text-secondary-fixed hover:text-on-primary transition-colors flex items-center gap-0.5 no-underline">
-                    <span>Revisar borradores</span>
-                    <span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                <a href="/upload" class="h-10 px-space-md bg-primary-container hover:bg-primary text-on-primary rounded-lg font-title-md text-body-sm flex items-center gap-space-xs shadow-sm transition-colors no-underline">
+                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">add</span>
+                    <span>Registrar Gasto / Factura</span>
                 </a>
             </div>
         </div>
+    </header>
 
-        <!-- ======================================================================================== -->
-        <!-- SECCIÓN PASO 2: VOUCHER BANCARIO DE CONFIRMACIÓN (Aparece cuando hay facturas pendientes) -->
-        <!-- ======================================================================================== -->
-        <div id="seccion-confirmacion" th:if="${!#lists.isEmpty(pendingConfirmations)}" class="flex flex-col space-y-3">
-            <div class="flex items-center justify-between px-1">
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
-                    <h2 class="font-headline-md text-headline-md text-on-surface">Paso 2 de 3: Revisa y Confirma antes de Indexar en pgvector</h2>
+    <main class="w-full pt-20 bg-surface flex-1">
+        <!-- Sub-header Breadcrumb -->
+        <div class="w-full px-margin-lg py-space-md bg-surface-container-low/60 flex items-center justify-between">
+            <div class="flex items-center gap-space-sm min-w-0">
+                <div class="flex items-center gap-space-xxs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+                    <span>CuentaClara</span>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <span class="text-primary font-semibold">Panel de Control Financiero</span>
                 </div>
-                <span class="font-code-legal text-code-legal text-secondary font-semibold bg-surface-container-low px-2.5 py-1 rounded-full">
-                    Extracción Automática Lista
-                </span>
+                <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Sincronización en tiempo real vía DIAN UBL 2.1 + pgvector</span>
             </div>
-
-            <div th:each="item : ${pendingConfirmations}" class="relative bg-surface-container-lowest rounded-2xl shadow-xl overflow-hidden border border-secondary/20">
-                <div class="h-2 w-full bg-gradient-to-r from-primary-container via-secondary to-primary-fixed"></div>
-                <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" class="p-space-md space-y-4">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0 text-primary">
-                                <span class="material-symbols-outlined text-[22px]">receipt_long</span>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="font-headline-md text-headline-md font-bold text-on-surface leading-tight"
-                                      th:text="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}">
-                                    Comercio Extraído
-                                </span>
-                                <span class="font-code-legal text-code-legal text-on-surface-variant"
-                                      th:text="'Archivo: ' + ${item.document.originalFilename} + ' · Método: ' + ${item.extraction != null ? item.extraction.extractionMethod : item.document.sourceType}">
-                                    UBL 2.1
-                                </span>
-                            </div>
-                        </div>
-                        <span class="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed/40 text-on-primary-fixed-variant font-code-legal text-code-legal font-bold">
-                            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                            Por Confirmar (RF-05)
-                        </span>
-                    </div>
-
-                    <!-- Campos editables antes de confirmar -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-surface-container-low p-3 rounded-xl">
-                        <div>
-                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Comercio / Emisor</label>
-                            <input type="text" name="merchantName" required
-                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface"
-                                   th:value="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}"/>
-                        </div>
-                        <div>
-                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">NIT Emisor</label>
-                            <input type="text" name="merchantNit"
-                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"
-                                   th:value="${item.extraction != null ? item.extraction.merchantNit : '0'}"/>
-                        </div>
-                        <div>
-                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Número Factura</label>
-                            <input type="text" name="invoiceNumber"
-                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"
-                                   th:value="${item.extraction != null ? item.extraction.invoiceNumber : 'SIN-NUMERO'}"/>
-                        </div>
-                        <div>
-                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Fecha Emisión</label>
-                            <input type="date" name="transactionDate"
-                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"
-                                   th:value="${item.extraction != null ? item.extraction.issueDate : ''}"/>
-                        </div>
-                        <div>
-                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Categoría Sugerida (RF-09)</label>
-                            <input type="text" name="category" required
-                                   class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-secondary font-bold"
-                                   th:value="${item.extraction != null ? item.extraction.suggestedCategory : 'Alimentación'}"/>
-                        </div>
-                        <div>
-                            <label class="font-code-legal text-code-legal text-on-surface-variant uppercase">Bloque 50/30/20</label>
-                            <select name="budgetBlock" class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface">
-                                <option th:each="blk : ${budgetBlocks}"
-                                        th:value="${blk}"
-                                        th:text="${blk.label}"
-                                        th:selected="${item.extraction != null and item.extraction.suggestedBudgetBlock == blk}">
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="pt-1 bg-surface-container-low p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="space-y-0.5 font-code-legal text-code-legal text-on-surface-variant">
-                            <div>Subtotal extraído: <strong class="text-on-surface" th:text="'$ ' + ${item.extraction != null ? item.extraction.subtotalAmount : 0} + ' COP'"></strong></div>
-                            <div>IVA / Impuestos: <strong class="text-on-surface" th:text="'$ ' + ${item.extraction != null ? item.extraction.taxAmount : 0} + ' COP'"></strong></div>
-                            <div th:if="${item.document.cufe != null}" class="truncate max-w-md" th:text="'CUFE: ' + ${item.document.cufe}"></div>
-                        </div>
-                        <div class="text-right">
-                            <label class="font-code-legal text-code-legal text-on-surface-variant block">Total Liquidado (COP)</label>
-                            <input type="number" step="0.01" name="totalAmount" required
-                                   class="mt-1 w-44 p-2 rounded-lg bg-surface-container-lowest font-numeric-hero-mobile text-numeric-hero-mobile font-bold text-secondary text-right"
-                                   th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
-                        </div>
-                    </div>
-
-                    <button class="w-full py-3.5 px-space-md rounded-xl bg-secondary text-on-secondary shadow-lg shadow-secondary/25 hover:bg-secondary/95 active:scale-[0.99] transition-all flex items-center justify-center gap-2" type="submit">
-                        <span class="material-symbols-outlined text-[22px]">database</span>
-                        <span class="font-headline-md text-headline-md font-semibold">Paso 3: Confirmar, Indexar en pgvector y Eliminar Temporal</span>
-                        <span class="material-symbols-outlined text-[20px]">check_circle</span>
-                    </button>
-                </form>
+            <div class="flex items-center gap-space-xs text-on-surface-variant font-data-mono text-data-mono">
+                <span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
+                <span>Aislamiento RLS verificado</span>
             </div>
         </div>
 
-        <!-- ======================================================================================== -->
-        <!-- SECCIÓN CARGA DE FACTURAS Y GASTO RÁPIDO MANUAL (Con Switch de Pestañas)                -->
-        <!-- ======================================================================================== -->
-        <div id="seccion-carga" class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm space-y-space-md">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[22px] text-secondary">add_circle</span>
-                    <h2 class="font-headline-md text-headline-md text-on-surface">Registrar Factura Electrónica o Gasto Diario</h2>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-code-legal text-code-legal">
-                    <span class="material-symbols-outlined text-[14px]">document_scanner</span>
-                    XML UBL 2.1 · PDF · OCR
-                </span>
+        <div class="w-full px-margin-lg py-space-xl flex flex-col gap-space-xl max-w-[1600px] mx-auto">
+
+            <!-- Alertas Flash -->
+            <div th:if="${successMessage}" class="p-4 rounded-xl bg-secondary-container text-on-secondary-fixed font-body-md text-body-md flex items-center gap-2 shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container text-on-error-container font-body-md text-body-md flex items-center gap-2 shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">error</span>
+                <span th:text="${errorMessage}"></span>
             </div>
 
-            <!-- Mode Switcher Tabs -->
-            <div class="w-full bg-surface-container-high p-1 rounded-xl flex items-center justify-between">
-                <button class="flex-1 py-2 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm transition-all"
-                        id="tab-voucher" onclick="switchUploadMode('voucher')" type="button">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">cloud_upload</span>
-                    <span>Subir Factura / Extracto</span>
-                </button>
-                <button class="flex-1 py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 transition-all"
-                        id="tab-manual" onclick="switchUploadMode('manual')" type="button">
-                    <span class="material-symbols-outlined text-[18px]">edit_note</span>
-                    <span>Gasto Rápido Manual (Segundos)</span>
-                </button>
-            </div>
-
-            <!-- Panel A: Subir Factura XML/PDF/Foto -->
-            <form id="panel-voucher" method="post" action="/dashboard/upload" enctype="multipart/form-data"
-                  class="relative group rounded-xl p-space-md transition-all duration-300 bg-secondary-container/20 hover:bg-secondary-container/30 overflow-hidden shadow-sm">
-                <div class="relative z-10 flex flex-col items-center text-center space-y-3">
-                    <div class="relative w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-md flex items-center justify-center text-secondary">
-                        <span class="material-symbols-outlined text-[30px]">receipt_long</span>
-                        <span class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary-container text-on-primary-fixed flex items-center justify-center shadow">
-                            <span class="material-symbols-outlined text-[14px]">cloud_upload</span>
-                        </span>
+            <!-- 1. Header Bar Summary Row -->
+            <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-xs">
+                <div class="flex flex-col gap-space-xxs">
+                    <div class="flex items-center gap-space-xs">
+                        <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-semibold">Portal de Gestión Patrimonial</span>
+                        <span class="px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px] uppercase font-bold tracking-wider">RAG Híbrido RRF</span>
                     </div>
-                    <div class="space-y-1 max-w-md">
-                        <h3 class="font-headline-md text-headline-md text-on-surface font-semibold leading-tight">
-                            Selecciona o arrastra tu factura electrónica
-                        </h3>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant">
-                            Formatos validados por contenido real y ClamAV (máx. 10 MB): <span class="font-code-legal text-code-legal font-medium text-secondary">XML (UBL 2.1)</span>, PDF o Foto JPG/PNG.
-                        </p>
-                    </div>
-
-                    <input type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required
-                           class="w-full max-w-md p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal text-on-surface"/>
-
-                    <label class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface cursor-pointer">
-                        <input type="checkbox" name="statement" value="true" class="w-4 h-4 accent-secondary rounded"/>
-                        <span>Es un extracto bancario PDF digital (se indexa por página para chat sin duplicar gastos)</span>
-                    </label>
-
-                    <button type="submit" class="w-full max-w-md py-3 px-4 rounded-xl bg-secondary text-on-secondary font-headline-md text-headline-md shadow-md hover:bg-secondary/95 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">upload_file</span>
-                        <span>Paso 1: Subir y Extraer Datos</span>
-                    </button>
-
-                    <div class="flex items-start gap-1.5 pt-1 text-left bg-surface-container-lowest/80 p-2.5 rounded-lg max-w-md">
-                        <span class="material-symbols-outlined text-secondary text-[16px] mt-0.5 shrink-0">verified_user</span>
-                        <p class="font-code-legal text-code-legal text-on-surface-variant leading-relaxed">
-                            Privacidad Ley 1581: El archivo original se elimina automáticamente del servidor tras verificar su indexación vectorial en pgvector (RF-08).
-                        </p>
-                    </div>
+                    <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight m-0">
+                        Hola, <span th:text="${user.fullName}">Usuario</span>
+                        <span class="text-outline font-body-lg text-title-lg font-normal" th:text="'• Resumen Financiero ' + ${selectedMonth}">• Resumen Financiero</span>
+                    </h1>
                 </div>
-            </form>
+                <div class="flex items-center gap-space-sm flex-shrink-0">
+                    <form method="post" action="/dashboard/simulate-month" class="m-0">
+                        <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                        <button type="submit" class="h-10 px-space-md rounded-lg bg-surface-container-lowest text-primary hover:bg-surface-container-high transition-all flex items-center gap-space-xs shadow-sm font-title-md text-body-sm">
+                            <span class="material-symbols-outlined text-[18px] text-secondary">science</span>
+                            <span>Simular 1er Mes y Generar Informe SQL</span>
+                        </button>
+                    </form>
+                    <a href="/upload" class="h-10 px-space-lg rounded-lg bg-primary-container hover:bg-primary text-on-primary transition-all flex items-center gap-space-xs shadow-md font-title-md text-body-sm no-underline">
+                        <span class="material-symbols-outlined text-[18px] text-secondary-fixed">add_circle</span>
+                        <span>+ Subir Factura Electrónica</span>
+                    </a>
+                </div>
+            </header>
 
-            <!-- Panel B: Gasto Rápido Manual con Adjunto Opcional -->
-            <form id="panel-manual" method="post" action="/dashboard/manual-expense" enctype="multipart/form-data"
-                  class="hidden flex-col gap-3 bg-surface-container-low p-space-md rounded-xl">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="font-label-md text-label-md text-on-surface-variant">Comercio o Concepto *</label>
-                        <input type="text" name="merchantName" required placeholder="Ej. Rappi / Panadería Masa Madre"
-                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm"/>
-                    </div>
-                    <div>
-                        <label class="font-label-md text-label-md text-on-surface-variant">Monto Total (COP) *</label>
-                        <input type="number" step="0.01" name="totalAmount" required placeholder="45000"
-                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-numeric-table text-numeric-table font-bold text-primary"/>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="font-label-md text-label-md text-on-surface-variant">Fecha del Gasto</label>
-                        <input type="date" name="transactionDate"
-                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal"/>
-                    </div>
-                    <div>
-                        <label class="font-label-md text-label-md text-on-surface-variant">Categoría (Dejar vacío para auto-sugerir RF-09)</label>
-                        <input type="text" name="category" placeholder="Ej. Domicilios y Restaurantes"
-                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm"/>
-                    </div>
-                    <div>
-                        <label class="font-label-md text-label-md text-on-surface-variant">Bloque 50/30/20</label>
-                        <select name="budgetBlock" class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm">
-                            <option value="">Auto-asignar según categoría</option>
-                            <option th:each="blk : ${budgetBlocks}" th:value="${blk}" th:text="${blk.label}"></option>
-                        </select>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="font-label-md text-label-md text-on-surface-variant">Descripción / Notas</label>
-                        <input type="text" name="description" placeholder="Ej. Almuerzo de trabajo"
-                               class="mt-1 w-full p-2.5 rounded-lg bg-surface-container-lowest font-body-sm text-body-sm"/>
-                    </div>
-                    <div>
-                        <label class="font-label-md text-label-md text-on-surface-variant">Comprobante de respaldo (Opcional RF-02)</label>
-                        <input type="file" name="attachment" accept=".xml,.pdf,image/jpeg,image/png"
-                               class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-code-legal text-code-legal"/>
-                    </div>
-                </div>
-                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-secondary text-on-secondary font-headline-md text-headline-md shadow-md hover:bg-secondary/95 flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-[20px]">bolt</span>
-                    <span>Guardar Gasto Manual en Segundos</span>
-                </button>
-            </form>
-        </div>
-
-        <!-- ======================================================================================== -->
-        <!-- SECCIÓN ASISTENTE RAG CON CITAS VERIFICABLES Y CHIPS DE 1 CLIC (RF-12, RNF-06)           -->
-        <!-- ======================================================================================== -->
-        <div id="seccion-asistente" class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm space-y-space-md">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-space-sm">
-                    <div class="relative w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-secondary-fixed shadow-inner">
-                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-                        <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-secondary-fixed border-2 border-surface-container-lowest animate-pulse"></span>
-                    </div>
-                    <div>
-                        <h2 class="font-headline-md text-headline-md text-on-surface leading-tight">Asistente CuentaClara (RAG Híbrido + SQL)</h2>
-                        <p class="font-code-legal text-code-legal text-secondary font-medium tracking-wide flex items-center gap-1">
-                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                            Reciprocal Rank Fusion (pgvector + tsvector) · Citas Obligatorias
-                        </p>
-                    </div>
-                </div>
-                <span class="bg-surface-container px-2.5 py-1 rounded-full text-on-surface-variant font-code-legal text-code-legal flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-secondary">verified_user</span>
-                    Cero Alucinación Numérica
-                </span>
-            </div>
-
-            <!-- Chips de Preguntas Rápidas de 1 Toque -->
-            <div class="flex flex-col space-y-1.5">
-                <div class="flex items-center justify-between px-1">
-                    <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Preguntas rápidas sugeridas (1 clic)</span>
-                </div>
-                <div class="flex flex-wrap gap-2 pt-1">
-                    <button class="bg-surface-container-low hover:bg-surface-container text-on-surface active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
-                            onclick="submitSuggestedQuestion('¿Cuánto gasté en domicilios en octubre?')" type="button">
-                        <span class="material-symbols-outlined text-secondary text-[16px]">delivery_dining</span>
-                        <span class="font-body-sm text-body-sm font-medium">¿Cuánto gasté en domicilios en octubre?</span>
-                    </button>
-                    <button class="bg-secondary-fixed/30 hover:bg-secondary-fixed/50 text-on-secondary-fixed active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
-                            onclick="submitSuggestedQuestion('¿En qué factura compré Café Molido Gourmet?')" type="button">
-                        <span class="material-symbols-outlined text-secondary text-[16px]">coffee</span>
-                        <span class="font-body-sm text-body-sm font-semibold">¿En qué factura compré Café Molido Gourmet?</span>
-                    </button>
-                    <button class="bg-surface-container-low hover:bg-surface-container text-on-surface active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
-                            onclick="submitSuggestedQuestion('¿Cuánto gasté en Almacenes Éxito?')" type="button">
-                        <span class="material-symbols-outlined text-secondary text-[16px]">storefront</span>
-                        <span class="font-body-sm text-body-sm font-medium">¿Cuánto gasté en Almacenes Éxito?</span>
-                    </button>
-                    <button class="bg-surface-container-low hover:bg-surface-container text-on-surface active:scale-95 transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-sm text-left"
-                            onclick="submitSuggestedQuestion('¿Cuál es mi presupuesto inicial y distribución 50/30/20?')" type="button">
-                        <span class="material-symbols-outlined text-secondary text-[16px]">pie_chart</span>
-                        <span class="font-body-sm text-body-sm font-medium">¿Cuál es mi presupuesto y distribución 50/30/20?</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Respuesta Verificada del Chat (Cuando el usuario envía una consulta) -->
-            <div th:if="${chatResponse != null}" class="flex flex-col space-y-2 pt-2">
-                <div class="self-end max-w-[85%] bg-primary text-on-primary px-space-md py-2.5 rounded-2xl rounded-tr-xs shadow-sm">
-                    <p class="font-body-sm text-body-sm m-0" th:text="${chatResponse.question}"></p>
-                </div>
-                <div class="self-start w-full bg-surface-container-low rounded-2xl rounded-tl-xs p-space-md shadow-sm space-y-3 border-l-4 border-secondary">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-5 h-5 rounded-full bg-primary-container flex items-center justify-center">
-                                <span class="material-symbols-outlined text-secondary-fixed text-[12px]">auto_awesome</span>
-                            </div>
-                            <span class="font-label-md text-label-md font-bold text-primary">Respuesta Verificada con SQL + pgvector</span>
-                        </div>
-                        <span class="font-code-legal text-code-legal text-secondary bg-surface-container-lowest px-2 py-0.5 rounded-full"
-                              th:text="${chatResponse.hasEvidence ? 'Evidencia Confirmada' : 'Sin Evidencia Registrada'}"></span>
-                    </div>
-                    <p class="font-body-sm text-body-sm text-on-surface leading-relaxed m-0" th:text="${chatResponse.answer}"></p>
-
-                    <div th:if="${!#lists.isEmpty(chatResponse.citations)}" class="pt-1 space-y-1.5">
-                        <span class="font-label-md text-label-md font-bold text-on-surface-variant flex items-center gap-1 uppercase tracking-wide">
-                            <span class="material-symbols-outlined text-[16px] text-secondary">policy</span> Citas Verificables de Respaldo:
-                        </span>
-                        <div class="flex flex-wrap gap-1.5">
-                            <span th:each="cit : ${chatResponse.citations}"
-                                  class="bg-secondary-fixed/50 text-on-secondary-fixed px-2.5 py-1 rounded-lg font-code-legal text-code-legal font-bold flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[13px]">verified</span>
-                                <span th:text="${cit}"></span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Barra de entrada del Chat -->
-            <form id="chat-form" method="post" action="/dashboard/chat"
-                  class="bg-surface-container-low rounded-2xl p-2 shadow-inner flex items-center gap-2">
-                <span class="material-symbols-outlined text-[20px] text-secondary ml-2">search</span>
-                <input id="chat-input" name="question" type="text" required autocomplete="off"
-                       class="flex-1 bg-transparent px-2 py-2 text-on-surface placeholder:text-outline text-body-sm font-body-sm focus:outline-none"
-                       placeholder="Haz una pregunta sobre tus gastos, facturas XML, PDF o extractos..."/>
-                <button aria-label="Enviar pregunta" class="w-10 h-10 rounded-xl bg-secondary text-on-secondary shadow-[0_4px_12px_rgba(0,108,73,0.3)] hover:bg-secondary/90 flex items-center justify-center flex-shrink-0 transition-transform active:scale-90" type="submit">
-                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">send</span>
-                </button>
-            </form>
-        </div>
-
-        <!-- ======================================================================================== -->
-        <!-- SECCIÓN INFORME MENSUAL / QUINCENAL Y SIMULADOR DEL PRIMER MES (RF-13, RF-16)            -->
-        <!-- ======================================================================================== -->
-        <div id="seccion-informe" class="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-3.5">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[22px] text-secondary">donut_large</span>
-                    <div>
-                        <h2 class="font-headline-md text-headline-md text-on-surface">Informe de Cierre de Periodo y Plan Sugerido (RF-13, RF-16)</h2>
-                        <span class="font-code-legal text-code-legal text-on-surface-variant">Compara perfil declarado vs. gastos reales confirmados en SQL</span>
-                    </div>
-                </div>
-                <form method="post" action="/dashboard/simulate-month" class="flex items-center gap-2 m-0">
-                    <input type="text" name="month" th:value="${selectedMonth}" class="w-28 p-2 rounded-lg bg-surface-container-low font-code-legal text-code-legal text-center"/>
-                    <button type="submit" class="py-2 px-3 rounded-xl bg-primary-container text-secondary-fixed font-label-md text-label-md flex items-center gap-1.5 shadow-sm hover:bg-primary transition-colors">
-                        <span class="material-symbols-outlined text-[16px]">science</span>
-                        <span>Simular 1er Mes / Generar Informe</span>
-                    </button>
-                </form>
-            </div>
-
-            <div th:if="${latestClosure != null}" class="p-space-md rounded-xl bg-surface-container-low space-y-3 border-l-4 border-primary-container">
-                <p class="font-body-sm text-body-sm font-semibold text-primary m-0" th:text="${latestClosure.report.verdictSummary}"></p>
-                <div class="space-y-2">
-                    <div th:each="rec : ${latestClosure.recommendations}" class="p-3 rounded-xl bg-surface-container-lowest shadow-xs space-y-1.5">
+            <!-- 2. Top KPI Grid (4 Spacious Desktop Cards) -->
+            <section aria-label="Indicadores Clave" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+                <!-- KPI 1 -->
+                <div class="bg-surface-container-lowest rounded-xl p-space-lg flex flex-col justify-between shadow-sm relative overflow-hidden">
+                    <div class="flex flex-col gap-space-xs">
                         <div class="flex items-center justify-between">
-                            <span class="font-code-legal text-code-legal font-bold text-secondary uppercase" th:text="'Bloque ' + ${rec.block}"></span>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Ingreso Base Declarado</span>
+                            <span class="material-symbols-outlined text-secondary text-[20px]">account_balance_wallet</span>
                         </div>
-                        <p class="font-body-sm text-body-sm text-on-surface m-0" th:text="${rec.explanation}"></p>
-                        <div class="flex flex-wrap gap-1 pt-1" th:if="${!#lists.isEmpty(rec.backingCitations)}">
-                            <span th:each="c : ${rec.backingCitations}"
-                                  class="px-2 py-0.5 rounded bg-secondary-fixed/40 text-on-secondary-fixed font-code-legal text-code-legal"
-                                  th:text="${c}"></span>
+                        <div class="font-headline-md text-headline-md text-primary tracking-tight font-bold">
+                            $ <span th:text="${#numbers.formatDecimal(profile != null ? profile.netIncome : 4000000, 1, 'POINT', 0, 'COMMA')}">4.000.000</span>
+                            <span class="font-title-md text-body-sm text-on-surface-variant font-normal">COP</span>
+                        </div>
+                    </div>
+                    <div class="pt-space-md flex flex-col gap-space-xs mt-space-sm">
+                        <div class="flex items-center justify-between text-body-sm font-body-sm">
+                            <span class="text-on-surface-variant" th:text="${profile != null ? 'Regla ' + profile.needsPct + '/' + profile.wantsPct + '/' + profile.savingsPct + ' Activa' : 'Regla 50/30/20 Activa'}">Regla 50/30/20</span>
+                            <span class="text-secondary font-semibold font-data-mono">100% asignado</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- ======================================================================================== -->
-        <!-- SECCIÓN HISTORIAL DE GASTOS CONFIRMADOS Y TOTALES SQL POR CATEGORÍA (RF-10)              -->
-        <!-- ======================================================================================== -->
-        <div class="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-3.5">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[20px] text-secondary">receipt</span>
-                    <h2 class="font-headline-md text-headline-md text-on-surface">Historial de Movimientos Confirmados (RF-10)</h2>
-                </div>
-                <span class="font-numeric-table text-numeric-table font-bold text-secondary"
-                      th:text="'Total SQL: $ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
-            </div>
-
-            <!-- Filtros por Mes, Categoría y Comercio -->
-            <form method="get" action="/dashboard" class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                <input type="text" name="month" th:value="${selectedMonth}" placeholder="Mes (2026-10)"
-                       class="p-2 rounded-lg bg-surface-container-low font-code-legal text-code-legal"/>
-                <input type="text" name="category" th:value="${selectedCategory}" placeholder="Filtrar categoría..."
-                       class="p-2 rounded-lg bg-surface-container-low font-body-sm text-body-sm"/>
-                <input type="text" name="merchant" th:value="${selectedMerchant}" placeholder="Filtrar comercio..."
-                       class="p-2 rounded-lg bg-surface-container-low font-body-sm text-body-sm"/>
-                <button type="submit" class="py-2 px-4 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md flex items-center justify-center gap-1">
-                    <span class="material-symbols-outlined text-[16px]">filter_alt</span>
-                    <span>Filtrar SQL</span>
-                </button>
-            </form>
-
-            <!-- Totales por Categoría en Píldoras -->
-            <div th:if="${!#maps.isEmpty(history.totalsByCategory)}" class="flex flex-wrap gap-2">
-                <div th:each="entry : ${history.totalsByCategory}"
-                     class="px-3 py-1.5 rounded-xl bg-surface-container-low font-code-legal text-code-legal flex items-center gap-2">
-                    <span class="font-bold text-primary" th:text="${entry.key + ':'}"></span>
-                    <span class="text-secondary font-bold" th:text="'$ ' + ${#numbers.formatDecimal(entry.value, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
-                </div>
-            </div>
-
-            <!-- Lista de Transacciones -->
-            <div class="space-y-2">
-                <div th:if="${#lists.isEmpty(history.transactions)}" class="p-6 text-center text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low rounded-xl">
-                    Aún no hay movimientos confirmados para este filtro. Sube una factura XML/PDF o registra un gasto manual arriba.
-                </div>
-                <div th:each="tx : ${history.transactions}"
-                     class="p-3 rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-primary-container text-secondary-fixed flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined text-[18px]">verified</span>
+                <!-- KPI 2 -->
+                <div class="bg-surface-container-lowest rounded-xl p-space-lg flex flex-col justify-between shadow-sm relative overflow-hidden">
+                    <div class="flex flex-col gap-space-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Gasto Confirmado del Mes</span>
+                            <span class="material-symbols-outlined text-secondary text-[20px]">shopping_cart_checkout</span>
                         </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-label-md text-label-md font-bold text-on-surface" th:text="${tx.merchantName}"></span>
-                                <span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-code-legal text-code-legal font-semibold" th:text="${tx.category}"></span>
+                        <div class="font-headline-md text-headline-md text-on-surface tracking-tight font-bold">
+                            $ <span th:text="${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')}">0</span>
+                            <span class="font-title-md text-body-sm text-on-surface-variant font-normal">COP</span>
+                        </div>
+                    </div>
+                    <div class="pt-space-md flex flex-col gap-space-xs mt-space-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="inline-flex items-center gap-0.5 px-space-xs py-0.5 rounded bg-secondary-fixed/50 text-on-secondary-fixed font-label-sm text-[11px] font-bold"
+                                  th:text="${#lists.size(history.transactions)} + ' movimientos confirmados'">
+                                0 movimientos
+                            </span>
+                            <span class="font-data-mono text-body-sm text-on-surface-variant">Calculado en SQL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 3 -->
+                <div class="bg-surface-container-lowest rounded-xl p-space-lg flex flex-col justify-between shadow-sm relative overflow-hidden">
+                    <div class="flex flex-col gap-space-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Facturas por Confirmar</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+                        </div>
+                        <div class="flex items-baseline gap-space-xs">
+                            <span class="font-headline-md text-headline-md text-secondary tracking-tight font-bold"
+                                  th:text="${#lists.size(pendingConfirmations)} + ' Pendiente(s)'">0 Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="pt-space-md flex flex-col gap-space-xxs mt-space-sm">
+                        <a href="/upload" class="font-label-sm text-label-sm text-primary font-bold hover:underline flex items-center gap-1 no-underline">
+                            <span>Ir a revisión y carga</span>
+                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- KPI 4 -->
+                <div class="bg-surface-container-lowest rounded-xl p-space-lg flex flex-col justify-between shadow-sm relative overflow-hidden">
+                    <div class="flex flex-col gap-space-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Meta de Ahorro del Periodo</span>
+                            <span class="material-symbols-outlined text-secondary text-[20px]">savings</span>
+                        </div>
+                        <div class="font-headline-md text-headline-md text-on-surface tracking-tight font-bold">
+                            $ <span th:text="${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')}">800.000</span>
+                            <span class="font-title-md text-body-sm text-on-surface-variant font-normal">COP</span>
+                        </div>
+                    </div>
+                    <div class="pt-space-md flex flex-col gap-space-xs mt-space-sm">
+                        <div class="flex items-center justify-between text-body-sm font-body-sm">
+                            <span class="text-on-surface-variant">Bloque Ahorro / Objetivos</span>
+                            <span class="text-secondary font-semibold font-data-mono" th:text="${(profile != null ? profile.savingsPct : 20) + '%'}">20%</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Main Content 2-Column Desktop Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+
+                <!-- LEFT COLUMN (60% -> span 7) -->
+                <div class="lg:col-span-7 flex flex-col gap-space-xl">
+
+                    <!-- a) Banner destacado: Facturas pendientes de confirmar e indexar (Paso 2/3) -->
+                    <article th:each="item : ${pendingConfirmations}" class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden flex flex-col border border-secondary/30">
+                        <div class="bg-primary-container text-on-primary px-space-lg py-space-md flex items-center justify-between flex-wrap gap-space-sm">
+                            <div class="flex items-center gap-space-sm">
+                                <div class="w-9 h-9 rounded-lg bg-surface-container-lowest/15 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-secondary-fixed text-[20px]">assignment_turned_in</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary-fixed font-semibold">Paso 2 de 3 • Confirmación Obligatoria (RF-05)</span>
+                                    <h2 class="font-title-lg text-title-lg text-on-primary font-semibold m-0">Factura pendiente de indexar en PostgreSQL + pgvector</h2>
+                                </div>
                             </div>
-                            <span class="font-code-legal text-code-legal text-on-surface-variant block mt-0.5"
-                                  th:text="${tx.transactionDate + ' · Bloque: ' + tx.budgetBlock + ' · Cita: ' + tx.citationReference}"></span>
                         </div>
-                    </div>
-                    <div class="font-numeric-table text-numeric-table font-bold text-primary text-right shrink-0"
-                         th:text="'$ ' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">
-                    </div>
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" class="p-space-lg flex flex-col gap-space-md m-0">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm bg-surface-container-low p-space-md rounded-lg">
+                                <div>
+                                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Comercio / Emisor</label>
+                                    <input type="text" name="merchantName" required
+                                           class="mt-1 w-full p-2 rounded bg-surface-container-lowest font-title-md text-body-sm text-primary font-bold"
+                                           th:value="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}"/>
+                                </div>
+                                <div>
+                                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">NIT Emisor</label>
+                                    <input type="text" name="merchantNit"
+                                           class="mt-1 w-full p-2 rounded bg-surface-container-lowest font-data-mono text-body-sm"
+                                           th:value="${item.extraction != null ? item.extraction.merchantNit : '0'}"/>
+                                </div>
+                                <div>
+                                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Folio / Factura</label>
+                                    <input type="text" name="invoiceNumber"
+                                           class="mt-1 w-full p-2 rounded bg-surface-container-lowest font-data-mono text-body-sm"
+                                           th:value="${item.extraction != null ? item.extraction.invoiceNumber : 'SIN-NUMERO'}"/>
+                                </div>
+                                <div>
+                                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Fecha Emisión</label>
+                                    <input type="date" name="transactionDate"
+                                           class="mt-1 w-full p-2 rounded bg-surface-container-lowest font-data-mono text-body-sm"
+                                           th:value="${item.extraction != null ? item.extraction.issueDate : ''}"/>
+                                </div>
+                                <div>
+                                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Categoría (RF-09)</label>
+                                    <input type="text" name="category" required
+                                           class="mt-1 w-full p-2 rounded bg-surface-container-lowest font-title-md text-body-sm text-secondary font-bold"
+                                           th:value="${item.extraction != null ? item.extraction.suggestedCategory : 'Alimentación'}"/>
+                                </div>
+                                <div>
+                                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Bloque 50/30/20</label>
+                                    <select name="budgetBlock" class="mt-1 w-full p-2 rounded bg-surface-container-lowest font-title-md text-body-sm">
+                                        <option th:each="blk : ${budgetBlocks}" th:value="${blk}" th:text="${blk.label}"
+                                                th:selected="${item.extraction != null and item.extraction.suggestedBudgetBlock == blk}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between bg-surface-container-low p-space-md rounded-lg">
+                                <span class="font-title-lg text-title-lg text-primary font-bold">Total Liquidado (COP)</span>
+                                <input type="number" step="0.01" name="totalAmount" required
+                                       class="w-48 p-2 rounded bg-surface-container-lowest font-headline-md text-headline-md text-secondary font-bold text-right"
+                                       th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
+                            </div>
+                            <button type="submit" class="w-full h-11 px-space-lg rounded-lg bg-secondary hover:bg-primary-container text-on-secondary transition-all shadow-md font-title-md text-body-sm flex items-center justify-center gap-space-xs font-semibold">
+                                <span class="material-symbols-outlined text-[18px]">database</span>
+                                <span>Confirmar e Indexar en PostgreSQL (Borra Temporal RF-08)</span>
+                            </button>
+                        </form>
+                    </article>
+
+                    <!-- b) Zona Drag & Drop de escritorio para carga rápida de facturas -->
+                    <section aria-label="Carga Rápida de Comprobantes" class="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col gap-space-md relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <h3 class="font-title-lg text-title-lg text-primary font-bold m-0">Carga de Documentos Fiscales (XML UBL 2.1, PDF o Foto)</h3>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant m-0">El parser DIAN y el OCR extraen los datos y los dejan listos para tu confirmación.</p>
+                            </div>
+                            <span class="material-symbols-outlined text-secondary text-[24px]">cloud_upload</span>
+                        </div>
+
+                        <form method="post" action="/dashboard/upload" enctype="multipart/form-data" class="flex flex-col gap-space-md m-0">
+                            <label class="relative w-full rounded-xl p-space-xl bg-surface-container-low/60 hover:bg-surface-container-high/50 transition-all cursor-pointer flex flex-col items-center justify-center text-center group border-2 border-dashed border-secondary/40">
+                                <div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-on-primary transition-all duration-200 shadow-sm mb-space-sm">
+                                    <span class="material-symbols-outlined text-[30px]">receipt_long</span>
+                                </div>
+                                <h4 class="font-title-md text-title-md text-primary font-semibold mb-space-xxs m-0">
+                                    Selecciona o arrastra tu archivo XML (UBL 2.1), PDF o foto aquí
+                                </h4>
+                                <input type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required
+                                       class="mt-3 p-2 rounded bg-surface-container-lowest font-data-mono text-body-sm text-on-surface"/>
+                            </label>
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <label class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant cursor-pointer">
+                                    <input type="checkbox" name="statement" value="true" class="w-4 h-4 accent-secondary rounded"/>
+                                    <span>Es extracto bancario PDF digital (se indexa por página para chat)</span>
+                                </label>
+                                <button type="submit" class="h-11 px-space-xl rounded-lg bg-primary-container hover:bg-primary text-on-primary font-title-md text-body-sm font-semibold flex items-center gap-2 shadow-sm">
+                                    <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                                    <span>Subir y Analizar Documento</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- c) Historial de Movimientos Confirmados y Totales SQL (RF-10) -->
+                    <section id="historial-sql" class="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col gap-space-md">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <h3 class="font-title-lg text-title-lg text-primary font-bold m-0">Historial de Movimientos Confirmados (RF-10)</h3>
+                                <span class="font-body-sm text-body-sm text-on-surface-variant">Cifras y totales por categoría calculados estrictamente en SQL</span>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-data-mono text-data-mono font-bold"
+                                  th:text="'Total SQL: $ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                        </div>
+
+                        <form method="get" action="/dashboard" class="grid grid-cols-1 sm:grid-cols-4 gap-2 m-0">
+                            <input type="text" name="month" th:value="${selectedMonth}" placeholder="Mes (2026-10)" class="h-10 px-3 rounded-lg bg-surface-container-low font-data-mono text-body-sm"/>
+                            <input type="text" name="category" th:value="${selectedCategory}" placeholder="Categoría..." class="h-10 px-3 rounded-lg bg-surface-container-low font-body-sm text-body-sm"/>
+                            <input type="text" name="merchant" th:value="${selectedMerchant}" placeholder="Comercio..." class="h-10 px-3 rounded-lg bg-surface-container-low font-body-sm text-body-sm"/>
+                            <button type="submit" class="h-10 px-4 rounded-lg bg-secondary text-on-secondary font-title-md text-body-sm font-semibold">Filtrar</button>
+                        </form>
+
+                        <div class="divide-y divide-surface-container-low">
+                            <div th:if="${#lists.isEmpty(history.transactions)}" class="py-6 text-center text-on-surface-variant font-body-sm">
+                                No hay movimientos confirmados para este filtro. Sube una factura en `samples/` o haz clic en "Simular 1er Mes".
+                            </div>
+                            <div th:each="tx : ${history.transactions}" class="py-3 flex items-center justify-between gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-title-md text-body-md text-primary font-bold" th:text="${tx.merchantName}"></span>
+                                        <span class="px-2 py-0.5 rounded bg-surface-container-high text-primary font-label-sm text-[11px] font-semibold" th:text="${tx.category}"></span>
+                                        <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-[11px]" th:text="${tx.budgetBlock}"></span>
+                                    </div>
+                                    <span class="font-data-mono text-[12px] text-on-surface-variant truncate" th:text="${tx.transactionDate + ' • Cita: ' + tx.citationReference}"></span>
+                                </div>
+                                <span class="font-data-mono text-title-md text-primary font-bold flex-shrink-0"
+                                      th:text="'$ ' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- RIGHT COLUMN (40% -> span 5) -->
+                <div class="lg:col-span-5 flex flex-col gap-space-xl">
+
+                    <!-- a) Desglose del Presupuesto 50/30/20 -->
+                    <section aria-label="Presupuesto Estratégico 50/30/20" class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-space-xs">
+                                    <h3 class="font-title-lg text-title-lg text-primary font-bold m-0"
+                                        th:text="${profile != null ? 'Presupuesto ' + profile.needsPct + ' / ' + profile.wantsPct + ' / ' + profile.savingsPct : 'Presupuesto 50 / 30 / 20'}">Presupuesto 50 / 30 / 20</h3>
+                                    <span class="px-space-xs py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px] font-bold">Estimación Día 1</span>
+                                </div>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant m-0">Control estricto de liquidez y distribución personalizada</p>
+                            </div>
+                            <a class="p-2 rounded-lg text-primary hover:bg-surface-container-high transition-colors no-underline" href="/profile" title="Ajustar reglas">
+                                <span class="material-symbols-outlined text-[20px]">tune</span>
+                            </a>
+                        </div>
+
+                        <div class="flex flex-col gap-space-md pt-space-xs">
+                            <div class="flex flex-col gap-space-xs p-space-sm rounded-lg bg-surface-container-low/60">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-space-xs">
+                                        <span class="w-3 h-3 rounded-full bg-secondary"></span>
+                                        <span class="font-title-md text-body-sm text-primary font-semibold"
+                                              th:text="'Necesidades (' + ${(profile != null ? profile.needsPct : 50)} + '%)'">Necesidades (50%)</span>
+                                    </div>
+                                    <span class="font-data-mono text-body-sm text-on-surface font-semibold"
+                                          th:text="'Tope: $ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.needsLimit : 2000000, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+                                    <div class="h-full bg-secondary rounded-full" th:style="'width:' + ${(profile != null ? profile.needsPct : 50)} + '%'"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-space-xs p-space-sm rounded-lg bg-surface-container-low/60">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-space-xs">
+                                        <span class="w-3 h-3 rounded-full bg-[#d97706]"></span>
+                                        <span class="font-title-md text-body-sm text-on-surface font-semibold"
+                                              th:text="'Deseos & Ocio (' + ${(profile != null ? profile.wantsPct : 30)} + '%)'">Deseos (30%)</span>
+                                    </div>
+                                    <span class="font-data-mono text-body-sm text-on-surface font-semibold"
+                                          th:text="'Tope: $ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.wantsLimit : 1200000, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+                                    <div class="h-full bg-[#d97706] rounded-full" th:style="'width:' + ${(profile != null ? profile.wantsPct : 30)} + '%'"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-space-xs p-space-sm rounded-lg bg-surface-container-low/60">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-space-xs">
+                                        <span class="w-3 h-3 rounded-full bg-primary-container"></span>
+                                        <span class="font-title-md text-body-sm text-on-surface font-semibold"
+                                              th:text="'Ahorro & Objetivos (' + ${(profile != null ? profile.savingsPct : 20)} + '%)'">Ahorro (20%)</span>
+                                    </div>
+                                    <span class="font-data-mono text-body-sm text-on-surface font-semibold"
+                                          th:text="'Meta: $ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')} + ' COP'"></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+                                    <div class="h-full bg-primary-container rounded-full" th:style="'width:' + ${(profile != null ? profile.savingsPct : 20)} + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informe de cierre si fue generado -->
+                        <div th:if="${latestClosure != null}" class="p-space-md rounded-xl bg-primary-container text-on-primary space-y-2 mt-2">
+                            <span class="font-label-sm text-label-sm uppercase text-secondary-fixed font-bold">Informe de Cierre SQL Generado</span>
+                            <p class="font-body-sm text-body-sm text-primary-fixed m-0" th:text="${latestClosure.report.verdictSummary}"></p>
+                            <ul class="list-disc pl-4 space-y-1 font-body-sm text-body-sm text-surface-container-lowest">
+                                <li th:each="r : ${latestClosure.recommendations}" th:text="${r.explanation}"></li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- b) Consola de Preguntas Rápidas al Asistente RAG -->
+                    <section aria-label="Asistente RAG Inteligente" class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-space-xs">
+                                <div class="w-8 h-8 rounded-lg bg-primary-container text-secondary-fixed flex items-center justify-center shadow-sm">
+                                    <span class="material-symbols-outlined text-[18px]">psychology</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <h3 class="font-title-md text-title-md text-primary font-bold m-0">Asistente Fiscal &amp; RAG</h3>
+                                    <span class="font-label-sm text-[10px] text-secondary uppercase font-semibold">Búsqueda Híbrida RRF + SQL</span>
+                                </div>
+                            </div>
+                            <a href="/assistant" class="px-2.5 py-1 rounded bg-surface-container-high text-primary font-label-sm text-[11px] font-bold no-underline">Abrir vista completa &rarr;</a>
+                        </div>
+
+                        <!-- Interactive Chips -->
+                        <div class="flex flex-wrap gap-space-xs">
+                            <form method="post" action="/dashboard/chat" class="m-0">
+                                <input type="hidden" name="returnTo" value="/dashboard"/>
+                                <input type="hidden" name="question" value="¿Cuánto gasté en domicilios en octubre?"/>
+                                <button type="submit" class="px-space-sm py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-body-sm text-[12px] transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-secondary">search</span>
+                                    <span>¿Cuánto gasté en domicilios en octubre?</span>
+                                </button>
+                            </form>
+                            <form method="post" action="/dashboard/chat" class="m-0">
+                                <input type="hidden" name="returnTo" value="/dashboard"/>
+                                <input type="hidden" name="question" value="¿En qué factura compré Café Molido Gourmet?"/>
+                                <button type="submit" class="px-space-sm py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-body-sm text-[12px] transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-secondary">search</span>
+                                    <span>¿En qué factura compré Café Molido?</span>
+                                </button>
+                            </form>
+                            <form method="post" action="/dashboard/chat" class="m-0">
+                                <input type="hidden" name="returnTo" value="/dashboard"/>
+                                <input type="hidden" name="question" value="¿Cuánto gasté en Almacenes Éxito?"/>
+                                <button type="submit" class="px-space-sm py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-body-sm text-[12px] transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-secondary">search</span>
+                                    <span>¿Cuánto gasté en Almacenes Éxito?</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Respuesta analítica si existe -->
+                        <div th:if="${chatResponse != null}" class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs border-l-4 border-secondary">
+                            <div class="flex items-center justify-between">
+                                <span class="text-primary font-label-sm text-label-sm font-semibold" th:text="${chatResponse.question}"></span>
+                                <span class="font-data-mono text-[10px] text-secondary font-bold">Verificado SQL + pgvector</span>
+                            </div>
+                            <p class="font-body-sm text-body-sm text-on-surface leading-snug m-0" th:text="${chatResponse.answer}"></p>
+                            <div class="pt-space-xs flex flex-wrap gap-1" th:if="${!#lists.isEmpty(chatResponse.citations)}">
+                                <span th:each="cit : ${chatResponse.citations}"
+                                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-secondary-fixed/60 text-on-secondary-fixed font-data-mono text-[11px] font-semibold">
+                                    <span class="material-symbols-outlined text-[13px]">link</span>
+                                    <span th:text="${cit}"></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <form method="post" action="/dashboard/chat" class="relative flex items-center mt-space-xxs m-0">
+                            <input type="hidden" name="returnTo" value="/dashboard"/>
+                            <input name="question" required class="w-full h-10 pl-space-md pr-10 rounded-lg bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/60 font-body-md text-body-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" placeholder="Pregunta algo sobre tus facturas..." type="text"/>
+                            <button type="submit" class="absolute right-1.5 w-7 h-7 rounded-md bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container transition-colors shadow-sm" title="Enviar pregunta">
+                                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                            </button>
+                        </form>
+                    </section>
                 </div>
             </div>
         </div>
-
-        <!-- Footer Insight Banner -->
-        <div class="p-3 rounded-xl bg-surface-container-high/60 flex items-center gap-2.5 text-on-surface-variant">
-            <span class="material-symbols-outlined text-[18px] text-secondary shrink-0">verified_user</span>
-            <p class="font-code-legal text-code-legal leading-relaxed m-0">
-                Tus datos están aislados con PostgreSQL Row Level Security (RNF-01) y protegidos bajo la Ley 1581 de 2012.
-            </p>
-        </div>
-    </div>
-</main>
-
-<!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,53,39,0.06)]">
-    <div class="max-w-4xl mx-auto h-16 px-space-sm flex items-center justify-around">
-        <a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] transition-colors text-secondary font-semibold no-underline" href="#seccion-inicio">
-            <span class="material-symbols-outlined text-[22px]">dashboard</span>
-            <span class="font-label-md text-label-md mt-0.5">Inicio</span>
-        </a>
-        <div class="relative -top-3 flex flex-col items-center">
-            <a class="w-12 h-12 rounded-full bg-secondary text-on-secondary shadow-[0_8px_16px_rgba(0,108,73,0.3)] flex items-center justify-center transition-transform active:scale-95 hover:bg-secondary/90 no-underline" href="#seccion-carga">
-                <span class="material-symbols-outlined text-[26px]">add</span>
-            </a>
-            <span class="font-label-md text-label-md text-on-surface-variant mt-1">+ Cargar</span>
-        </div>
-        <a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-secondary transition-colors no-underline" href="/profile">
-            <span class="material-symbols-outlined text-[22px]">pie_chart</span>
-            <span class="font-label-md text-label-md mt-0.5">Presupuesto</span>
-        </a>
-        <a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-secondary transition-colors no-underline" href="#seccion-asistente">
-            <span class="material-symbols-outlined text-[22px]">smart_toy</span>
-            <span class="font-label-md text-label-md mt-0.5">Asistente</span>
-        </a>
-    </div>
-</nav>
-
-<script>
-    function switchUploadMode(mode) {
-        const panelVoucher = document.getElementById('panel-voucher');
-        const panelManual = document.getElementById('panel-manual');
-        const tabVoucher = document.getElementById('tab-voucher');
-        const tabManual = document.getElementById('tab-manual');
-
-        if (mode === 'manual') {
-            panelVoucher.classList.add('hidden');
-            panelManual.classList.remove('hidden');
-            panelManual.classList.add('flex');
-            tabManual.className = 'flex-1 py-2 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm transition-all';
-            tabVoucher.className = 'flex-1 py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 transition-all';
-        } else {
-            panelManual.classList.add('hidden');
-            panelManual.classList.remove('flex');
-            panelVoucher.classList.remove('hidden');
-            tabVoucher.className = 'flex-1 py-2 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm transition-all';
-            tabManual.className = 'flex-1 py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 transition-all';
-        }
-    }
-
-    function submitSuggestedQuestion(text) {
-        const input = document.getElementById('chat-input');
-        const form = document.getElementById('chat-form');
-        if (input && form) {
-            input.value = text;
-            form.submit();
-        }
-    }
-</script>
+    </main>
+</div>
 </body>
 </html>

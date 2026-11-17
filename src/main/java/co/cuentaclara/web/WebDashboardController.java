@@ -62,9 +62,40 @@ public class WebDashboardController {
             @RequestParam(value = "merchant", required = false) String merchant,
             Model model
     ) {
+        populateCommonDashboardModel(principal, month, category, merchant, model);
+        return "dashboard/index";
+    }
+
+    @GetMapping("/upload")
+    public String uploadAndConfirmPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam(value = "month", required = false) String month,
+            Model model
+    ) {
+        populateCommonDashboardModel(principal, month, null, null, model);
+        return "dashboard/upload";
+    }
+
+    @GetMapping("/assistant")
+    public String assistantPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam(value = "month", required = false) String month,
+            Model model
+    ) {
+        populateCommonDashboardModel(principal, month, null, null, model);
+        return "dashboard/assistant";
+    }
+
+    private void populateCommonDashboardModel(
+            AuthenticatedUserPrincipal principal,
+            String month,
+            String category,
+            String merchant,
+            Model model
+    ) {
         model.addAttribute("user", principal);
         model.addAttribute("budgetBlocks", BudgetBlock.values());
-        model.addAttribute("selectedMonth", month != null ? month : "2026-10");
+        model.addAttribute("selectedMonth", month != null && !month.isBlank() ? month : "2026-10");
         model.addAttribute("selectedCategory", category != null ? category : "");
         model.addAttribute("selectedMerchant", merchant != null ? merchant : "");
 
@@ -86,8 +117,6 @@ public class WebDashboardController {
         );
         model.addAttribute("history", history);
         model.addAttribute("reports", reportService.listReports(principal.userId()));
-
-        return "dashboard/index";
     }
 
     @PostMapping("/dashboard/upload")
@@ -178,6 +207,7 @@ public class WebDashboardController {
     public String askChatFromWeb(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam String question,
+            @RequestParam(value = "returnTo", defaultValue = "/assistant") String returnTo,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -187,7 +217,7 @@ public class WebDashboardController {
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/dashboard";
+        return "redirect:" + (returnTo.startsWith("/") ? returnTo : "/assistant");
     }
 
     @PostMapping("/dashboard/simulate-month")
