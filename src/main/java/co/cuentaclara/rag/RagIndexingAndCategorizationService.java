@@ -1,15 +1,5 @@
 package co.cuentaclara.rag;
 
-import co.cuentaclara.document.DocumentEntity;
-import co.cuentaclara.document.DocumentExtraction;
-import co.cuentaclara.document.DocumentRepository;
-import co.cuentaclara.document.DocumentSourceType;
-import co.cuentaclara.document.DocumentStatus;
-import co.cuentaclara.profile.BudgetBlock;
-import co.cuentaclara.transaction.TransactionEntity;
-import co.cuentaclara.transaction.TransactionService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,12 +9,25 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import co.cuentaclara.document.DocumentEntity;
+import co.cuentaclara.document.DocumentExtraction;
+import co.cuentaclara.document.DocumentRepository;
+import co.cuentaclara.document.DocumentSourceType;
+import co.cuentaclara.document.DocumentStatus;
+import co.cuentaclara.profile.BudgetBlock;
+import co.cuentaclara.transaction.TransactionEntity;
+import co.cuentaclara.transaction.TransactionService;
 
 /**
  * Servicio de Fragmentación, Indexación Vectorial en pgvector, Verificación y Eliminación Segura de

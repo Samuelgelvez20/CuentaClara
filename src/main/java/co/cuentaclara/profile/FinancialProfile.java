@@ -44,6 +44,9 @@ public class FinancialProfile {
     @Column(name = "savings_pct", nullable = false)
     private int savingsPct = 20;
 
+    @Column(name = "needs_cut_percent", nullable = false)
+    private int needsCutPercent = 10;
+
     @Column(name = "financial_goals")
     private String financialGoals;
 
@@ -136,6 +139,14 @@ public class FinancialProfile {
 
     public void setSavingsPct(int savingsPct) {
         this.savingsPct = savingsPct;
+    }
+
+    public int getNeedsCutPercent() {
+        return needsCutPercent;
+    }
+
+    public void setNeedsCutPercent(int needsCutPercent) {
+        this.needsCutPercent = Math.max(0, Math.min(30, needsCutPercent));
     }
 
     public String getFinancialGoals() {

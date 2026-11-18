@@ -303,24 +303,36 @@
 
                         <div id="register-obligations-list" class="flex flex-col gap-2">
                             <!-- Fila 1: Alquiler / Vivienda -->
-                            <div class="grid grid-cols-12 gap-1.5 items-center">
-                                <input type="text" name="obligationName" placeholder="Ej. Pago de Alquiler"
-                                       class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface"/>
-                                <input type="number" step="1000" name="obligationAmount" placeholder="Monto $"
-                                       class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary"/>
-                                <input type="number" min="1" max="31" name="obligationDueDay" placeholder="Día (5)" title="Día del mes en que pagas (1-31)"
-                                       class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-primary text-center"/>
-                                <input type="hidden" name="obligationCategory" value="Vivienda"/>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="this.parentElement.remove()" title="Eliminar deuda fija"
+                                        class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer">
+                                    &minus;
+                                </button>
+                                <div class="grid grid-cols-12 gap-1.5 items-center flex-1">
+                                    <input type="text" name="obligationName" placeholder="Ej. Pago de Alquiler"
+                                           class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface"/>
+                                    <input type="number" step="1000" name="obligationAmount" placeholder="Monto $"
+                                           class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary"/>
+                                    <input type="number" min="1" max="31" name="obligationDueDay" placeholder="Día (5)" title="Día del mes en que pagas (1-31)"
+                                           class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-primary text-center"/>
+                                    <input type="hidden" name="obligationCategory" value="Vivienda"/>
+                                </div>
                             </div>
                             <!-- Fila 2: Deuda / Préstamo -->
-                            <div class="grid grid-cols-12 gap-1.5 items-center">
-                                <input type="text" name="obligationName" placeholder="Ej. Cuota Préstamo / Deuda"
-                                       class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface"/>
-                                <input type="number" step="1000" name="obligationAmount" placeholder="Monto $"
-                                       class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary"/>
-                                <input type="number" min="1" max="31" name="obligationDueDay" placeholder="Día (15)" title="Día del mes en que pagas (1-31)"
-                                       class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-primary text-center"/>
-                                <input type="hidden" name="obligationCategory" value="Deudas y Préstamos"/>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="this.parentElement.remove()" title="Eliminar deuda fija"
+                                        class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer">
+                                    &minus;
+                                </button>
+                                <div class="grid grid-cols-12 gap-1.5 items-center flex-1">
+                                    <input type="text" name="obligationName" placeholder="Ej. Cuota Préstamo / Deuda"
+                                           class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface"/>
+                                    <input type="number" step="1000" name="obligationAmount" placeholder="Monto $"
+                                           class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary"/>
+                                    <input type="number" min="1" max="31" name="obligationDueDay" placeholder="Día (15)" title="Día del mes en que pagas (1-31)"
+                                           class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-primary text-center"/>
+                                    <input type="hidden" name="obligationCategory" value="Deudas y Préstamos"/>
+                                </div>
                             </div>
                         </div>
 
@@ -451,17 +463,26 @@
     function addRegisterObligationRow() {
         const list = document.getElementById('register-obligations-list');
         const row = document.createElement('div');
-        row.className = 'grid grid-cols-12 gap-1.5 items-center';
+        row.className = 'flex items-center gap-1.5';
         row.innerHTML = `
-            <input type="text" name="obligationName" placeholder="Ej. Tarjeta o Deuda"
-                   class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface"/>
-            <input type="number" step="1000" name="obligationAmount" placeholder="Monto $"
-                   class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary"/>
-            <input type="number" min="1" max="31" name="obligationDueDay" placeholder="Día (20)" title="Día del mes en que pagas (1-31)"
-                   class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-primary text-center"/>
-            <input type="hidden" name="obligationCategory" value="Deudas y Préstamos"/>
+            <button type="button" onclick="this.parentElement.remove()" title="Eliminar deuda fija"
+                    class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer">
+                &minus;
+            </button>
+            <div class="grid grid-cols-12 gap-1.5 items-center flex-1">
+                <input type="text" name="obligationName" placeholder="Ej. Tarjeta o Deuda"
+                       class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface"/>
+                <input type="number" step="1000" name="obligationAmount" placeholder="Monto $"
+                       class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary"/>
+                <input type="number" min="1" max="31" name="obligationDueDay" placeholder="Día (20)" title="Día del mes en que pagas (1-31)"
+                       class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-primary text-center"/>
+                <input type="hidden" name="obligationCategory" value="Deudas y Préstamos"/>
+            </div>
         `;
         list.appendChild(row);
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
     }
 
     function togglePasswordVisibility() {

@@ -250,7 +250,8 @@
                         </div>
                     </div>
                     <div class="my-2">
-                        <span class="text-2xl font-extrabold text-primary">$ <span th:text="${#numbers.formatDecimal(profile != null ? profile.netIncome : 4000000, 1, 'POINT', 0, 'COMMA')}">4.000.000</span></span>
+                        <span class="text-2xl font-extrabold text-primary"
+                              th:text="'$ ' + ${#numbers.formatDecimal(profile != null ? profile.netIncome : 4000000, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 4.000.000 COP</span>
                     </div>
                     <div class="flex items-center justify-between text-xs">
                         <span class="text-on-surface-variant" th:text="${profile != null ? 'Plan ' + profile.needsPct + '/' + profile.wantsPct + '/' + profile.savingsPct : 'Plan 50/30/20'}">Plan 50/30/20</span>
@@ -267,7 +268,8 @@
                         </div>
                     </div>
                     <div class="my-2">
-                        <span class="text-2xl font-extrabold text-on-surface">$ <span th:text="${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')}">0</span></span>
+                        <span class="text-2xl font-extrabold text-on-surface"
+                              th:text="'$ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0 COP</span>
                     </div>
                     <div class="flex items-center justify-between text-xs">
                         <span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-bold"
@@ -302,7 +304,8 @@
                         </div>
                     </div>
                     <div class="my-2">
-                        <span class="text-2xl font-extrabold text-on-surface">$ <span th:text="${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')}">800.000</span></span>
+                        <span class="text-2xl font-extrabold text-on-surface"
+                              th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 800.000 COP</span>
                     </div>
                     <div class="flex items-center justify-between text-xs">
                         <span class="text-on-surface-variant">Para tus sueños y metas</span>
@@ -347,13 +350,20 @@
                             <span>Mes Anterior</span>
                         </a>
 
-                        <form method="get" action="/dashboard" class="m-0">
-                            <select name="month" onchange="this.form.submit()"
-                                    class="h-10 px-4 rounded-full bg-primary-container text-on-primary text-xs font-bold cursor-pointer border-0 focus:outline-none shadow-sm">
-                                <option th:each="entry : ${availableMonths}"
+                        <form method="get" action="/dashboard" class="m-0 flex items-center gap-1.5 bg-surface-container-low p-1 rounded-full border border-outline-variant/30 shadow-xs">
+                            <select name="monthNum" onchange="this.form.submit()" aria-label="Filtrar por mes"
+                                    class="h-8 px-3.5 rounded-full bg-primary-container text-on-primary text-xs font-bold cursor-pointer border-0 focus:outline-none shadow-xs">
+                                <option th:each="entry : ${availableMonthNames}"
                                         th:value="${entry.key}"
                                         th:text="${entry.value}"
-                                        th:selected="${entry.key == selectedMonth}">Noviembre 2026</option>
+                                        th:selected="${entry.key == selectedMonthNumber}">Noviembre</option>
+                            </select>
+                            <select name="year" onchange="this.form.submit()" aria-label="Filtrar por año"
+                                    class="h-8 px-3 rounded-full bg-surface-container-lowest text-primary text-xs font-extrabold cursor-pointer border border-outline-variant/30 focus:outline-none">
+                                <option th:each="yr : ${availableYears}"
+                                        th:value="${yr}"
+                                        th:text="${yr}"
+                                        th:selected="${yr == selectedYear}">2026</option>
                             </select>
                         </form>
 
@@ -573,6 +583,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3" th:if="${!#lists.isEmpty(obligations)}">
                             <div th:each="ob : ${obligations}" class="p-4 rounded-2xl bg-surface-container-low/80 border border-outline-variant/25 flex items-center justify-between gap-2">
                                 <div class="flex items-center gap-3 min-w-0">
+                                    <form method="post" th:action="@{'/dashboard/obligations/' + ${ob.id} + '/delete'}" class="m-0 flex-shrink-0">
+                                        <input type="hidden" name="returnTo" th:value="'/dashboard?month=' + ${selectedMonth}"/>
+                                        <button type="submit" title="Eliminar deuda fija"
+                                                class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer shadow-xs">
+                                            &minus;
+                                        </button>
+                                    </form>
                                     <div class="w-11 h-11 rounded-2xl bg-primary-container text-white flex flex-col items-center justify-center flex-shrink-0 leading-none shadow-xs">
                                         <span class="text-[9px] uppercase font-bold opacity-80">Día</span>
                                         <span class="text-sm font-extrabold" th:text="${ob.dueDay}">5</span>
@@ -585,12 +602,6 @@
                                 <div class="flex items-center gap-2 flex-shrink-0">
                                     <span class="text-xs font-extrabold text-secondary"
                                           th:text="'$ ' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}">$ 1.200.000</span>
-                                    <form method="post" th:action="@{'/dashboard/obligations/' + ${ob.id} + '/delete'}" class="m-0">
-                                        <input type="hidden" name="returnTo" th:value="'/dashboard?month=' + ${selectedMonth}"/>
-                                        <button type="submit" title="Eliminar pago fijo" class="p-1.5 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors">
-                                            <span class="material-symbols-outlined text-[16px]">delete</span>
-                                        </button>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -891,6 +902,9 @@
 
 <script>
     function formatCOP(val) {
+        if (window.CuentaClaraTheme && window.CuentaClaraTheme.formatAmount) {
+            return window.CuentaClaraTheme.formatAmount(val);
+        }
         const num = Number(val) || 0;
         return '$ ' + num.toLocaleString('es-CO', { maximumFractionDigits: 0 }) + ' COP';
     }
@@ -990,6 +1004,9 @@
         const backdrop = document.getElementById('day-modal-backdrop');
         backdrop.classList.remove('hidden');
         backdrop.classList.add('flex');
+        if (window.CuentaClaraTheme && window.CuentaClaraTheme.refreshLocalization) {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
     }
 
     function closeDayModal() {

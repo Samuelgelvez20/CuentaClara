@@ -207,16 +207,25 @@
             <!-- Barra de Filtros con Desplegables (<select>) -->
             <section class="bg-surface-container-lowest rounded-3xl p-6 sm:p-8 shadow-sm border border-outline-variant/30 flex flex-col gap-6">
                 <form method="get" action="/history" class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 bg-surface-container-low/70 p-4 rounded-2xl border border-outline-variant/25 m-0">
-                    <!-- Desplegable 1: Mes -->
+                    <!-- Desplegable 1: Mes y Año -->
                     <div class="sm:col-span-3 flex flex-col gap-1">
-                        <label class="text-xs font-bold text-on-surface-variant px-1">Mes a consultar</label>
-                        <select name="month" onchange="this.form.submit()"
-                                class="h-11 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-xs font-bold text-on-surface cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary">
-                            <option th:each="entry : ${availableMonths}"
-                                    th:value="${entry.key}"
-                                    th:text="${entry.value}"
-                                    th:selected="${entry.key == selectedMonth}">Octubre 2026</option>
-                        </select>
+                        <label class="text-xs font-bold text-on-surface-variant px-1">Mes y Año a consultar</label>
+                        <div class="flex items-center gap-2">
+                            <select name="monthNum" onchange="this.form.submit()" aria-label="Filtrar por mes"
+                                    class="flex-1 h-11 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-xs font-bold text-on-surface cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary">
+                                <option th:each="entry : ${availableMonthNames}"
+                                        th:value="${entry.key}"
+                                        th:text="${entry.value}"
+                                        th:selected="${entry.key == selectedMonthNumber}">Noviembre</option>
+                            </select>
+                            <select name="year" onchange="this.form.submit()" aria-label="Filtrar por año"
+                                    class="w-24 h-11 px-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-xs font-extrabold text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary">
+                                <option th:each="yr : ${availableYears}"
+                                        th:value="${yr}"
+                                        th:text="${yr}"
+                                        th:selected="${yr == selectedYear}">2026</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Desplegable 2: Categoría -->

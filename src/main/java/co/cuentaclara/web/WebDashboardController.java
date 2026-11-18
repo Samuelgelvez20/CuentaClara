@@ -83,11 +83,14 @@ public class WebDashboardController {
     public String dashboard(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam(value = "month", required = false) String month,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "monthNum", required = false) Integer monthNum,
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "merchant", required = false) String merchant,
             Model model
     ) {
-        populateCommonDashboardModel(principal, month, category, merchant, model);
+        String effectiveMonth = resolveEffectiveMonthParam(month, year, monthNum);
+        populateCommonDashboardModel(principal, effectiveMonth, category, merchant, model);
         return "dashboard/index";
     }
 
@@ -143,7 +146,7 @@ public class WebDashboardController {
                                 needsPct, wantsPct, savingsPct,
                                 financialGoals != null && !financialGoals.isBlank() ? financialGoals : "Ahorrar y organizar mis finanzas",
                                 BigDecimal.ZERO,
-                                List.of()
+                                null
                         )
                 );
             }
@@ -197,12 +200,22 @@ public class WebDashboardController {
     public String historyPage(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam(value = "month", required = false) String month,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "monthNum", required = false) Integer monthNum,
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "merchant", required = false) String merchant,
             Model model
     ) {
-        populateCommonDashboardModel(principal, month, category, merchant, model);
+        String effectiveMonth = resolveEffectiveMonthParam(month, year, monthNum);
+        populateCommonDashboardModel(principal, effectiveMonth, category, merchant, model);
         return "dashboard/history";
+    }
+
+    private String resolveEffectiveMonthParam(String month, Integer year, Integer monthNum) {
+        if (year != null && monthNum != null && monthNum >= 1 && monthNum <= 12) {
+            return YearMonth.of(year, monthNum).toString();
+        }
+        return month;
     }
 
     private void populateCommonDashboardModel(
@@ -285,23 +298,29 @@ public class WebDashboardController {
             YearMonth currentYm,
             Model model
     ) {
-        Map<String, String> monthOptions = new LinkedHashMap<>();
-        List<YearMonth> presetMonths = List.of(
-                YearMonth.of(2026, 8),
-                YearMonth.of(2026, 9),
-                YearMonth.of(2026, 10),
-                YearMonth.of(2026, 11),
-                YearMonth.of(2026, 12),
-                currentYm
-        );
-        for (YearMonth ym : presetMonths) {
-            monthOptions.put(ym.toString(), formatMonthLabel(ym));
+        int currentYear = currentYm.getYear();
+        int currentMonthNum = currentYm.getMonthValue();
+
+        Set<Integer> yearSet = new LinkedHashSet<>();
+        int minYear = Math.min(1970, currentYear - 20);
+        int maxYear = Math.max(2100, currentYear + 50);
+        for (int y = minYear; y <= maxYear; y++) {
+            yearSet.add(y);
         }
+        yearSet.add(currentYear);
         for (TransactionEntity tx : allTransactions) {
             if (tx.getTransactionDate() != null) {
-                YearMonth txYm = YearMonth.from(tx.getTransactionDate());
-                monthOptions.put(txYm.toString(), formatMonthLabel(txYm));
+                yearSet.add(tx.getTransactionDate().getYear());
             }
+        }
+        List<Integer> sortedYears = yearSet.stream().sorted().toList();
+
+        Map<Integer, String> monthNumberNames = new LinkedHashMap<>();
+        Map<String, String> monthOptions = new LinkedHashMap<>();
+        for (int m = 1; m <= 12; m++) {
+            monthNumberNames.put(m, SPANISH_MONTH_NAMES[m]);
+            YearMonth ym = YearMonth.of(currentYear, m);
+            monthOptions.put(ym.toString(), formatMonthLabel(ym));
         }
 
         Set<String> categoryOptions = new LinkedHashSet<>(STANDARD_CATEGORIES);
@@ -315,6 +334,10 @@ public class WebDashboardController {
             }
         }
 
+        model.addAttribute("selectedYear", currentYear);
+        model.addAttribute("selectedMonthNumber", currentMonthNum);
+        model.addAttribute("availableYears", sortedYears);
+        model.addAttribute("availableMonthNames", monthNumberNames);
         model.addAttribute("availableMonths", monthOptions);
         model.addAttribute("availableCategories", categoryOptions);
         model.addAttribute("availableMerchants", merchantOptions);

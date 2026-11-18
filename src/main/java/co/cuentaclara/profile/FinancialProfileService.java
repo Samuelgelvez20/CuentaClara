@@ -69,9 +69,9 @@ public class FinancialProfileService {
 
         FinancialProfile savedProfile = profileRepository.save(profile);
 
-        // Si se enviaron obligaciones recurrentes en el formulario, actualizarlas; si viene vacío, conservar las existentes
+        // Si se envió la lista de obligaciones en el formulario (incluso vacía al borrar todas), actualizarlas; si es null (/settings), conservar las existentes
         List<RecurringObligation> savedObligations = new ArrayList<>();
-        if (request.obligations() != null && !request.obligations().isEmpty()) {
+        if (request.obligations() != null) {
             obligationRepository.deleteByUserId(userId);
             for (ObligationInput item : request.obligations()) {
                 if (item.name() != null && !item.name().isBlank()

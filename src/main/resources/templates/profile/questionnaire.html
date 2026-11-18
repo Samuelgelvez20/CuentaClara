@@ -338,80 +338,106 @@
                     </div>
 
                     <div id="profile-obligations-rows" class="flex flex-col gap-2.5">
-                        <!-- Si ya tiene obligaciones guardadas, mostrarlas editables -->
-                        <div th:each="ob : ${obligations}" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30">
-                            <div class="sm:col-span-4">
-                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
-                                <input type="text" name="obligationName" th:value="${ob.name}"
-                                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
-                            </div>
-                            <div class="sm:col-span-3">
-                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
-                                <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
-                                    <option value="Vivienda" th:selected="${ob.category == 'Vivienda'}">🏠 Vivienda / Alquiler</option>
-                                    <option value="Deudas y Préstamos" th:selected="${ob.category == 'Deudas y Préstamos'}">💳 Deudas y Préstamos</option>
-                                    <option value="Servicios" th:selected="${ob.category == 'Servicios'}">💡 Servicios e Internet</option>
-                                    <option value="Alimentación" th:selected="${ob.category == 'Alimentación'}">🛒 Alimentación</option>
-                                    <option value="Otros" th:selected="${ob.category == 'Otros'}">📌 Otros</option>
-                                </select>
-                            </div>
-                            <div class="sm:col-span-3">
-                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
-                                <input type="number" step="1000" name="obligationAmount" th:value="${ob.estimatedAmount}"
-                                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
-                                <input type="number" min="1" max="31" name="obligationDueDay" th:value="${ob.dueDay}"
-                                       class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                        <!-- Si ya tiene obligaciones guardadas, mostrarlas editables con botón circular (-) al inicio -->
+                        <div th:each="ob : ${obligations}"
+                             th:attr="data-obligation-id=${ob.id}"
+                             class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all">
+                            <button type="button"
+                                    onclick="removeProfileObligationRow(this)"
+                                    title="Eliminar esta deuda o pago fijo"
+                                    class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                                &minus;
+                            </button>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
+                                <div class="sm:col-span-4">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                                    <input type="text" name="obligationName" th:value="${ob.name}"
+                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                    <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                                        <option value="Vivienda" th:selected="${ob.category == 'Vivienda'}">🏠 Vivienda / Alquiler</option>
+                                        <option value="Deudas y Préstamos" th:selected="${ob.category == 'Deudas y Préstamos'}">💳 Deudas y Préstamos</option>
+                                        <option value="Servicios" th:selected="${ob.category == 'Servicios'}">💡 Servicios e Internet</option>
+                                        <option value="Alimentación" th:selected="${ob.category == 'Alimentación'}">🛒 Alimentación</option>
+                                        <option value="Otros" th:selected="${ob.category == 'Otros'}">📌 Otros</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                                    <input type="number" step="1000" name="obligationAmount" th:value="${ob.estimatedAmount}"
+                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                    <input type="number" min="1" max="31" name="obligationDueDay" th:value="${ob.dueDay}"
+                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Si aún no tiene obligaciones guardadas, mostrar 3 filas sugeridas listas para llenar -->
+                        <!-- Si aún no tiene obligaciones guardadas, mostrar 2 filas sugeridas listas para llenar o borrar -->
                         <th:block th:if="${#lists.isEmpty(obligations)}">
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30">
-                                <div class="sm:col-span-4">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Pago</label>
-                                    <input type="text" name="obligationName" value="Alquiler / Vivienda"
-                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
-                                    <input type="text" name="obligationCategory" value="Vivienda" readonly
-                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
-                                    <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 1450000"
-                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
-                                    <input type="number" min="1" max="31" name="obligationDueDay" value="5"
-                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                            <div class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all">
+                                <button type="button"
+                                        onclick="removeProfileObligationRow(this)"
+                                        title="Eliminar esta deuda o pago fijo"
+                                        class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                                    &minus;
+                                </button>
+                                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
+                                    <div class="sm:col-span-4">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Pago</label>
+                                        <input type="text" name="obligationName" value="Alquiler / Vivienda"
+                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                    </div>
+                                    <div class="sm:col-span-3">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                        <input type="text" name="obligationCategory" value="Vivienda" readonly
+                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                    </div>
+                                    <div class="sm:col-span-3">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                                        <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 1450000"
+                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                        <input type="number" min="1" max="31" name="obligationDueDay" value="5"
+                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30">
-                                <div class="sm:col-span-4">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
-                                    <input type="text" name="obligationName" value="Cuota Préstamo / Deuda"
-                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
-                                    <input type="text" name="obligationCategory" value="Deudas y Préstamos" readonly
-                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
-                                    <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 350000"
-                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
-                                    <input type="number" min="1" max="31" name="obligationDueDay" value="12"
-                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                            <div class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all">
+                                <button type="button"
+                                        onclick="removeProfileObligationRow(this)"
+                                        title="Eliminar esta deuda o pago fijo"
+                                        class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                                    &minus;
+                                </button>
+                                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
+                                    <div class="sm:col-span-4">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                                        <input type="text" name="obligationName" value="Cuota Préstamo / Deuda"
+                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                    </div>
+                                    <div class="sm:col-span-3">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                        <input type="text" name="obligationCategory" value="Deudas y Préstamos" readonly
+                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                    </div>
+                                    <div class="sm:col-span-3">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                                        <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 350000"
+                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                        <input type="number" min="1" max="31" name="obligationDueDay" value="12"
+                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                    </div>
                                 </div>
                             </div>
                         </th:block>
@@ -499,7 +525,20 @@
         const rangeSavings = document.getElementById('rangeSavings');
 
         function formatCOP(amount) {
+            if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.formatAmount === 'function') {
+                return window.CuentaClaraTheme.formatAmount(Math.round(amount));
+            }
             return '$ ' + new Intl.NumberFormat('es-CO').format(Math.round(amount));
+        }
+
+        function setAmountText(id, amount) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const copStr = '$ ' + new Intl.NumberFormat('es-CO').format(Math.round(amount));
+            el.textContent = formatCOP(amount);
+            if (el.firstChild) {
+                el.firstChild._ccOrigText = copStr;
+            }
         }
 
         function updateUI() {
@@ -517,67 +556,102 @@
             const amtW = (income * w) / 100;
             const amtS = (income * s) / 100;
 
-            document.getElementById('valNeedsAmt').innerText = formatCOP(amtN);
-            document.getElementById('valWantsAmt').innerText = formatCOP(amtW);
-            document.getElementById('valSavingsAmt').innerText = formatCOP(amtS);
+            setAmountText('valNeedsAmt', amtN);
+            setAmountText('valWantsAmt', amtW);
+            setAmountText('valSavingsAmt', amtS);
 
-            document.getElementById('cardNeedsAmt').innerText = formatCOP(amtN);
-            document.getElementById('cardWantsAmt').innerText = formatCOP(amtW);
-            document.getElementById('cardSavingsAmt').innerText = formatCOP(amtS);
+            setAmountText('cardNeedsAmt', amtN);
+            setAmountText('cardWantsAmt', amtW);
+            setAmountText('cardSavingsAmt', amtS);
 
             document.getElementById('barNeeds').style.width = n + '%';
             document.getElementById('barWants').style.width = w + '%';
             document.getElementById('barSavings').style.width = s + '%';
 
             const sumBadge = document.getElementById('sumBadge');
+            const isEn = window.CuentaClaraTheme && window.CuentaClaraTheme.getLanguage && window.CuentaClaraTheme.getLanguage() === 'en-US';
             if (sum === 100) {
                 sumBadge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-bold';
-                sumBadge.innerText = 'Suma: 100% Correcto';
+                sumBadge.textContent = isEn ? 'Sum: 100% Valid' : 'Suma: 100% Correcto';
+                if (sumBadge.firstChild) sumBadge.firstChild._ccOrigText = 'Suma: 100% Correcto';
             } else {
                 sumBadge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-error font-label-sm text-label-sm font-bold';
-                sumBadge.innerText = 'Suma: ' + sum + '% (Debe ser 100%)';
+                const origBadge = 'Suma: ' + sum + '% (Debe ser 100%)';
+                sumBadge.textContent = isEn ? ('Sum: ' + sum + '% (Must be 100%)') : origBadge;
+                if (sumBadge.firstChild) sumBadge.firstChild._ccOrigText = origBadge;
             }
         }
 
         [netIncomeInput, rangeNeeds, rangeWants, rangeSavings].forEach(el => {
             el.addEventListener('input', updateUI);
         });
+        window.addEventListener('cuentaclara:currency-changed', updateUI);
+        window.addEventListener('cuentaclara:language-changed', updateUI);
+        document.addEventListener('DOMContentLoaded', updateUI);
 
         updateUI();
     })();
 
+    function removeProfileObligationRow(btn) {
+        const row = btn.closest('.obligation-slide-row');
+        if (!row) return;
+        const obligationId = row.getAttribute('data-obligation-id');
+        if (obligationId) {
+            fetch('/dashboard/obligations/' + encodeURIComponent(obligationId) + '/delete?returnTo=/profile', {
+                method: 'POST',
+                credentials: 'same-origin'
+            }).catch(() => {});
+        }
+        row.style.opacity = '0';
+        row.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            row.remove();
+        }, 120);
+    }
+
     function addProfileObligationRow() {
         const container = document.getElementById('profile-obligations-rows');
         const row = document.createElement('div');
-        row.className = 'grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30';
+        row.className = 'obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all';
         row.innerHTML = `
-            <div class="sm:col-span-4">
-                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
-                <input type="text" name="obligationName" placeholder="Ej. Tarjeta, Crédito, Internet..."
-                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
-            </div>
-            <div class="sm:col-span-3">
-                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
-                <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
-                    <option value="Deudas y Préstamos">💳 Deudas y Préstamos</option>
-                    <option value="Vivienda">🏠 Vivienda / Alquiler</option>
-                    <option value="Servicios">💡 Servicios e Internet</option>
-                    <option value="Educación">📚 Educación</option>
-                    <option value="Otros">📌 Otros</option>
-                </select>
-            </div>
-            <div class="sm:col-span-3">
-                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
-                <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 250000"
-                       class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
-            </div>
-            <div class="sm:col-span-2">
-                <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
-                <input type="number" min="1" max="31" name="obligationDueDay" value="15"
-                       class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+            <button type="button"
+                    onclick="removeProfileObligationRow(this)"
+                    title="Eliminar esta deuda o pago fijo"
+                    class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                &minus;
+            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
+                <div class="sm:col-span-4">
+                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                    <input type="text" name="obligationName" placeholder="Ej. Tarjeta, Crédito, Internet..."
+                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                </div>
+                <div class="sm:col-span-3">
+                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                    <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                        <option value="Deudas y Préstamos">💳 Deudas y Préstamos</option>
+                        <option value="Vivienda">🏠 Vivienda / Alquiler</option>
+                        <option value="Servicios">💡 Servicios e Internet</option>
+                        <option value="Educación">📚 Educación</option>
+                        <option value="Otros">📌 Otros</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-3">
+                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                    <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 250000"
+                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                    <input type="number" min="1" max="31" name="obligationDueDay" value="15"
+                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                </div>
             </div>
         `;
         container.appendChild(row);
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
     }
 </script>
 </body>

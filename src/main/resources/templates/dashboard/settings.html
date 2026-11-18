@@ -464,21 +464,22 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" th:if="${!#lists.isEmpty(obligations)}">
-                <div th:each="ob : ${obligations}" class="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-between gap-3">
-                    <div class="flex flex-col gap-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded-full bg-primary-container text-white text-[11px] font-bold" th:text="'Día ' + ${ob.dueDay} + ' de cada mes'">Día 5</span>
-                            <span class="text-xs text-on-surface-variant font-medium" th:text="${ob.category}">Vivienda</span>
-                        </div>
-                        <span class="text-sm font-bold text-on-surface mt-1" th:text="${ob.name}">Alquiler</span>
-                        <span class="text-sm font-extrabold text-secondary" th:text="'$ ' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 1.200.000</span>
-                    </div>
-                    <form method="post" th:action="@{'/dashboard/obligations/' + ${ob.id} + '/delete'}" class="m-0">
+                <div th:each="ob : ${obligations}" class="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex items-center gap-3">
+                    <form method="post" th:action="@{'/dashboard/obligations/' + ${ob.id} + '/delete'}" class="m-0 flex-shrink-0">
                         <input type="hidden" name="returnTo" value="/settings"/>
-                        <button type="submit" title="Quitar del calendario" class="p-2 rounded-xl text-on-surface-variant hover:text-red-600 hover:bg-red-500/10 transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                        <button type="submit" title="Eliminar deuda fija"
+                                class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-xs">
+                            &minus;
                         </button>
                     </form>
+                    <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-primary-container text-white text-[11px] font-bold" th:text="'Día ' + ${ob.dueDay} + ' de cada mes'">Día 5</span>
+                            <span class="text-xs text-on-surface-variant font-medium truncate" th:text="${ob.category}">Vivienda</span>
+                        </div>
+                        <span class="text-sm font-bold text-on-surface mt-1 truncate" th:text="${ob.name}">Alquiler</span>
+                        <span class="text-sm font-extrabold text-secondary" th:text="'$ ' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 1.200.000</span>
+                    </div>
                 </div>
             </div>
 
@@ -535,8 +536,9 @@
         const toastText = document.getElementById('lang-confirm-text');
         if (toast && toastText) {
             toastText.textContent = selectedLang === 'en-US'
-                ? '✓ System language confirmed and applied (English - US)!'
-                : '✓ ¡Idioma del sistema confirmado y aplicado (Español - Colombia)!';
+                ? `✓ Language (English) & Currency (${selectedCurr}) applied across the system!`
+                : `✓ ¡Idioma (Español) y Moneda (${selectedCurr}) aplicados en todo el sistema!`;
+            toastText._ccOrigText = toastText.textContent;
             toast.classList.remove('hidden');
             toast.classList.add('flex');
         }
