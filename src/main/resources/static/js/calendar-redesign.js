@@ -187,16 +187,47 @@
                 txList.innerHTML = '<div class="p-3 rounded-xl bg-surface-container-low text-xs text-on-surface-variant text-center">No hay movimientos en este día.</div>';
             } else {
                 data.transactions.forEach(tx => {
-                    const row = document.createElement('div');
-                    row.className = 'cc-panel-item';
-                    row.innerHTML = `
-                        <div class="flex flex-col min-w-0">
-                            <span class="text-xs font-bold text-primary truncate">${escapeHtml(tx.merchant)}</span>
-                            <span class="text-[11px] text-on-surface-variant truncate">${escapeHtml(tx.category)}${tx.desc ? ' · ' + escapeHtml(tx.desc) : ''}</span>
+                    const card = document.createElement('div');
+                    card.className = 'cc-panel-tx-card';
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('tabindex', '0');
+                    card.setAttribute('aria-expanded', 'false');
+                    card.innerHTML = `
+                        <div class="cc-panel-tx-summary">
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-bold text-primary truncate">${escapeHtml(tx.merchant)}</span>
+                                <span class="text-[11px] text-on-surface-variant truncate">${escapeHtml(tx.category)}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                                <span class="text-xs font-extrabold text-secondary">${formatCurrency(tx.amount)}</span>
+                                <span class="material-symbols-outlined text-[16px] text-on-surface-variant transition-transform duration-150">expand_more</span>
+                            </div>
                         </div>
-                        <span class="text-xs font-extrabold text-secondary flex-shrink-0">${formatCurrency(tx.amount)}</span>
+                        <div class="cc-panel-tx-details">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold">Categoría</span>
+                                <span>${escapeHtml(tx.category || 'General')}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold">Detalle</span>
+                                <span class="text-right truncate">${escapeHtml(tx.desc || 'Sin nota adicional')}</span>
+                            </div>
+                        </div>
                     `;
-                    txList.appendChild(row);
+                    const toggleCard = () => {
+                        const expanded = card.classList.toggle('is-expanded');
+                        card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                        const icon = card.querySelector('.material-symbols-outlined');
+                        if (icon) icon.style.transform = expanded ? 'rotate(180deg)' : '';
+                    };
+                    card.addEventListener('click', toggleCard);
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleCard();
+                        }
+                    });
+                    txList.appendChild(card);
                 });
             }
         }
@@ -765,7 +796,58 @@
         getState: () => ({ activeDayNum, activeView, selectedYear, selectedMonthNum, selectedMonth, todayIso })
     };
 
+    // --- Filter Pills con conteos en vivo ---
+    let activeCalFilter = 'all';
+
+    function updateFilterCounts() {
+        if (!monthGrid) return;
+        const pendingCount = monthGrid.querySelectorAll('.cc-chip-pending').length;
+        const paidCount = monthGrid.querySelectorAll('.cc-chip-paid').length;
+        const expenseCount = monthGrid.querySelectorAll('.cc-chip-expense').length;
+        const allCount = pendingCount + paidCount + expenseCount;
+
+        const elAll = document.getElementById('cc-count-all');
+        const elPending = document.getElementById('cc-count-pending');
+        const elPaid = document.getElementById('cc-count-paid');
+        const elExpense = document.getElementById('cc-count-expense');
+        if (elAll) elAll.textContent = String(allCount);
+        if (elPending) elPending.textContent = String(pendingCount);
+        if (elPaid) elPaid.textContent = String(paidCount);
+        if (elExpense) elExpense.textContent = String(expenseCount);
+    }
+
+    function applyCalendarFilter(filter) {
+        activeCalFilter = filter || 'all';
+        const pillButtons = document.querySelectorAll('#cc-filter-pills .cc-filter-pill[data-cal-filter]');
+        pillButtons.forEach(btn => {
+            const isMatch = btn.dataset.calFilter === activeCalFilter;
+            btn.classList.toggle('is-active', isMatch);
+            btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+        });
+
+        const chips = document.querySelectorAll('#cc-cal-view-month .cc-chip, #cc-cal-view-week .cc-chip');
+        chips.forEach(chip => {
+            if (activeCalFilter === 'all') {
+                chip.classList.remove('is-dimmed');
+                return;
+            }
+            const targetClass =
+                activeCalFilter === 'pending' ? 'cc-chip-pending' :
+                activeCalFilter === 'paid' ? 'cc-chip-paid' :
+                'cc-chip-expense';
+            chip.classList.toggle('is-dimmed', !chip.classList.contains(targetClass));
+        });
+    }
+
+    document.querySelectorAll('#cc-filter-pills .cc-filter-pill[data-cal-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            applyCalendarFilter(btn.dataset.calFilter || 'all');
+        });
+    });
+
     populateOutsideMonthDays();
+    updateFilterCounts();
+    applyCalendarFilter(activeCalFilter);
 
     // Aplicar fundido + desplazamiento corto al cambiar de mes
     try {
@@ -783,6 +865,7 @@
         const savedView = sessionStorage.getItem('cuentaclara_cal_view');
         if (savedView === 'week' || savedView === 'day') {
             setView(savedView);
+            applyCalendarFilter(activeCalFilter);
         }
     } catch (_) {}
 })();

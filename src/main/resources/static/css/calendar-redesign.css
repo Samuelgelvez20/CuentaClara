@@ -1161,3 +1161,167 @@ html.dark .cc-chip-expense {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+/* ==========================================================================
+   VIDEO DASHBOARD UPGRADES: Slim Icon-Rail, Filter Pills, Capacity Bars, Expandable Cards
+   ========================================================================== */
+
+/* 1. Barra lateral colapsable en escritorio (>= 1024px) */
+@media (min-width: 1024px) {
+    body.cc-sidebar-collapsed #cc-sidebar {
+        width: 78px;
+    }
+    body.cc-sidebar-collapsed #cc-main-shell {
+        padding-left: 78px;
+    }
+    body.cc-sidebar-collapsed #cc-top-header {
+        left: 78px;
+    }
+    body.cc-sidebar-collapsed .cc-sidebar-text {
+        display: none;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-nav-link {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-sidebar-user {
+        justify-content: center;
+        padding: 0.45rem;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .p-space-lg {
+        padding: 1rem 0.75rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* 2. Pills interactivos de filtro con conteo (estilo Haulix / Phenomenon) */
+.cc-filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.cc-filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 30px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 50%, transparent);
+    background-color: var(--surface-container-lowest);
+    color: var(--on-surface-variant);
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 110ms var(--ease-out);
+}
+
+.cc-filter-pill:hover {
+    border-color: color-mix(in srgb, var(--secondary) 45%, transparent);
+    color: var(--primary);
+}
+
+.cc-filter-pill:active {
+    transform: scale(0.96);
+}
+
+.cc-filter-pill.is-active {
+    background-color: var(--primary-container);
+    border-color: var(--primary-container);
+    color: var(--on-primary);
+}
+
+.cc-pill-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9999px;
+    background-color: var(--surface-container);
+    color: var(--on-surface);
+    font-size: 0.65rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.cc-filter-pill.is-active .cc-pill-count {
+    background-color: rgba(255, 255, 255, 0.22);
+    color: var(--on-primary);
+}
+
+/* Chips atenuados cuando un filtro específico está activo */
+.cc-chip.is-dimmed {
+    opacity: 0.22;
+}
+
+/* 3. Barras de capacidad segmentadas/rayadas (50/30/20) */
+.cc-capacity-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 9999px;
+    background-color: var(--surface-container-highest);
+    overflow: hidden;
+}
+
+.cc-capacity-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background-size: 10px 10px;
+}
+
+.cc-fill-needs {
+    background-color: var(--secondary);
+    background-image: repeating-linear-gradient(-55deg, rgba(255,255,255,0.18) 0 3px, transparent 3px 6px);
+}
+
+.cc-fill-wants {
+    background-color: #d97706;
+    background-image: repeating-linear-gradient(-55deg, rgba(255,255,255,0.18) 0 3px, transparent 3px 6px);
+}
+
+.cc-fill-savings {
+    background-color: #059669;
+    background-image: repeating-linear-gradient(-55deg, rgba(255,255,255,0.18) 0 3px, transparent 3px 6px);
+}
+
+/* 4. Tarjetas expandibles en el Panel del Día */
+.cc-panel-tx-card {
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.85rem;
+    background-color: var(--surface-container-low);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 40%, transparent);
+    cursor: pointer;
+    transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.cc-panel-tx-card:hover {
+    border-color: color-mix(in srgb, var(--secondary) 45%, transparent);
+}
+
+.cc-panel-tx-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.cc-panel-tx-details {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid color-mix(in srgb, var(--outline-variant) 35%, transparent);
+    font-size: 0.72rem;
+    color: var(--on-surface-variant);
+    display: none;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.cc-panel-tx-card.is-expanded .cc-panel-tx-details {
+    display: flex;
+}

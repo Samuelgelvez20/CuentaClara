@@ -98,15 +98,19 @@
 <aside id="cc-sidebar" class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 lg:z-40 flex flex-col justify-between border-r border-outline-variant/25 shadow-lg lg:shadow-sm transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-out">
     <div class="flex flex-col flex-1 overflow-y-auto">
         <div class="p-space-lg flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md flex-shrink-0">
                     <span class="material-symbols-outlined text-secondary-fixed text-[24px]">calendar_month</span>
                 </div>
-                <div class="flex flex-col">
+                <div class="flex flex-col cc-sidebar-text min-w-0">
                     <span class="text-lg text-primary leading-tight font-extrabold tracking-tight">CuentaClara</span>
                     <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
                 </div>
             </div>
+            <button type="button" onclick="toggleDesktopSidebar()" id="cc-sidebar-collapse-btn" aria-label="Contraer o expandir menú" title="Contraer barra lateral"
+                    class="hidden lg:flex w-9 h-9 flex-shrink-0 rounded-xl text-on-surface-variant hover:bg-surface-container-high items-center justify-center border-0 bg-transparent cursor-pointer">
+                <span class="material-symbols-outlined text-[19px]" id="cc-sidebar-collapse-icon">dock_to_left</span>
+            </button>
             <button type="button" onclick="closeMobileSidebar()" aria-label="Cerrar menú"
                     class="lg:hidden w-10 h-10 rounded-xl text-on-surface-variant hover:bg-surface-container-high flex items-center justify-center border-0 bg-transparent cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">close</span>
@@ -114,51 +118,51 @@
         </div>
 
         <div class="px-space-md py-space-xs">
-            <div class="px-space-sm pb-2">
+            <div class="px-space-sm pb-2 cc-sidebar-text">
                 <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Menú</span>
             </div>
             <nav class="flex flex-col gap-1.5">
-                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">calendar_month</span>
-                    <span>Calendario</span>
+                <a aria-current="page" title="Calendario" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/dashboard">
+                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed flex-shrink-0">calendar_month</span>
+                    <span class="cc-sidebar-text">Calendario</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Historial de gastos</span>
+                <a title="Historial de gastos" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">receipt_long</span>
+                    <span class="cc-sidebar-text">Historial de gastos</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px]">upload_file</span>
-                    <span>Facturas y recibos</span>
-                    <span th:if="${!#lists.isEmpty(pendingConfirmations)}" class="ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold" th:text="${#lists.size(pendingConfirmations)}"></span>
+                <a title="Facturas y recibos" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">upload_file</span>
+                    <span class="cc-sidebar-text">Facturas y recibos</span>
+                    <span th:if="${!#lists.isEmpty(pendingConfirmations)}" class="cc-sidebar-text ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold" th:text="${#lists.size(pendingConfirmations)}"></span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px]">savings</span>
-                    <span>Presupuesto y deudas</span>
+                <a title="Presupuesto y deudas" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">savings</span>
+                    <span class="cc-sidebar-text">Presupuesto y deudas</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-                    <span>Consultas</span>
+                <a title="Consultas" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">chat_bubble</span>
+                    <span class="cc-sidebar-text">Consultas</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px]">tune</span>
-                    <span>Configuración</span>
+                <a title="Configuración" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">tune</span>
+                    <span class="cc-sidebar-text">Configuración</span>
                 </a>
             </nav>
         </div>
     </div>
 
     <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/35">
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest shadow-xs border border-outline-variant/20">
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest shadow-xs border border-outline-variant/20 cc-sidebar-user">
             <div class="flex items-center gap-2.5 overflow-hidden">
                 <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
                 </div>
-                <div class="flex flex-col truncate">
+                <div class="flex flex-col truncate cc-sidebar-text">
                     <span class="text-xs text-on-surface truncate font-bold" th:text="${user.fullName}">Usuario</span>
                     <span class="text-[11px] text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
                 </div>
             </div>
-            <form method="post" action="/auth/logout" class="m-0">
+            <form method="post" action="/auth/logout" class="m-0 cc-sidebar-text">
                 <button class="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" title="Cerrar sesión" type="submit">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                 </button>
@@ -168,9 +172,9 @@
 </aside>
 
 <!-- RIGHT DESKTOP/MOBILE WORKSPACE -->
-<div class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full overflow-x-hidden">
+<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full overflow-x-hidden transition-[padding] duration-200 ease-out">
     <!-- Top Header Bar -->
-    <header class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20">
+    <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
         <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-space-xl flex items-center justify-between gap-2 sm:gap-space-md">
             <div class="flex items-center gap-2 flex-1 min-w-0">
                 <button type="button" onclick="openMobileSidebar()" aria-label="Abrir menú"
@@ -181,7 +185,8 @@
                     <input type="hidden" name="returnTo" value="/assistant"/>
                     <div class="relative flex items-center">
                         <span class="material-symbols-outlined absolute left-3 sm:left-4 text-on-surface-variant text-[18px] sm:text-[20px]">search</span>
-                        <input name="question" class="w-full h-10 pl-9 sm:pl-11 pr-3 sm:pr-4 bg-surface-container-lowest rounded-xl font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" placeholder="Consultar gastos del mes..." type="text"/>
+                        <input id="cc-top-search" name="question" class="w-full h-10 pl-9 sm:pl-11 pr-3 sm:pr-16 bg-surface-container-lowest rounded-xl font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" placeholder="Consultar gastos del mes..." type="text"/>
+                        <kbd class="hidden sm:inline-flex items-center gap-0.5 absolute right-3 px-1.5 py-0.5 rounded-md bg-surface-container text-[10px] font-bold text-on-surface-variant border border-outline-variant/40 pointer-events-none">Ctrl K</kbd>
                     </div>
                 </form>
             </div>
@@ -329,23 +334,32 @@
                     </div>
                 </div>
 
-                <!-- Leyenda compacta de 4 estados en una línea alineada a la derecha -->
-                <div class="cc-legend-inline" aria-label="Leyenda del calendario">
+                <!-- Barra de filtros rápidos con conteos + leyenda compacta de 4 estados -->
+                <div class="cc-legend-inline justify-between" aria-label="Filtros y leyenda del calendario">
+                    <div class="cc-filter-pills" id="cc-filter-pills" role="group" aria-label="Filtrar movimientos del calendario">
+                        <button type="button" class="cc-filter-pill is-active" data-cal-filter="all">
+                            <span>Todos</span>
+                            <span class="cc-pill-count" id="cc-count-all">0</span>
+                        </button>
+                        <button type="button" class="cc-filter-pill" data-cal-filter="pending">
+                            <span class="cc-dot cc-dot-pending"></span>
+                            <span>Pendientes</span>
+                            <span class="cc-pill-count" id="cc-count-pending">0</span>
+                        </button>
+                        <button type="button" class="cc-filter-pill" data-cal-filter="paid">
+                            <span class="cc-dot cc-dot-paid"></span>
+                            <span>Al día</span>
+                            <span class="cc-pill-count" id="cc-count-paid">0</span>
+                        </button>
+                        <button type="button" class="cc-filter-pill" data-cal-filter="expense">
+                            <span class="cc-dot cc-dot-expense"></span>
+                            <span>Gastos</span>
+                            <span class="cc-pill-count" id="cc-count-expense">0</span>
+                        </button>
+                    </div>
                     <span class="cc-legend-item">
                         <span class="cc-dot cc-dot-today"></span>
                         <span>Hoy</span>
-                    </span>
-                    <span class="cc-legend-item">
-                        <span class="cc-dot cc-dot-pending"></span>
-                        <span>Pago fijo pendiente</span>
-                    </span>
-                    <span class="cc-legend-item">
-                        <span class="cc-dot cc-dot-paid"></span>
-                        <span>Pago fijo al día</span>
-                    </span>
-                    <span class="cc-legend-item">
-                        <span class="cc-dot cc-dot-expense"></span>
-                        <span>Gasto registrado</span>
                     </span>
                 </div>
 
@@ -633,8 +647,8 @@
                                     <span class="text-xs text-on-surface font-bold"
                                           th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.needsLimit : 2000000, 1, 'POINT', 0, 'COMMA')}"></span>
                                 </div>
-                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
-                                    <div class="h-full bg-secondary rounded-full" th:style="'width:' + ${(profile != null ? profile.needsPct : 50)} + '%'"></div>
+                                <div class="cc-capacity-track">
+                                    <div class="cc-capacity-fill cc-fill-needs" th:style="'width:' + ${(profile != null ? profile.needsPct : 50)} + '%'"></div>
                                 </div>
                             </div>
 
@@ -648,8 +662,8 @@
                                     <span class="text-xs text-on-surface font-bold"
                                           th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.wantsLimit : 1200000, 1, 'POINT', 0, 'COMMA')}"></span>
                                 </div>
-                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
-                                    <div class="h-full bg-amber-500 rounded-full" th:style="'width:' + ${(profile != null ? profile.wantsPct : 30)} + '%'"></div>
+                                <div class="cc-capacity-track">
+                                    <div class="cc-capacity-fill cc-fill-wants" th:style="'width:' + ${(profile != null ? profile.wantsPct : 30)} + '%'"></div>
                                 </div>
                             </div>
 
@@ -663,8 +677,8 @@
                                     <span class="text-xs text-on-surface font-bold"
                                           th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')}"></span>
                                 </div>
-                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
-                                    <div class="h-full bg-emerald-600 rounded-full" th:style="'width:' + ${(profile != null ? profile.savingsPct : 20)} + '%'"></div>
+                                <div class="cc-capacity-track">
+                                    <div class="cc-capacity-fill cc-fill-savings" th:style="'width:' + ${(profile != null ? profile.savingsPct : 20)} + '%'"></div>
                                 </div>
                             </div>
                         </div>
@@ -865,6 +879,37 @@
         if (sidebar) sidebar.classList.add('-translate-x-full');
         if (backdrop) backdrop.classList.add('hidden');
     }
+
+    function applyDesktopSidebarState(collapsed) {
+        document.body.classList.toggle('cc-sidebar-collapsed', collapsed);
+        const icon = document.getElementById('cc-sidebar-collapse-icon');
+        const btn = document.getElementById('cc-sidebar-collapse-btn');
+        if (icon) icon.textContent = collapsed ? 'dock_to_right' : 'dock_to_left';
+        if (btn) btn.title = collapsed ? 'Expandir barra lateral' : 'Contraer barra lateral';
+    }
+
+    function toggleDesktopSidebar() {
+        const next = !document.body.classList.contains('cc-sidebar-collapsed');
+        applyDesktopSidebarState(next);
+        try { localStorage.setItem('cuentaclara_sidebar_collapsed', next ? '1' : '0'); } catch (_) {}
+    }
+
+    try {
+        if (localStorage.getItem('cuentaclara_sidebar_collapsed') === '1') {
+            applyDesktopSidebarState(true);
+        }
+    } catch (_) {}
+
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            const searchInput = document.getElementById('cc-top-search');
+            if (searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+        }
+    });
 
     function openObligationModal() {
         const backdrop = document.getElementById('obligation-modal-backdrop');
