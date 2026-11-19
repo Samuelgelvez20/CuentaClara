@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <link rel="stylesheet" href="/css/cuentaclara-theme.css"/>
+    <link rel="stylesheet" href="/css/calendar-redesign.css"/>
     <script src="/js/cuentaclara-theme.js"></script>
     <style>
         @layer base { html, body { margin: 0; padding: 0; scroll-behavior: smooth; } body { overscroll-behavior: none; } }
@@ -191,181 +192,146 @@
     </header>
 
     <main class="w-full pt-20 bg-surface flex-1">
-        <div class="w-full px-margin-lg py-space-lg flex flex-col gap-space-xl max-w-[1600px] mx-auto">
+        <div class="w-full px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-4 max-w-[1640px] mx-auto">
 
             <!-- Alertas Flash -->
-            <div th:if="${successMessage}" class="p-4 rounded-xl bg-secondary-container text-on-secondary-container font-semibold text-sm flex items-center gap-3 border border-secondary/20">
-                <span class="material-symbols-outlined text-[20px] text-secondary">check_circle</span>
+            <div th:if="${successMessage}" class="px-4 py-2.5 rounded-xl bg-secondary-container text-on-secondary-container font-semibold text-xs flex items-center gap-2.5 border border-secondary/20">
+                <span class="material-symbols-outlined text-[18px] text-secondary">check_circle</span>
                 <span th:text="${successMessage}"></span>
             </div>
-            <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container text-on-error-container font-semibold text-sm flex items-center gap-3">
-                <span class="material-symbols-outlined text-[20px]">error</span>
+            <div th:if="${errorMessage}" class="px-4 py-2.5 rounded-xl bg-error-container text-on-error-container font-semibold text-xs flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[18px]">error</span>
                 <span th:text="${errorMessage}"></span>
             </div>
 
-            <!-- 1. Encabezado -->
-            <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div class="flex flex-col gap-0.5">
-                    <h1 class="text-2xl sm:text-3xl font-bold text-primary tracking-tight m-0"
-                        th:text="${calendarMonthLabel}">Octubre 2026</h1>
-                    <p class="text-xs text-on-surface-variant m-0">Resumen mensual y registro diario de gastos</p>
-                </div>
-                <div class="flex items-center gap-2.5 flex-wrap">
-                    <form method="post" action="/dashboard/simulate-month" class="m-0">
-                        <input type="hidden" name="month" th:value="${selectedMonth}"/>
-                        <button type="submit" class="h-10 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-primary hover:bg-surface-container-high transition-all flex items-center gap-1.5 text-xs font-semibold">
-                            <span class="material-symbols-outlined text-[18px] text-secondary">dataset</span>
-                            <span>Cargar datos de ejemplo</span>
-                        </button>
-                    </form>
-                    <a href="/upload" class="h-10 px-4 rounded-xl bg-primary-container hover:opacity-95 text-on-primary transition-all flex items-center gap-1.5 shadow-xs text-xs font-semibold no-underline">
-                        <span class="material-symbols-outlined text-[18px] text-secondary-fixed">upload_file</span>
-                        <span>Subir factura o recibo</span>
-                    </a>
-                </div>
-            </header>
-
-            <!-- 2. Indicadores del Mes -->
-            <section aria-label="Resumen de tu dinero" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Tarjeta 1: Ingreso -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Ingreso mensual</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">payments</span>
-                    </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-primary"
+            <!-- 1. Métricas compactas en una sola fila delgada (el calendario entra completo en 1080p) -->
+            <section aria-label="Resumen financiero del mes" class="cc-metrics-strip">
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label">Ingreso mensual</span>
+                        <span class="cc-metric-value"
                               th:text="'$ ' + ${#numbers.formatDecimal(profile != null ? profile.netIncome : 4000000, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 4.000.000 COP</span>
                     </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant" th:text="${profile != null ? 'Regla ' + profile.needsPct + '/' + profile.wantsPct + '/' + profile.savingsPct : 'Regla 50/30/20'}">Regla 50/30/20</span>
-                        <a href="/profile" class="text-secondary font-semibold no-underline hover:underline">Editar</a>
-                    </div>
+                    <a href="/profile" class="cc-metric-action">Editar</a>
                 </div>
 
-                <!-- Tarjeta 2: Gastado en este filtro/mes -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Gastado este mes</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">receipt_long</span>
-                    </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-on-surface"
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label" th:text="'Gastado (' + ${#lists.size(history.transactions)} + ' mov.)'">Gastado</span>
+                        <span class="cc-metric-value"
                               th:text="'$ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0 COP</span>
                     </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant font-medium"
-                              th:text="${#lists.size(history.transactions)} + ' movimiento(s)'">0 movimientos</span>
-                        <a th:href="@{/history(month=${selectedMonth})}" class="text-secondary font-semibold no-underline hover:underline">Ver detalle</a>
-                    </div>
+                    <a th:href="@{/history(month=${selectedMonth})}" class="cc-metric-action">Detalle</a>
                 </div>
 
-                <!-- Tarjeta 3: Pagos Fijos / Deudas Mensuales -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Pagos fijos del mes</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">event_repeat</span>
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label">Pagos fijos</span>
+                        <span class="cc-metric-value text-secondary" th:text="${#lists.size(obligations)} + ' programados'">0 programados</span>
                     </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-secondary" th:text="${#lists.size(obligations)} + ' programados'">0 programados</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant">Recordatorio mensual</span>
-                        <button type="button" onclick="openObligationModal()" class="text-primary font-semibold hover:underline bg-transparent border-0 p-0 cursor-pointer">+ Agregar</button>
-                    </div>
+                    <button type="button" onclick="openObligationModal()" class="cc-metric-action">+ Agregar</button>
                 </div>
 
-                <!-- Tarjeta 4: Meta de Ahorro -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Meta de ahorro</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">savings</span>
-                    </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-on-surface"
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label" th:text="'Meta ahorro (' + ${(profile != null ? profile.savingsPct : 20)} + '%)'">Meta ahorro</span>
+                        <span class="cc-metric-value"
                               th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 800.000 COP</span>
                     </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant" th:text="${(profile != null ? profile.savingsPct : 20) + '% del ingreso'}">20% del ingreso</span>
+                    <div class="flex items-center gap-1">
+                        <form method="post" action="/dashboard/simulate-month" class="m-0">
+                            <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                            <button type="submit" title="Cargar datos de ejemplo" class="cc-metric-action">Cargar ejemplo</button>
+                        </form>
                     </div>
                 </div>
             </section>
 
             <!-- ========================================================================================
-                 3. CALENDARIO INTERACTIVO MENSUAL DE GASTOS DIARIOS Y PAGOS FIJOS (#calendario-mes)
+                 2. MÓDULO DE CALENDARIO REDISEÑADO (#calendario-mes)
                  ======================================================================================== -->
-            <section id="calendario-mes" class="bg-surface-container-lowest rounded-2xl p-6 sm:p-7 border border-outline-variant/30 flex flex-col gap-5">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant/20 pb-4">
-                    <div>
-                        <div class="flex items-center gap-2.5 flex-wrap">
-                            <h2 class="text-lg font-bold text-primary m-0" th:text="'Calendario — ' + ${calendarMonthLabel}">Calendario</h2>
-                            <span class="px-2.5 py-0.5 rounded-md bg-surface-container text-on-surface text-xs font-semibold"
-                                  th:text="'Hoy: ' + ${todayFullLabel}">Hoy</span>
-                        </div>
-                        <p class="text-xs text-on-surface-variant m-0 mt-1">
-                            Selecciona cualquier día para registrar o consultar tus gastos.
-                        </p>
+            <section id="calendario-mes" class="cc-calendar-shell"
+                     th:attr="data-selected-month=${selectedMonth},data-selected-year=${selectedYear},data-selected-month-num=${selectedMonthNumber},data-today-iso=${todayIso},data-prev-month=${prevMonth},data-next-month=${nextMonth},data-current-real-month=${currentRealMonth}">
+
+                <!-- Encabezado del calendario -->
+                <div class="cc-cal-header">
+                    <!-- Izquierda: Título del mes + menú discreto Mes/Año -->
+                    <div class="cc-cal-title-group">
+                        <h1 class="cc-cal-month-title" id="cc-cal-heading" th:text="${calendarMonthLabel}">Noviembre 2026</h1>
+                        <details class="cc-month-jump" id="cc-month-jump-details">
+                            <summary title="Ir a otro mes o año" aria-label="Elegir mes y año">
+                                <span class="material-symbols-outlined text-[20px]">keyboard_arrow_down</span>
+                            </summary>
+                            <div class="cc-month-jump-panel">
+                                <form method="get" action="/dashboard" class="m-0 flex flex-col gap-2.5">
+                                    <span class="text-xs font-bold text-primary">Ir a otro periodo</span>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <select name="monthNum" aria-label="Mes"
+                                                class="h-9 px-2.5 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold border border-outline-variant/40">
+                                            <option th:each="entry : ${availableMonthNames}"
+                                                    th:value="${entry.key}"
+                                                    th:text="${entry.value}"
+                                                    th:selected="${entry.key == selectedMonthNumber}">Noviembre</option>
+                                        </select>
+                                        <select name="year" aria-label="Año"
+                                                class="h-9 px-2.5 rounded-lg bg-surface-container-low text-primary text-xs font-bold border border-outline-variant/40">
+                                            <option th:each="yr : ${availableYears}"
+                                                    th:value="${yr}"
+                                                    th:text="${yr}"
+                                                    th:selected="${yr == selectedYear}">2026</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="h-9 rounded-lg bg-primary-container text-on-primary text-xs font-semibold border-0 cursor-pointer hover:opacity-95">
+                                        Ir al periodo
+                                    </button>
+                                </form>
+                            </div>
+                        </details>
                     </div>
 
-                    <!-- Controles de Navegación de Mes en el Calendario -->
+                    <!-- Centro: Selector segmentado Mes / Semana / Día -->
+                    <div class="cc-segmented" role="tablist" aria-label="Vista del calendario">
+                        <button type="button" role="tab" id="cc-tab-month" class="cc-segmented-btn" data-view="month" aria-selected="true">Mes</button>
+                        <button type="button" role="tab" id="cc-tab-week" class="cc-segmented-btn" data-view="week" aria-selected="false">Semana</button>
+                        <button type="button" role="tab" id="cc-tab-day" class="cc-segmented-btn" data-view="day" aria-selected="false">Día</button>
+                    </div>
+
+                    <!-- Derecha: Anterior / Hoy / Siguiente + acceso rápido Subir factura -->
                     <div class="flex items-center gap-2 flex-wrap">
-                        <a th:href="@{/dashboard(month=${currentRealMonth})}"
-                           title="Ir al mes actual"
-                           class="h-9 px-3.5 rounded-xl bg-secondary text-white hover:opacity-95 text-xs font-semibold flex items-center gap-1.5 no-underline">
-                            <span>Hoy</span>
-                        </a>
-
-                        <a th:href="@{/dashboard(month=${prevMonth})}"
-                           class="h-9 px-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1 no-underline border border-outline-variant/30">
-                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-                            <span>Anterior</span>
-                        </a>
-
-                        <form method="get" action="/dashboard" class="m-0 flex items-center gap-1.5 bg-surface-container-low p-1 rounded-xl border border-outline-variant/30">
-                            <select name="monthNum" onchange="this.form.submit()" aria-label="Filtrar por mes"
-                                    class="h-7 px-3 rounded-lg bg-primary-container text-on-primary text-xs font-semibold cursor-pointer border-0 focus:outline-none">
-                                <option th:each="entry : ${availableMonthNames}"
-                                        th:value="${entry.key}"
-                                        th:text="${entry.value}"
-                                        th:selected="${entry.key == selectedMonthNumber}">Noviembre</option>
-                            </select>
-                            <select name="year" onchange="this.form.submit()" aria-label="Filtrar por año"
-                                    class="h-7 px-2.5 rounded-lg bg-surface-container-lowest text-primary text-xs font-bold cursor-pointer border border-outline-variant/30 focus:outline-none">
-                                <option th:each="yr : ${availableYears}"
-                                        th:value="${yr}"
-                                        th:text="${yr}"
-                                        th:selected="${yr == selectedYear}">2026</option>
-                            </select>
-                        </form>
-
-                        <a th:href="@{/dashboard(month=${nextMonth})}"
-                           class="h-9 px-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1 no-underline border border-outline-variant/30">
-                            <span>Siguiente</span>
-                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                        <div class="cc-nav-group" role="group" aria-label="Navegar periodo">
+                            <a id="cc-nav-prev" th:href="@{/dashboard(month=${prevMonth})}" class="cc-nav-btn" aria-label="Anterior" title="Anterior">
+                                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                            </a>
+                            <a id="cc-nav-today" th:href="@{/dashboard(month=${currentRealMonth})}" class="cc-nav-btn cc-nav-btn-today">Hoy</a>
+                            <a id="cc-nav-next" th:href="@{/dashboard(month=${nextMonth})}" class="cc-nav-btn" aria-label="Siguiente" title="Siguiente">
+                                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                            </a>
+                        </div>
+                        <a href="/upload" class="cc-nav-btn bg-primary-container text-on-primary border-0 hover:opacity-95" title="Subir factura o recibo">
+                            <span class="material-symbols-outlined text-[18px] mr-1">upload_file</span>
+                            <span class="hidden sm:inline">Factura</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- Leyenda del Calendario -->
-                <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-on-surface-variant bg-surface-container-low/50 px-4 py-2 rounded-xl">
-                    <div class="flex flex-wrap items-center gap-5">
-                        <span class="flex items-center gap-1.5 font-semibold text-secondary">
-                            <span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
-                            <span>Día actual</span>
-                        </span>
-                        <span class="flex items-center gap-1.5 font-medium">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                            <span>Pago fijo pendiente</span>
-                        </span>
-                        <span class="flex items-center gap-1.5 font-medium">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                            <span>Pago fijo al día</span>
-                        </span>
-                        <span class="flex items-center gap-1.5 font-medium">
-                            <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
-                            <span>Gasto registrado</span>
-                        </span>
-                    </div>
+                <!-- Leyenda compacta de 4 estados en una línea alineada a la derecha -->
+                <div class="cc-legend-inline" aria-label="Leyenda del calendario">
+                    <span class="cc-legend-item">
+                        <span class="cc-dot cc-dot-today"></span>
+                        <span>Hoy</span>
+                    </span>
+                    <span class="cc-legend-item">
+                        <span class="cc-dot cc-dot-pending"></span>
+                        <span>Pago fijo pendiente</span>
+                    </span>
+                    <span class="cc-legend-item">
+                        <span class="cc-dot cc-dot-paid"></span>
+                        <span>Pago fijo al día</span>
+                    </span>
+                    <span class="cc-legend-item">
+                        <span class="cc-dot cc-dot-expense"></span>
+                        <span>Gasto registrado</span>
+                    </span>
                 </div>
 
                 <!-- Encabezado de Días de la Semana (Lunes a Domingo - Resalta el día de la semana de hoy) -->
