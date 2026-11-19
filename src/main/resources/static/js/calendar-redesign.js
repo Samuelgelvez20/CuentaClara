@@ -209,7 +209,7 @@
         }
 
         dayPanel.classList.remove('hidden');
-        if (window.innerWidth <= 1024 && sheetBackdrop) {
+        if (window.innerWidth < 1280 && sheetBackdrop) {
             sheetBackdrop.classList.add('is-open');
         }
 

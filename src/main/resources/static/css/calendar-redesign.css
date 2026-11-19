@@ -292,23 +292,66 @@
     .cc-metrics-strip {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    .cc-chip-amt {
+        display: none;
+    }
 }
 
 @media (max-width: 640px) {
     .cc-metrics-strip {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.5rem;
+        gap: 0.45rem;
     }
     .cc-metric-chip {
-        padding: 0.5rem 0.7rem;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 0.55rem 0.65rem;
+        gap: 0.15rem 0.35rem;
+        min-height: 0;
+    }
+    .cc-metric-meta {
+        display: contents;
+    }
+    .cc-metric-label {
+        order: 1;
+        flex: 1 1 auto;
+        font-size: 0.68rem;
+    }
+    .cc-metric-action {
+        order: 2;
+        font-size: 0.68rem;
+        padding: 0.15rem 0.35rem;
+    }
+    .cc-metric-value {
+        order: 3;
+        flex: 1 0 100%;
+        font-size: 0.88rem;
+        margin-top: 0.1rem;
     }
     .cc-cal-header {
         padding: 0.75rem;
+        gap: 0.6rem;
+    }
+    .cc-cal-title-group {
+        flex: 1 1 auto;
+    }
+    .cc-cal-month-title {
+        font-size: 1.08rem;
+    }
+    .cc-segmented {
+        order: 3;
+        width: 100%;
+    }
+    .cc-segmented-btn {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 0 0.5rem;
     }
     .cc-legend-inline {
         justify-content: flex-start;
-        padding: 0.5rem 0.75rem;
-        gap: 0.5rem 0.75rem;
+        padding: 0.45rem 0.75rem;
+        gap: 0.4rem 0.7rem;
+        font-size: 0.68rem;
     }
 }
 
@@ -373,7 +416,8 @@
 
 .cc-day-cell {
     position: relative;
-    min-height: 112px;
+    min-width: 0;
+    min-height: clamp(88px, 11vh, 112px);
     padding: 0.45rem 0.5rem;
     background-color: var(--surface-container-lowest);
     display: flex;
@@ -746,15 +790,15 @@ html.dark .cc-chip-expense {
     margin: 0.5rem auto 0.15rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
     .cc-day-panel {
         position: fixed;
         left: 0;
         right: 0;
         bottom: 0;
         width: 100%;
-        max-height: 80vh;
-        z-index: 50;
+        max-height: 82vh;
+        z-index: 55;
         border-left: 0;
         border-top: 1px solid color-mix(in srgb, var(--outline-variant) 60%, transparent);
         border-radius: 1.45rem 1.45rem 0 0;
@@ -771,6 +815,8 @@ html.dark .cc-chip-expense {
     position: fixed;
     z-index: 60;
     width: min(340px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
     background-color: var(--surface-container-lowest);
     border: 1px solid color-mix(in srgb, var(--outline-variant) 75%, transparent);
     border-radius: 1.25rem;
@@ -778,6 +824,13 @@ html.dark .cc-chip-expense {
     padding: 1rem;
     transform-origin: var(--popover-origin, top left);
     animation: ccQuickPopoverIn 180ms var(--ease-out);
+}
+
+@media (max-width: 640px) {
+    .cc-quick-field {
+        font-size: 16px;
+        min-height: 42px;
+    }
 }
 
 .cc-quick-popover.hidden {
