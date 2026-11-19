@@ -442,6 +442,39 @@
                         <div id="cc-view-week" class="cc-view-panel hidden" role="tabpanel" aria-labelledby="cc-tab-week"></div>
                         <div id="cc-view-day" class="cc-view-panel hidden" role="tabpanel" aria-labelledby="cc-tab-day"></div>
                     </div>
+
+                    <!-- Panel lateral de día (desktop) / Bottom sheet (móvil) -->
+                    <aside id="cc-day-panel" class="cc-day-panel hidden" aria-label="Detalle del día seleccionado">
+                        <div class="cc-sheet-handle" aria-hidden="true"></div>
+                        <div class="cc-day-panel-header">
+                            <div class="min-w-0">
+                                <h2 id="cc-panel-date-title" class="cc-day-panel-title">Detalle del día</h2>
+                                <div id="cc-panel-day-total" class="cc-day-panel-total"></div>
+                            </div>
+                            <button type="button" id="cc-panel-close-btn" class="cc-icon-btn" aria-label="Cerrar panel del día" title="Cerrar">
+                                <span class="material-symbols-outlined text-[20px]">close</span>
+                            </button>
+                        </div>
+
+                        <div class="cc-day-panel-body">
+                            <div id="cc-panel-ob-section" class="hidden">
+                                <span class="cc-panel-section-label">Pagos fijos</span>
+                                <div id="cc-panel-ob-list" class="flex flex-col gap-2"></div>
+                            </div>
+
+                            <div>
+                                <span class="cc-panel-section-label">Movimientos</span>
+                                <div id="cc-panel-tx-list" class="flex flex-col gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="cc-day-panel-footer">
+                            <button type="button" id="cc-panel-add-btn" class="cc-primary-btn">
+                                <span class="material-symbols-outlined text-[18px]">add</span>
+                                <span>Registrar gasto</span>
+                            </button>
+                        </div>
+                    </aside>
                 </div>
             </section>
 
@@ -679,99 +712,76 @@
     </main>
 </div>
 
+<!-- Backdrop sutil para bottom sheet en móvil -->
+<div id="cc-sheet-backdrop" class="cc-sheet-backdrop" aria-hidden="true"></div>
+
 <!-- ========================================================================================
-     MODAL DEL DÍA
+     POPOVER DE REGISTRO RÁPIDO ANCLADO A LA CELDA
      ======================================================================================== -->
-<div id="day-modal-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-xl border border-outline-variant/40 overflow-hidden flex flex-col max-h-[90vh]">
-        <div class="bg-primary-container text-on-primary px-6 py-4 flex items-center justify-between">
-            <div>
-                <span class="text-[11px] uppercase tracking-wider text-secondary-fixed font-semibold">Detalle del día</span>
-                <h3 id="modal-day-title" class="text-base font-bold text-white m-0">15 de Octubre de 2026</h3>
-            </div>
-            <button type="button" onclick="closeDayModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
-                <span class="material-symbols-outlined text-[18px]">close</span>
-            </button>
+<div id="cc-quick-popover" class="cc-quick-popover hidden" role="dialog" aria-modal="false" aria-labelledby="cc-quick-date-label">
+    <div class="cc-quick-popover-header">
+        <div>
+            <span class="text-[10px] uppercase tracking-wider font-bold text-on-surface-variant block">Registrar gasto</span>
+            <span id="cc-quick-date-label" class="cc-quick-popover-date">15 de Noviembre de 2026</span>
         </div>
-
-        <div class="p-6 overflow-y-auto flex flex-col gap-5">
-            <!-- 1. Pagos Fijos / Deudas de este día (si existen) -->
-            <div id="modal-obligations-section" class="hidden flex-col gap-2">
-                <span class="text-xs font-bold text-secondary">Pagos fijos programados</span>
-                <div id="modal-obligations-container" class="flex flex-col gap-2"></div>
-            </div>
-
-            <!-- 2. Gastos ya registrados en este día -->
-            <div class="flex flex-col gap-2">
-                <span class="text-xs font-bold text-primary">Gastos del día</span>
-                <div id="modal-transactions-container" class="flex flex-col gap-2"></div>
-            </div>
-
-            <!-- 3. Formulario para agregar un nuevo gasto en este día -->
-            <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data"
-                  class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/35 flex flex-col gap-3.5 m-0">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-primary">Registrar gasto</span>
-                </div>
-
-                <input type="hidden" name="transactionDate" id="modal-input-date" value="2026-10-15"/>
-                <input type="hidden" name="returnMonth" th:value="${selectedMonth}"/>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Concepto o comercio</label>
-                        <input type="text" name="merchantName" id="modal-input-merchant" required
-                               placeholder="Supermercado, almuerzo..."
-                               class="w-full h-10 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary"/>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Valor ($ COP)</label>
-                        <input type="number" step="1000" min="0" name="totalAmount" id="modal-input-amount" required
-                               placeholder="45000"
-                               oninput="this.setCustomValidity('')"
-                               class="w-full h-10 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary focus:outline-none focus:ring-2 focus:ring-secondary"/>
-                        <div class="flex flex-wrap items-center gap-1 mt-1.5">
-                            <button type="button" onclick="addQuickAmount(1000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+1.000</button>
-                            <button type="button" onclick="addQuickAmount(5000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+5.000</button>
-                            <button type="button" onclick="addQuickAmount(10000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+10.000</button>
-                            <button type="button" onclick="addQuickAmount(50000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+50.000</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Categoría</label>
-                        <select name="category" id="modal-input-category"
-                                class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface">
-                            <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}"></option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Bloque</label>
-                        <select name="budgetBlock" id="modal-input-block"
-                                class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface">
-                            <option value="NEEDS">Necesidades</option>
-                            <option value="WANTS">Deseos</option>
-                            <option value="SAVINGS">Ahorro / Deuda</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-on-surface mb-1">Notas (opcional)</label>
-                    <textarea name="description" id="modal-input-description" rows="2"
-                              placeholder="Detalle adicional del gasto..."
-                              class="w-full p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary"></textarea>
-                </div>
-
-                <button type="submit"
-                        class="w-full h-10 rounded-xl bg-primary-container hover:opacity-95 text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-all">
-                    <span>Guardar gasto</span>
-                </button>
-            </form>
-        </div>
+        <button type="button" id="cc-quick-close-btn" class="cc-icon-btn" aria-label="Cerrar" title="Cerrar">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
     </div>
+
+    <form id="cc-quick-form" method="post" action="/dashboard/manual-expense" enctype="multipart/form-data" class="flex flex-col gap-2.5 m-0">
+        <input type="hidden" name="transactionDate" id="cc-quick-input-date" value=""/>
+        <input type="hidden" name="returnMonth" th:value="${selectedMonth}"/>
+
+        <div>
+            <label for="cc-quick-merchant" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Concepto o comercio</label>
+            <input type="text" name="merchantName" id="cc-quick-merchant" required
+                   placeholder="Supermercado, almuerzo..."
+                   class="cc-quick-field"/>
+        </div>
+
+        <div>
+            <label for="cc-quick-amount" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Valor ($ COP)</label>
+            <input type="number" step="1000" min="0" name="totalAmount" id="cc-quick-amount" required
+                   placeholder="45000"
+                   oninput="this.setCustomValidity('')"
+                   class="cc-quick-field font-extrabold text-secondary"/>
+            <div class="cc-quick-amount-pills">
+                <button type="button" class="cc-quick-pill" data-quick-delta="1000">+1.000</button>
+                <button type="button" class="cc-quick-pill" data-quick-delta="5000">+5.000</button>
+                <button type="button" class="cc-quick-pill" data-quick-delta="10000">+10.000</button>
+                <button type="button" class="cc-quick-pill" data-quick-delta="50000">+50.000</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+                <label for="cc-quick-category" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Categoría</label>
+                <select name="category" id="cc-quick-category" class="cc-quick-field">
+                    <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="cc-quick-block" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Bloque</label>
+                <select name="budgetBlock" id="cc-quick-block" class="cc-quick-field">
+                    <option value="NEEDS">Necesidades</option>
+                    <option value="WANTS">Deseos</option>
+                    <option value="SAVINGS">Ahorro / Deuda</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label for="cc-quick-desc" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Descripción (opcional)</label>
+            <input type="text" name="description" id="cc-quick-desc"
+                   placeholder="Detalle adicional..."
+                   class="cc-quick-field"/>
+        </div>
+
+        <button type="submit" class="cc-primary-btn mt-1">
+            <span>Guardar gasto</span>
+        </button>
+    </form>
 </div>
 
 <!-- ========================================================================================
@@ -825,121 +835,8 @@
     </div>
 </div>
 
+<script src="/js/calendar-redesign.js"></script>
 <script>
-    function formatCOP(val) {
-        if (window.CuentaClaraTheme && window.CuentaClaraTheme.formatAmount) {
-            return window.CuentaClaraTheme.formatAmount(val);
-        }
-        const num = Number(val) || 0;
-        return '$ ' + num.toLocaleString('es-CO', { maximumFractionDigits: 0 }) + ' COP';
-    }
-
-    function openDayModal(dayNum) {
-        const dataEl = document.getElementById('day-data-' + dayNum);
-        if (!dataEl) return;
-
-        const isoDate = dataEl.getAttribute('data-iso');
-        const dateLabel = dataEl.getAttribute('data-label');
-
-        document.getElementById('modal-day-title').textContent = dateLabel;
-        document.getElementById('modal-input-date').value = isoDate;
-        document.getElementById('modal-input-merchant').value = '';
-        document.getElementById('modal-input-amount').value = '';
-        document.getElementById('modal-input-description').value = '';
-
-        // 1. Renderizar obligaciones del día
-        const obSection = document.getElementById('modal-obligations-section');
-        const obContainer = document.getElementById('modal-obligations-container');
-        obContainer.innerHTML = '';
-        const obItems = dataEl.querySelectorAll('.day-ob-item');
-
-        if (obItems.length > 0) {
-            obSection.classList.remove('hidden');
-            obSection.classList.add('flex');
-            obItems.forEach(item => {
-                const name = item.getAttribute('data-name');
-                const amount = item.getAttribute('data-amount');
-                const category = item.getAttribute('data-category');
-                const paid = item.getAttribute('data-paid') === 'true';
-
-                const div = document.createElement('div');
-                div.className = 'p-3 rounded-2xl border flex items-center justify-between gap-2 ' +
-                    (paid ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-amber-500/15 border-amber-500/40');
-
-                const info = document.createElement('div');
-                info.className = 'flex flex-col';
-                info.innerHTML = `<span class="text-xs font-bold text-on-surface">${paid ? '✓ ' : ''}${name} (${category})</span>
-                                  <span class="text-xs font-bold text-secondary">${formatCOP(amount)}</span>`;
-                div.appendChild(info);
-
-                if (!paid) {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'px-3 py-1.5 rounded-xl bg-primary-container text-white text-[11px] font-semibold hover:opacity-90';
-                    btn.textContent = 'Registrar pago';
-                    btn.onclick = () => {
-                        document.getElementById('modal-input-merchant').value = name;
-                        document.getElementById('modal-input-amount').value = Math.round(Number(amount));
-                        document.getElementById('modal-input-category').value = category;
-                        document.getElementById('modal-input-description').value = 'Pago mensual de ' + name;
-                        document.getElementById('modal-input-description').focus();
-                    };
-                    div.appendChild(btn);
-                } else {
-                    const badge = document.createElement('span');
-                    badge.className = 'px-2.5 py-1 rounded-md bg-emerald-600 text-white text-[10px] font-semibold';
-                    badge.textContent = 'Pagado';
-                    div.appendChild(badge);
-                }
-                obContainer.appendChild(div);
-            });
-        } else {
-            obSection.classList.add('hidden');
-            obSection.classList.remove('flex');
-        }
-
-        // 2. Renderizar gastos ya registrados en ese día
-        const txContainer = document.getElementById('modal-transactions-container');
-        txContainer.innerHTML = '';
-        const txItems = dataEl.querySelectorAll('.day-tx-item');
-
-        if (txItems.length === 0) {
-            txContainer.innerHTML = '<div class="p-3 rounded-xl bg-surface-container-low text-xs text-on-surface-variant text-center">Sin gastos registrados en este día.</div>';
-        } else {
-            txItems.forEach(item => {
-                const merchant = item.getAttribute('data-merchant');
-                const amount = item.getAttribute('data-amount');
-                const category = item.getAttribute('data-category');
-                const desc = item.getAttribute('data-desc') || 'Sin descripción adicional';
-
-                const row = document.createElement('div');
-                row.className = 'p-3 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-between gap-2';
-                row.innerHTML = `<div class="flex flex-col min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="text-xs font-extrabold text-primary">${merchant}</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-surface-container-high text-[10px] font-bold text-on-surface">${category}</span>
-                                    </div>
-                                    <span class="text-[11px] text-on-surface-variant truncate">${desc}</span>
-                                 </div>
-                                 <span class="text-xs font-extrabold text-secondary flex-shrink-0">${formatCOP(amount)}</span>`;
-                txContainer.appendChild(row);
-            });
-        }
-
-        const backdrop = document.getElementById('day-modal-backdrop');
-        backdrop.classList.remove('hidden');
-        backdrop.classList.add('flex');
-        if (window.CuentaClaraTheme && window.CuentaClaraTheme.refreshLocalization) {
-            window.CuentaClaraTheme.refreshLocalization();
-        }
-    }
-
-    function closeDayModal() {
-        const backdrop = document.getElementById('day-modal-backdrop');
-        backdrop.classList.add('hidden');
-        backdrop.classList.remove('flex');
-    }
-
     function openObligationModal() {
         const backdrop = document.getElementById('obligation-modal-backdrop');
         backdrop.classList.remove('hidden');
@@ -952,14 +849,7 @@
         backdrop.classList.remove('flex');
     }
 
-    function addQuickAmount(delta) {
-        const input = document.getElementById('modal-input-amount');
-        if (!input) return;
-        const current = parseInt(input.value, 10) || 0;
-        input.value = current + delta;
-    }
-
-    // Permitir cualquier valor escrito manualmente al enviar formularios, mientras las flechas suben de 1.000 en 1.000 desde 0
+    // Permitir cualquier valor escrito manualmente al enviar formularios
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', () => {
             form.querySelectorAll('input[type="number"]').forEach(numInput => {
@@ -970,10 +860,6 @@
         });
     });
 
-    // Cerrar modales al hacer clic fuera de la tarjeta
-    document.getElementById('day-modal-backdrop').addEventListener('click', (e) => {
-        if (e.target.id === 'day-modal-backdrop') closeDayModal();
-    });
     document.getElementById('obligation-modal-backdrop').addEventListener('click', (e) => {
         if (e.target.id === 'obligation-modal-backdrop') closeObligationModal();
     });
