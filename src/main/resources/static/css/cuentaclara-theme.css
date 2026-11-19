@@ -367,3 +367,124 @@ textarea {
     transition: background-color 150ms ease, border-color 150ms ease;
 }
 
+/* ==========================================================================
+   NAVEGACIÓN FLOTANTE INFERIOR EN MÓVIL + REGLAS MOBILE-NATIVE
+   ========================================================================== */
+html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+}
+
+button, a, [role="button"] {
+    touch-action: manipulation;
+}
+
+.cc-mobile-bottom-nav {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
+    z-index: 45;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.35rem;
+    border-radius: 1.35rem !important;
+    background-color: color-mix(in srgb, var(--surface-container-lowest) 92%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 55%, transparent);
+    box-shadow: 0 12px 30px -8px rgba(45, 9, 25, 0.22), 0 4px 12px -4px rgba(45, 9, 25, 0.12);
+}
+
+html.dark .cc-mobile-bottom-nav {
+    background-color: color-mix(in srgb, var(--surface-container-low) 92%, transparent);
+    box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.65), 0 4px 12px -4px rgba(0, 0, 0, 0.45);
+}
+
+.cc-mobile-nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 48px;
+    padding: 0.3rem 0.15rem;
+    border-radius: 1rem !important;
+    text-decoration: none;
+    color: var(--on-surface-variant);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    transition: transform 110ms ease-out, background-color 140ms ease, color 140ms ease;
+}
+
+.cc-mobile-nav-item:active {
+    transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .cc-mobile-nav-item:not(.is-active):hover {
+        background-color: var(--surface-container-high);
+        color: var(--primary);
+    }
+}
+
+.cc-mobile-nav-item.is-active {
+    background-color: var(--primary-container);
+    color: var(--on-primary);
+}
+
+.cc-mobile-nav-item.is-active .cc-mobile-nav-icon {
+    color: var(--secondary-fixed);
+}
+
+.cc-mobile-nav-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.cc-mobile-nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cc-mobile-nav-badge {
+    position: absolute;
+    top: 4px;
+    right: 10%;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 9999px;
+    background-color: var(--secondary);
+    color: var(--on-secondary);
+    font-size: 9px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 1023px) {
+    body {
+        padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+@media (min-width: 1024px) {
+    .cc-mobile-bottom-nav {
+        display: none !important;
+    }
+}
+

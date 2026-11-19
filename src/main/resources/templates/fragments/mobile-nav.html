@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="bottomNav(activePage)"
+     class="cc-mobile-bottom-nav lg:hidden"
+     aria-label="Navegación principal móvil">
+    <a href="/dashboard"
+       class="cc-mobile-nav-item"
+       th:classappend="${activePage == 'dashboard'} ? ' is-active' : ''"
+       th:attr="aria-current=${activePage == 'dashboard'} ? 'page' : null">
+        <span class="material-symbols-outlined cc-mobile-nav-icon">calendar_month</span>
+        <span class="cc-mobile-nav-label">Inicio</span>
+    </a>
+    <a href="/history"
+       class="cc-mobile-nav-item"
+       th:classappend="${activePage == 'history'} ? ' is-active' : ''"
+       th:attr="aria-current=${activePage == 'history'} ? 'page' : null">
+        <span class="material-symbols-outlined cc-mobile-nav-icon">receipt_long</span>
+        <span class="cc-mobile-nav-label">Gastos</span>
+    </a>
+    <a href="/upload"
+       class="cc-mobile-nav-item"
+       th:classappend="${activePage == 'upload'} ? ' is-active' : ''"
+       th:attr="aria-current=${activePage == 'upload'} ? 'page' : null">
+        <span class="material-symbols-outlined cc-mobile-nav-icon">upload_file</span>
+        <span class="cc-mobile-nav-label">Recibos</span>
+        <span th:if="${pendingConfirmations != null and !#lists.isEmpty(pendingConfirmations)}"
+              class="cc-mobile-nav-badge"
+              th:text="${#lists.size(pendingConfirmations)}"></span>
+    </a>
+    <a href="/profile"
+       class="cc-mobile-nav-item"
+       th:classappend="${activePage == 'profile'} ? ' is-active' : ''"
+       th:attr="aria-current=${activePage == 'profile'} ? 'page' : null">
+        <span class="material-symbols-outlined cc-mobile-nav-icon">savings</span>
+        <span class="cc-mobile-nav-label">Deudas</span>
+    </a>
+    <a href="/assistant"
+       class="cc-mobile-nav-item"
+       th:classappend="${activePage == 'assistant'} ? ' is-active' : ''"
+       th:attr="aria-current=${activePage == 'assistant'} ? 'page' : null">
+        <span class="material-symbols-outlined cc-mobile-nav-icon">chat_bubble</span>
+        <span class="cc-mobile-nav-label">Consultas</span>
+    </a>
+    <a href="/settings"
+       class="cc-mobile-nav-item"
+       th:classappend="${activePage == 'settings'} ? ' is-active' : ''"
+       th:attr="aria-current=${activePage == 'settings'} ? 'page' : null">
+        <span class="material-symbols-outlined cc-mobile-nav-icon">tune</span>
+        <span class="cc-mobile-nav-label">Ajustes</span>
+    </a>
+</nav>
+</body>
+</html>

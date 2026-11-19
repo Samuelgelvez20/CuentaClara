@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
     <title>CuentaClara — Mi Calendario y Organizador de Gastos</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -91,11 +91,8 @@
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased">
 
-<!-- BACKDROP DEL MENÚ MÓVIL/TABLET -->
-<div id="cc-sidebar-backdrop" class="fixed inset-0 bg-black/45 z-40 hidden lg:hidden" onclick="closeMobileSidebar()" aria-hidden="true"></div>
-
-<!-- LEFT SIDEBAR (Off-canvas drawer en < lg, fijo en >= lg) -->
-<aside id="cc-sidebar" class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 lg:z-40 flex flex-col justify-between border-r border-outline-variant/25 shadow-lg lg:shadow-sm transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-out">
+<!-- LEFT SIDEBAR (Solo escritorio >= lg; en móvil se usa la barra flotante inferior) -->
+<aside id="cc-sidebar" class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex-col justify-between border-r border-outline-variant/25 shadow-sm transition-all duration-200 ease-out">
     <div class="flex flex-col flex-1 overflow-y-auto">
         <div class="p-space-lg flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
@@ -177,10 +174,10 @@
     <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
         <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-space-xl flex items-center justify-between gap-2 sm:gap-space-md">
             <div class="flex items-center gap-2 flex-1 min-w-0">
-                <button type="button" onclick="openMobileSidebar()" aria-label="Abrir menú"
-                        class="lg:hidden w-10 h-10 flex-shrink-0 rounded-xl bg-surface-container border border-outline-variant/40 text-primary flex items-center justify-center cursor-pointer">
-                    <span class="material-symbols-outlined text-[22px]">menu</span>
-                </button>
+                <a href="/dashboard" aria-label="CuentaClara"
+                   class="lg:hidden w-10 h-10 flex-shrink-0 rounded-xl bg-primary-container text-secondary-fixed flex items-center justify-center shadow-xs no-underline">
+                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                </a>
                 <form method="post" action="/dashboard/chat" class="flex-1 max-w-xl m-0 min-w-0">
                     <input type="hidden" name="returnTo" value="/assistant"/>
                     <div class="relative flex items-center">
@@ -864,22 +861,10 @@
     </div>
 </div>
 
+<div th:replace="~{fragments/mobile-nav :: bottomNav('dashboard')}"></div>
+
 <script src="/js/calendar-redesign.js"></script>
 <script>
-    function openMobileSidebar() {
-        const sidebar = document.getElementById('cc-sidebar');
-        const backdrop = document.getElementById('cc-sidebar-backdrop');
-        if (sidebar) sidebar.classList.remove('-translate-x-full');
-        if (backdrop) backdrop.classList.remove('hidden');
-    }
-
-    function closeMobileSidebar() {
-        const sidebar = document.getElementById('cc-sidebar');
-        const backdrop = document.getElementById('cc-sidebar-backdrop');
-        if (sidebar) sidebar.classList.add('-translate-x-full');
-        if (backdrop) backdrop.classList.add('hidden');
-    }
-
     function applyDesktopSidebarState(collapsed) {
         document.body.classList.toggle('cc-sidebar-collapsed', collapsed);
         const icon = document.getElementById('cc-sidebar-collapse-icon');
