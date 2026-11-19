@@ -334,104 +334,114 @@
                     </span>
                 </div>
 
-                <!-- Encabezado de Días de la Semana (Lunes a Domingo - Resalta el día de la semana de hoy) -->
-                <div class="grid grid-cols-7 gap-2.5 text-center">
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 1} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Lun</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 2} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Mar</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 3} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Mié</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 4} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Jue</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 5} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Vie</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 6} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-secondary'">Sáb</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 7} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-secondary'">Dom</div>
-                </div>
+                <!-- Área principal del calendario (izquierda: vista Mes/Semana/Día; derecha: panel de día en Paso 4) -->
+                <div class="cc-cal-workspace" id="cc-cal-workspace">
+                    <div class="cc-cal-main" id="cc-cal-main">
 
-                <!-- Cuadrícula del Mes (Días 1 a 30/31) -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
-                    <th:block th:each="cell : ${calendarCells}">
-                        <!-- Casilla vacía de relleno para alinear el día 1 -->
-                        <div th:if="${cell.empty}" class="hidden lg:block min-h-[135px] rounded-2xl bg-surface-container-low/25 border border-dashed border-outline-variant/20"></div>
-
-                        <!-- Casilla de Día Real Interactiva (Resalta especialmente el Día de HOY) -->
-                        <div th:if="${!cell.empty}"
-                             th:attr="onclick='openDayModal(' + ${cell.dayNumber} + ')',data-cell-iso=${cell.isoDate}"
-                             class="calendar-day-card min-h-[135px] p-3 cursor-pointer flex flex-col justify-between gap-1.5 relative group"
-                             th:classappend="${cell.today} ? 'bg-secondary-container/35 ring-2 ring-secondary border-2 border-secondary shadow-md' : 'bg-surface-container-low/70 hover:bg-surface-container border border-outline-variant/35'">
-
-                            <!-- Fila superior: Número del día, Etiqueta HOY (si es hoy) y botón + al pasar el mouse -->
-                            <div class="flex items-center justify-between gap-1">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold"
-                                          th:classappend="${cell.today} ? 'bg-secondary text-white ring-4 ring-secondary/25 shadow-sm' : (${!#lists.isEmpty(cell.transactions) or !#lists.isEmpty(cell.obligations)} ? 'bg-primary-container text-on-primary shadow-xs' : 'bg-surface-container-lowest text-on-surface')"
-                                          th:text="${cell.dayNumber}">1</span>
-
-                                    <!-- Insignia destacada cuando la casilla corresponde al Día de HOY -->
-                                    <span th:if="${cell.today}"
-                                          class="px-2 py-0.5 rounded-md bg-secondary text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                                        <span th:text="'HOY • ' + ${cell.dayOfWeekName}">HOY</span>
-                                    </span>
-                                    <span th:if="${!cell.today}"
-                                          class="text-[10px] font-semibold text-on-surface-variant/75"
-                                          th:text="${cell.dayOfWeekName}">Mar</span>
-                                </div>
-
-                                <span class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 rounded-md bg-primary-container text-white text-[10px] font-semibold flex items-center gap-0.5">
-                                    <span class="material-symbols-outlined text-[12px]">add</span> Registrar
-                                </span>
+                        <!-- VISTA MENSUAL -->
+                        <div id="cc-view-month" class="cc-view-panel" role="tabpanel" aria-labelledby="cc-tab-month">
+                            <!-- Encabezado único de días de la semana (sin resaltar columna de hoy) -->
+                            <div class="cc-weekdays-row" role="row">
+                                <div class="cc-weekday-label" role="columnheader">Lun</div>
+                                <div class="cc-weekday-label" role="columnheader">Mar</div>
+                                <div class="cc-weekday-label" role="columnheader">Mié</div>
+                                <div class="cc-weekday-label" role="columnheader">Jue</div>
+                                <div class="cc-weekday-label" role="columnheader">Vie</div>
+                                <div class="cc-weekday-label" role="columnheader">Sáb</div>
+                                <div class="cc-weekday-label" role="columnheader">Dom</div>
                             </div>
 
-                            <!-- Lista de Pagos Fijos / Deudas Mensuales y Gastos del Día -->
-                            <div class="flex flex-col gap-1 my-1 overflow-hidden">
-                                <!-- Pagos Fijos / Deudas que vencen este día cada mes -->
-                                <div th:each="ob : ${cell.obligations}"
-                                     class="px-2 py-1 rounded-lg text-[11px] font-semibold truncate flex items-center justify-between gap-1"
-                                     th:classappend="${ob.paidThisMonth} ? 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/40'">
-                                    <span class="truncate" th:text="${(ob.paidThisMonth ? '✓ ' : '') + ob.name}">Alquiler</span>
-                                    <span class="flex-shrink-0 font-bold" th:text="'$' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}"></span>
-                                </div>
-
-                                <!-- Gastos Reales Registrados en este Día (máx 2 visibles en la miniatura) -->
-                                <div th:each="tx, iterStat : ${cell.transactions}" th:if="${iterStat.index < 2}"
-                                     class="px-2 py-1 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-[11px] text-on-surface truncate flex items-center justify-between gap-1">
-                                    <span class="truncate font-semibold" th:text="${tx.merchantName}">Comercio</span>
-                                    <span class="text-secondary font-bold flex-shrink-0" th:text="'$' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span>
-                                </div>
-                                <div th:if="${#lists.size(cell.transactions) > 2}"
-                                     class="text-[10px] text-primary font-semibold pl-1"
-                                     th:text="'+ ' + (${#lists.size(cell.transactions) - 2}) + ' más'">
-                                </div>
-                            </div>
-
-                            <!-- Pie de casilla: Total del día -->
-                            <div class="pt-1 border-t border-outline-variant/20 flex items-center justify-between text-[11px]">
-                                <span th:if="${cell.dayTotal > 0}" class="text-on-surface-variant font-medium">Total:</span>
-                                <span th:if="${cell.dayTotal > 0}" class="font-bold text-primary"
-                                      th:text="'$ ' + ${#numbers.formatDecimal(cell.dayTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</span>
-                                <span th:if="${cell.dayTotal == 0 and #lists.isEmpty(cell.obligations)}" class="text-[10px] text-on-surface-variant/60">Sin gastos</span>
-                            </div>
-
-                            <!-- Datos ocultos de este día para alimentar la Mini-Ventana al hacer clic -->
-                            <div th:id="'day-data-' + ${cell.dayNumber}" class="hidden"
-                                 th:attr="data-iso=${cell.isoDate},data-label=${cell.fullDateLabel}">
-                                <div class="day-obligations-list">
-                                    <div th:each="ob : ${cell.obligations}" class="day-ob-item"
-                                         th:attr="data-name=${ob.name},data-amount=${ob.estimatedAmount},data-category=${ob.category},data-block=${ob.budgetBlock},data-paid=${ob.paidThisMonth}">
+                            <!-- Cuadrícula del Mes -->
+                            <div class="cc-month-grid" id="cc-month-grid" role="grid" aria-label="Calendario mensual de gastos">
+                                <th:block th:each="cell : ${calendarCells}">
+                                    <!-- Días del mes anterior (gris suave, sin borde punteado) -->
+                                    <div th:if="${cell.empty}"
+                                         class="cc-day-cell is-outside cc-leading-outside"
+                                         aria-hidden="true">
+                                        <div class="cc-day-top">
+                                            <span class="cc-day-num"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="day-transactions-list">
-                                    <div th:each="tx : ${cell.transactions}" class="day-tx-item"
-                                         th:attr="data-merchant=${tx.merchantName},data-amount=${tx.totalAmount},data-category=${tx.category},data-desc=${tx.description != null ? tx.description : tx.itemsSummary}">
+
+                                    <!-- Día real del mes seleccionado -->
+                                    <div th:if="${!cell.empty}"
+                                         role="gridcell"
+                                         tabindex="0"
+                                         th:attr="data-day=${cell.dayNumber},data-cell-iso=${cell.isoDate},data-today=${cell.today},data-day-total=${cell.dayTotal},aria-label=${cell.fullDateLabel}"
+                                         class="cc-day-cell"
+                                         th:classappend="${cell.today} ? 'is-today' : ''">
+
+                                        <div class="cc-day-top">
+                                            <span class="cc-day-num" th:text="${cell.dayNumber}">1</span>
+                                            <button type="button"
+                                                    class="cc-cell-add-btn"
+                                                    th:attr="data-quick-add-day=${cell.dayNumber}"
+                                                    title="Registrar gasto en este día"
+                                                    aria-label="Registrar gasto">
+                                                <span class="material-symbols-outlined text-[16px]">add</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Chips de movimientos (máx. 2 visibles + "+N más") -->
+                                        <div class="cc-cell-items"
+                                             th:with="obCount=${#lists.size(cell.obligations)}, txCount=${#lists.size(cell.transactions)}, totalItems=${obCount + txCount}">
+                                            <div th:each="ob, obStat : ${cell.obligations}"
+                                                 th:if="${obStat.index < 2}"
+                                                 class="cc-chip"
+                                                 th:classappend="${ob.paidThisMonth} ? 'cc-chip-paid' : 'cc-chip-pending'">
+                                                <span class="cc-chip-title" th:text="${ob.name}">Arriendo</span>
+                                                <span class="cc-chip-amt" th:text="'$' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}"></span>
+                                            </div>
+
+                                            <div th:each="tx, txStat : ${cell.transactions}"
+                                                 th:if="${(obCount + txStat.index) < 2}"
+                                                 class="cc-chip cc-chip-expense">
+                                                <span class="cc-chip-title" th:text="${tx.merchantName}">Comercio</span>
+                                                <span class="cc-chip-amt" th:text="'$' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span>
+                                            </div>
+
+                                            <span th:if="${totalItems > 2}"
+                                                  class="cc-chip-more"
+                                                  th:text="'+' + (${totalItems - 2}) + ' más'">+1 más</span>
+                                        </div>
+
+                                        <!-- Puntos de color en vista móvil -->
+                                        <div class="cc-mobile-dots" aria-hidden="true">
+                                            <span th:each="ob, obStat : ${cell.obligations}"
+                                                  th:if="${obStat.index < 2}"
+                                                  class="cc-dot"
+                                                  th:classappend="${ob.paidThisMonth} ? 'cc-dot-paid' : 'cc-dot-pending'"></span>
+                                            <span th:if="${!#lists.isEmpty(cell.transactions)}" class="cc-dot cc-dot-expense"></span>
+                                        </div>
+
+                                        <!-- Total del día solo si hay gastos -->
+                                        <div th:if="${cell.dayTotal > 0}"
+                                             class="cc-cell-total"
+                                             th:text="'$ ' + ${#numbers.formatDecimal(cell.dayTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</div>
+
+                                        <!-- Datos ocultos del día para panel lateral, popover, vista semanal y vista diaria -->
+                                        <div th:id="'day-data-' + ${cell.dayNumber}" class="hidden"
+                                             th:attr="data-day=${cell.dayNumber},data-iso=${cell.isoDate},data-label=${cell.fullDateLabel},data-weekday=${cell.dayOfWeekName},data-today=${cell.today},data-total=${cell.dayTotal}">
+                                            <div class="day-obligations-list">
+                                                <div th:each="ob : ${cell.obligations}" class="day-ob-item"
+                                                     th:attr="data-name=${ob.name},data-amount=${ob.estimatedAmount},data-category=${ob.category},data-block=${ob.budgetBlock},data-paid=${ob.paidThisMonth}">
+                                                </div>
+                                            </div>
+                                            <div class="day-transactions-list">
+                                                <div th:each="tx : ${cell.transactions}" class="day-tx-item"
+                                                     th:attr="data-merchant=${tx.merchantName},data-amount=${tx.totalAmount},data-category=${tx.category},data-desc=${tx.description != null ? tx.description : tx.itemsSummary}">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                </th:block>
                             </div>
                         </div>
-                    </th:block>
+
+                        <!-- Contenedores para Vista Semanal y Vista Diaria (se poblan en Paso 5) -->
+                        <div id="cc-view-week" class="cc-view-panel hidden" role="tabpanel" aria-labelledby="cc-tab-week"></div>
+                        <div id="cc-view-day" class="cc-view-panel hidden" role="tabpanel" aria-labelledby="cc-tab-day"></div>
+                    </div>
                 </div>
             </section>
 
