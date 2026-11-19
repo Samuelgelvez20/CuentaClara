@@ -104,37 +104,37 @@
             </div>
             <div class="flex flex-col">
                 <span class="font-title-md text-title-md text-primary leading-tight tracking-tight font-bold">CuentaClara</span>
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Finanzas &amp; RAG DIAN</span>
+                <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
             </div>
         </div>
         <div class="px-space-md py-space-xs">
             <div class="px-space-sm pb-2">
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">Mi Espacio Personal</span>
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">Menú</span>
             </div>
             <nav class="flex flex-col gap-1.5">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
                     <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-                    <span>Mi Calendario del Mes</span>
+                    <span>Calendario</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
                     <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Historial de Gastos</span>
+                    <span>Historial de gastos</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
                     <span class="material-symbols-outlined text-[20px]">upload_file</span>
-                    <span>Subir Recibo o Factura</span>
+                    <span>Facturas y recibos</span>
                 </a>
-                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all bg-primary-container text-on-primary font-bold shadow-sm no-underline" href="/profile">
+                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/profile">
                     <span class="material-symbols-outlined text-[20px] text-secondary-fixed">savings</span>
-                    <span>Mi Plan y Deudas Fijas</span>
+                    <span>Presupuesto y deudas</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
                     <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-                    <span>Pregúntale a tu Asistente</span>
+                    <span>Consultas</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px]">palette</span>
-                    <span>Colores y Configuración</span>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
+                    <span class="material-symbols-outlined text-[20px]">tune</span>
+                    <span>Configuración</span>
                 </a>
             </nav>
         </div>
@@ -161,28 +161,28 @@
 
 <!-- RIGHT DESKTOP WORKSPACE -->
 <div class="pl-72 flex flex-col min-h-screen">
-    <header class="fixed top-0 left-72 right-0 h-20 bg-surface/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,53,39,0.04)]">
+    <header class="fixed top-0 left-72 right-0 h-20 bg-surface/85 backdrop-blur-xl z-40 border-b border-outline-variant/20">
         <div class="h-20 w-full px-space-xl flex items-center justify-between gap-space-md">
             <div class="flex items-center gap-space-xxs text-on-surface-variant font-label-md text-label-md">
                 <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary">Inicio</a>
                 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span class="text-primary font-semibold">Perfil Financiero y Regla 50 / 30 / 20</span>
+                <span class="text-primary font-semibold">Presupuesto y pagos fijos</span>
             </div>
-            <div class="flex items-center gap-space-sm">
+            <div class="flex items-center gap-2">
                 <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
-                        title="Alternar Modo Claro / Oscuro"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all shadow-sm">
+                        title="Alternar tema claro / oscuro"
+                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
                     <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
-                    <span>Modo Visual</span>
+                    <span>Tema</span>
                 </button>
-                <a href="/settings" title="Personalizar Colores y Preferencias"
-                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all shadow-sm no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">palette</span>
-                    <span>Temas</span>
+                <a href="/settings" title="Configuración"
+                   class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all no-underline">
+                    <span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
+                    <span>Ajustes</span>
                 </a>
-                <a href="/dashboard" class="h-10 px-space-md bg-primary-container hover:opacity-95 text-on-primary rounded-xl font-title-md text-body-sm flex items-center gap-space-xs shadow-md transition-all no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">dashboard</span>
-                    <span>Ir al Panel</span>
+                <a href="/dashboard" class="h-9 px-4 bg-primary-container hover:opacity-95 text-on-primary rounded-xl font-title-md text-xs font-semibold flex items-center gap-1.5 transition-all no-underline">
+                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">calendar_month</span>
+                    <span>Calendario</span>
                 </a>
             </div>
         </div>
@@ -191,97 +191,92 @@
     <main class="w-full pt-20 bg-surface flex-1">
         <div class="flex flex-col w-full px-space-xl py-space-lg gap-space-xl max-w-[1600px] mx-auto">
 
-            <div th:if="${successMessage}" class="p-4 rounded-xl bg-secondary-container text-on-secondary-fixed font-body-md flex items-center gap-2 shadow-sm">
+            <div th:if="${successMessage}" class="p-4 rounded-xl bg-secondary-container text-on-secondary-fixed font-body-md flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">check_circle</span>
                 <span th:text="${successMessage}"></span>
             </div>
-            <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container text-on-error-container font-body-md flex items-center gap-2 shadow-sm">
+            <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container text-on-error-container font-body-md flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">error</span>
                 <span th:text="${errorMessage}"></span>
             </div>
 
             <!-- Header Bar -->
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
-                <div class="flex flex-col gap-space-xxs">
-                    <div class="flex items-center gap-space-xs">
-                        <span class="px-space-xs py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm uppercase tracking-wider font-semibold">
-                            Planificación desde el Día 1 (RF-11, RF-15, RF-17)
-                        </span>
-                    </div>
-                    <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight m-0">
-                        Perfil Financiero y Presupuesto Inteligente
+                <div class="flex flex-col gap-1">
+                    <h1 class="text-2xl font-bold text-primary tracking-tight m-0">
+                        Presupuesto y pagos fijos
                     </h1>
-                    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl m-0">
-                        Configura tus ingresos netos, frecuencia de recaudo, compromisos prioritarios y la distribución del presupuesto regla 50/30/20 (suma = 100%).
+                    <p class="text-xs text-on-surface-variant max-w-2xl m-0">
+                        Define tu ingreso mensual, la distribución 50/30/20 y los pagos que se repiten cada mes.
                     </p>
                 </div>
             </div>
 
-            <!-- Formulario Real Conectado a POST /profile (Bento Card 12 Columnas en PC) -->
-            <form method="post" action="/profile" class="w-full bg-surface-container-lowest rounded-xl shadow-md p-space-xl flex flex-col gap-space-lg m-0">
+            <!-- Formulario Real Conectado a POST /profile -->
+            <form method="post" action="/profile" class="w-full bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-space-xl flex flex-col gap-space-lg m-0">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
 
-                    <!-- Section 1: Ingreso Mensual Neto Declarado (Cols 1-4) -->
+                    <!-- Section 1: Ingreso Mensual -->
                     <div class="lg:col-span-4 flex flex-col gap-space-md">
-                        <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
-                            01 • Ingreso Neto por Periodo Declarado (COP)
+                        <span class="text-xs font-bold text-primary">
+                            Ingresos y deudas
                         </span>
-                        <div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
-                            <span class="font-label-sm text-label-sm text-on-surface-variant">Monto Neto ($ COP)</span>
+                        <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs">
+                            <span class="font-label-sm text-label-sm text-on-surface-variant">Ingreso neto ($ COP)</span>
                             <input id="netIncomeInput" name="netIncome" type="number" step="0.01" required
-                                   class="w-full p-2 rounded bg-surface-container-lowest font-headline-md text-primary font-bold"
+                                   class="w-full p-2 rounded-lg bg-surface-container-lowest font-headline-md text-primary font-bold border border-outline-variant/30"
                                    th:value="${profile != null ? profile.netIncome : 4800000}"/>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Deudas Totales (COP)</label>
+                                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Deudas totales (COP)</label>
                                 <input type="number" step="0.01" name="totalDebts"
-                                       class="w-full p-2 rounded bg-surface-container-low font-data-mono text-body-sm"
+                                       class="w-full p-2 rounded-lg bg-surface-container-low font-data-mono text-body-sm border border-outline-variant/30"
                                        th:value="${profile != null ? profile.totalDebts : 0}"/>
                             </div>
                             <div>
-                                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Meta Principal</label>
+                                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Objetivo principal</label>
                                 <input type="text" name="financialGoals"
-                                       class="w-full p-2 rounded bg-surface-container-low font-body-sm text-body-sm"
+                                       class="w-full p-2 rounded-lg bg-surface-container-low font-body-sm text-body-sm border border-outline-variant/30"
                                        th:value="${profile != null ? profile.financialGoals : 'Ahorro y control'}"/>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section 2: Frecuencia de Recaudo y Compromisos (Cols 5-7) -->
+                    <!-- Section 2: Frecuencia -->
                     <div class="lg:col-span-3 flex flex-col gap-space-md">
-                        <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
-                            02 • Frecuencia y Días de Pago
+                        <span class="text-xs font-bold text-primary">
+                            Frecuencia de pago
                         </span>
                         <div>
-                            <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Frecuencia de Recaudo</label>
-                            <select name="paymentFrequency" class="w-full h-10 px-3 rounded-lg bg-surface-container-low font-title-md text-body-sm text-primary font-semibold">
+                            <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Periodicidad</label>
+                            <select name="paymentFrequency" class="w-full h-10 px-3 rounded-lg bg-surface-container-low font-title-md text-body-sm text-primary font-semibold border border-outline-variant/30">
                                 <option th:each="freq : ${frequencies}" th:value="${freq}" th:text="${freq.label}"
                                         th:selected="${profile != null and profile.paymentFrequency == freq}"></option>
                             </select>
                         </div>
                         <div>
-                            <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Días de recepción (ej. 15,30 o 30)</label>
+                            <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Días de pago (ej. 15,30 o 30)</label>
                             <input type="text" name="paymentDays" required
-                                   class="w-full h-10 px-3 rounded-lg bg-surface-container-low font-data-mono text-body-sm"
+                                   class="w-full h-10 px-3 rounded-lg bg-surface-container-low font-data-mono text-body-sm border border-outline-variant/30"
                                    th:value="${profile != null ? profile.paymentDays : '15,30'}"/>
                         </div>
                     </div>
 
-                    <!-- Section 3: Interactive Distribution Sliders 50/30/20 (Cols 8-12) -->
+                    <!-- Section 3: Interactive Distribution Sliders 50/30/20 -->
                     <div class="lg:col-span-5 flex flex-col gap-space-md">
                         <div class="flex items-center justify-between">
-                            <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
-                                03 • Calibración Regla 50 / 30 / 20
+                            <span class="text-xs font-bold text-primary">
+                                Distribución 50 / 30 / 20
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-bold" id="sumBadge">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-bold" id="sumBadge">
                                 Suma: 100% Correcto
                             </span>
                         </div>
 
                         <!-- Segmented Bar Visualization -->
                         <div class="flex flex-col gap-space-xxs">
-                            <div class="w-full h-3.5 rounded-full bg-surface-container-high overflow-hidden flex shadow-inner">
+                            <div class="w-full h-3 rounded-full bg-surface-container-high overflow-hidden flex">
                                 <div class="h-full bg-secondary transition-all duration-300" id="barNeeds" style="width: 50%;"></div>
                                 <div class="h-full bg-amber-600 transition-all duration-300" id="barWants" style="width: 30%;"></div>
                                 <div class="h-full bg-primary-container transition-all duration-300" id="barSavings" style="width: 20%;"></div>
@@ -323,17 +318,16 @@
                     </div>
                 </div>
 
-                <!-- Pagos Fijos y Deudas Importantes de Cada Mes (Se marcan en el Calendario) -->
-                <div class="p-5 rounded-2xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-4 mt-2">
+                <!-- Pagos Fijos y Deudas -->
+                <div class="p-5 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-4 mt-2">
                     <div class="flex items-center justify-between flex-wrap gap-2">
                         <div>
-                            <span class="text-xs uppercase tracking-wider font-extrabold text-primary">04 • Tus Pagos Fijos y Deudas Importantes de Cada Mes</span>
-                            <p class="text-xs text-on-surface-variant m-0">Indica qué día del mes (1 al 31) debes pagar cada compromiso o deuda; se marcarán automáticamente cada mes en tu calendario.</p>
+                            <span class="text-xs font-bold text-primary">Pagos fijos mensuales</span>
+                            <p class="text-xs text-on-surface-variant m-0">Compromisos que vencen el mismo día cada mes (1 al 31).</p>
                         </div>
                         <button type="button" onclick="addProfileObligationRow()"
-                                class="px-3.5 py-1.5 rounded-full bg-secondary text-white text-xs font-bold hover:opacity-95 transition-opacity flex items-center gap-1 border-0 cursor-pointer">
-                            <span class="material-symbols-outlined text-[16px]">add_circle</span>
-                            <span>+ Agregar otra deuda o pago fijo</span>
+                                class="px-3.5 py-1.5 rounded-xl bg-secondary text-white text-xs font-semibold hover:opacity-95 transition-opacity flex items-center gap-1 border-0 cursor-pointer">
+                            <span>+ Agregar pago fijo</span>
                         </button>
                     </div>
 
@@ -341,102 +335,102 @@
                         <!-- Si ya tiene obligaciones guardadas, mostrarlas editables con botón circular (-) al inicio -->
                         <div th:each="ob : ${obligations}"
                              th:attr="data-obligation-id=${ob.id}"
-                             class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all">
+                             class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/30 transition-all">
                             <button type="button"
                                     onclick="removeProfileObligationRow(this)"
-                                    title="Eliminar esta deuda o pago fijo"
-                                    class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                                    title="Eliminar pago fijo"
+                                    class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer">
                                 &minus;
                             </button>
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
                                 <div class="sm:col-span-4">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                                    <label class="text-[11px] font-semibold text-on-surface-variant">Concepto</label>
                                     <input type="text" name="obligationName" th:value="${ob.name}"
-                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                           class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
                                 </div>
                                 <div class="sm:col-span-3">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
-                                    <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
-                                        <option value="Vivienda" th:selected="${ob.category == 'Vivienda'}">🏠 Vivienda / Alquiler</option>
-                                        <option value="Deudas y Préstamos" th:selected="${ob.category == 'Deudas y Préstamos'}">💳 Deudas y Préstamos</option>
-                                        <option value="Servicios" th:selected="${ob.category == 'Servicios'}">💡 Servicios e Internet</option>
-                                        <option value="Alimentación" th:selected="${ob.category == 'Alimentación'}">🛒 Alimentación</option>
-                                        <option value="Otros" th:selected="${ob.category == 'Otros'}">📌 Otros</option>
+                                    <label class="text-[11px] font-semibold text-on-surface-variant">Categoría</label>
+                                    <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                                        <option value="Vivienda" th:selected="${ob.category == 'Vivienda'}">Vivienda / Alquiler</option>
+                                        <option value="Deudas y Préstamos" th:selected="${ob.category == 'Deudas y Préstamos'}">Deudas y préstamos</option>
+                                        <option value="Servicios" th:selected="${ob.category == 'Servicios'}">Servicios e internet</option>
+                                        <option value="Alimentación" th:selected="${ob.category == 'Alimentación'}">Alimentación</option>
+                                        <option value="Otros" th:selected="${ob.category == 'Otros'}">Otros</option>
                                     </select>
                                 </div>
                                 <div class="sm:col-span-3">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
+                                    <label class="text-[11px] font-semibold text-on-surface-variant">Monto mensual ($ COP)</label>
                                     <input type="number" step="1000" name="obligationAmount" th:value="${ob.estimatedAmount}"
-                                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                           class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40"/>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                    <label class="text-[11px] font-semibold text-on-surface-variant">Día (1-31)</label>
                                     <input type="number" min="1" max="31" name="obligationDueDay" th:value="${ob.dueDay}"
-                                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                           class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40"/>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Si aún no tiene obligaciones guardadas, mostrar 2 filas sugeridas listas para llenar o borrar -->
+                        <!-- Si aún no tiene obligaciones guardadas -->
                         <th:block th:if="${#lists.isEmpty(obligations)}">
-                            <div class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all">
+                            <div class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/30 transition-all">
                                 <button type="button"
                                         onclick="removeProfileObligationRow(this)"
-                                        title="Eliminar esta deuda o pago fijo"
-                                        class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                                        title="Eliminar pago fijo"
+                                        class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer">
                                     &minus;
                                 </button>
                                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
                                     <div class="sm:col-span-4">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Pago</label>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Concepto</label>
                                         <input type="text" name="obligationName" value="Alquiler / Vivienda"
-                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
                                     </div>
                                     <div class="sm:col-span-3">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Categoría</label>
                                         <input type="text" name="obligationCategory" value="Vivienda" readonly
-                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
                                     </div>
                                     <div class="sm:col-span-3">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
-                                        <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 1450000"
-                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Monto mensual ($ COP)</label>
+                                        <input type="number" step="1000" name="obligationAmount" placeholder="1450000"
+                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40"/>
                                     </div>
                                     <div class="sm:col-span-2">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Día (1-31)</label>
                                         <input type="number" min="1" max="31" name="obligationDueDay" value="5"
-                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40"/>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all">
+                            <div class="obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/30 transition-all">
                                 <button type="button"
                                         onclick="removeProfileObligationRow(this)"
-                                        title="Eliminar esta deuda o pago fijo"
-                                        class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                                        title="Eliminar pago fijo"
+                                        class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer">
                                     &minus;
                                 </button>
                                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
                                     <div class="sm:col-span-4">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Concepto</label>
                                         <input type="text" name="obligationName" value="Cuota Préstamo / Deuda"
-                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
                                     </div>
                                     <div class="sm:col-span-3">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Categoría</label>
                                         <input type="text" name="obligationCategory" value="Deudas y Préstamos" readonly
-                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
                                     </div>
                                     <div class="sm:col-span-3">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
-                                        <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 350000"
-                                               class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Monto mensual ($ COP)</label>
+                                        <input type="number" step="1000" name="obligationAmount" placeholder="350000"
+                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40"/>
                                     </div>
                                     <div class="sm:col-span-2">
-                                        <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                                        <label class="text-[11px] font-semibold text-on-surface-variant">Día (1-31)</label>
                                         <input type="number" min="1" max="31" name="obligationDueDay" value="12"
-                                               class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40"/>
                                     </div>
                                 </div>
                             </div>
@@ -445,71 +439,70 @@
                 </div>
 
                 <div class="flex justify-end gap-3">
-                    <a href="/dashboard" class="h-11 px-6 rounded-2xl bg-surface-container-high text-on-surface font-title-md text-body-sm font-bold flex items-center gap-2 no-underline">
-                        <span>Ver mi Calendario</span>
+                    <a href="/dashboard" class="h-10 px-5 rounded-xl bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-2 no-underline">
+                        <span>Volver al calendario</span>
                     </a>
-                    <button type="submit" class="h-11 px-space-xl rounded-2xl bg-primary-container hover:bg-primary text-on-primary font-title-md text-body-sm font-bold shadow-md transition-all flex items-center gap-space-xs">
-                        <span class="material-symbols-outlined text-[18px] text-secondary-fixed">save</span>
-                        <span>Guardar mi Plan y Marcar Pagos en el Calendario</span>
+                    <button type="submit" class="h-10 px-6 rounded-xl bg-primary-container hover:bg-primary text-on-primary text-xs font-semibold shadow-xs transition-all flex items-center gap-2">
+                        <span>Guardar cambios</span>
                     </button>
                 </div>
             </form>
 
-            <!-- Main 3-Column Desktop Grid showing Detailed Budget Breakdown -->
+            <!-- 3-Column Budget Breakdown -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
-                <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+                <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-outline-variant/30 flex flex-col gap-space-md">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-space-sm">
-                            <div class="w-11 h-11 rounded-lg bg-surface-container-high text-primary-container flex items-center justify-center">
-                                <span class="material-symbols-outlined text-[24px]">home</span>
+                            <div class="w-10 h-10 rounded-lg bg-surface-container-high text-primary-container flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[22px]">home</span>
                             </div>
                             <div class="flex flex-col">
-                                <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary-fixed text-on-secondary-fixed w-fit">Necesidades</span>
-                                <h3 class="font-title-md text-title-md text-on-surface font-semibold mt-0.5 m-0">Necesidades Vitales</h3>
+                                <span class="text-xs text-on-surface-variant">Necesidades</span>
+                                <h3 class="text-sm text-on-surface font-semibold m-0">Gastos esenciales</h3>
                             </div>
                         </div>
-                        <span class="font-title-lg text-title-lg font-bold text-secondary" id="cardNeedsAmt">$ 2.400.000</span>
+                        <span class="text-base font-bold text-secondary" id="cardNeedsAmt">$ 2.400.000</span>
                     </div>
                 </div>
 
-                <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+                <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-outline-variant/30 flex flex-col gap-space-md">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-space-sm">
-                            <div class="w-11 h-11 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-[24px]">local_cafe</span>
+                            <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[22px]">local_cafe</span>
                             </div>
                             <div class="flex flex-col">
-                                <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-900 w-fit">Deseos</span>
-                                <h3 class="font-title-md text-title-md text-on-surface font-semibold mt-0.5 m-0">Deseos &amp; Ocio</h3>
+                                <span class="text-xs text-on-surface-variant">Deseos</span>
+                                <h3 class="text-sm text-on-surface font-semibold m-0">Gustos y ocio</h3>
                             </div>
                         </div>
-                        <span class="font-title-lg text-title-lg font-bold text-amber-700" id="cardWantsAmt">$ 1.440.000</span>
+                        <span class="text-base font-bold text-amber-700" id="cardWantsAmt">$ 1.440.000</span>
                     </div>
                 </div>
 
-                <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+                <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-outline-variant/30 flex flex-col gap-space-md">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-space-sm">
-                            <div class="w-11 h-11 rounded-lg bg-teal-50 text-teal-800 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-[24px]">savings</span>
+                            <div class="w-10 h-10 rounded-lg bg-teal-50 text-teal-800 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[22px]">savings</span>
                             </div>
                             <div class="flex flex-col">
-                                <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-teal-100 text-teal-900 w-fit">Patrimonio</span>
-                                <h3 class="font-title-md text-title-md text-on-surface font-semibold mt-0.5 m-0">Ahorro &amp; Respaldo</h3>
+                                <span class="text-xs text-on-surface-variant">Ahorro</span>
+                                <h3 class="text-sm text-on-surface font-semibold m-0">Reserva mensual</h3>
                             </div>
                         </div>
-                        <span class="font-title-lg text-title-lg font-bold text-primary" id="cardSavingsAmt">$ 960.000</span>
+                        <span class="text-base font-bold text-primary" id="cardSavingsAmt">$ 960.000</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Recomendaciones Deterministas -->
+            <!-- Notas de presupuesto -->
             <div th:if="${recommendations != null and !#lists.isEmpty(recommendations)}"
-                 class="bg-gradient-to-br from-primary via-primary-container to-secondary text-on-primary rounded-xl p-space-lg shadow-md flex flex-col gap-space-xs">
-                <span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold text-secondary-fixed">
-                    Diagnóstico Determinista desde el Día 1 (RF-13, RF-16)
+                 class="bg-surface-container-lowest border border-outline-variant/40 text-on-surface rounded-xl p-space-lg flex flex-col gap-2">
+                <span class="text-xs font-bold text-primary">
+                    Notas sobre tu presupuesto
                 </span>
-                <ul class="list-disc pl-5 space-y-1 font-body-sm text-body-sm text-surface-container-lowest m-0">
+                <ul class="list-disc pl-5 space-y-1 text-xs text-on-surface-variant m-0">
                     <li th:each="rec : ${recommendations}" th:text="${rec}"></li>
                 </ul>
             </div>
@@ -612,39 +605,39 @@
     function addProfileObligationRow() {
         const container = document.getElementById('profile-obligations-rows');
         const row = document.createElement('div');
-        row.className = 'obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 transition-all';
+        row.className = 'obligation-slide-row flex items-center gap-3 bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/30 transition-all';
         row.innerHTML = `
             <button type="button"
                     onclick="removeProfileObligationRow(this)"
-                    title="Eliminar esta deuda o pago fijo"
-                    class="w-8 h-8 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-lg leading-none transition-colors border border-error/20 cursor-pointer shadow-sm">
+                    title="Eliminar pago fijo"
+                    class="w-7 h-7 rounded-full bg-error-container/50 hover:bg-error text-error hover:text-white flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none transition-colors border border-error/20 cursor-pointer">
                 &minus;
             </button>
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center flex-1">
                 <div class="sm:col-span-4">
-                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Concepto / Deuda</label>
-                    <input type="text" name="obligationName" placeholder="Ej. Tarjeta, Crédito, Internet..."
-                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-bold text-on-surface border border-outline-variant/40"/>
+                    <label class="text-[11px] font-semibold text-on-surface-variant">Concepto</label>
+                    <input type="text" name="obligationName" placeholder="Tarjeta, crédito, internet..."
+                           class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
                 </div>
                 <div class="sm:col-span-3">
-                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Categoría</label>
-                    <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
-                        <option value="Deudas y Préstamos">💳 Deudas y Préstamos</option>
-                        <option value="Vivienda">🏠 Vivienda / Alquiler</option>
-                        <option value="Servicios">💡 Servicios e Internet</option>
-                        <option value="Educación">📚 Educación</option>
-                        <option value="Otros">📌 Otros</option>
+                    <label class="text-[11px] font-semibold text-on-surface-variant">Categoría</label>
+                    <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                        <option value="Deudas y Préstamos">Deudas y préstamos</option>
+                        <option value="Vivienda">Vivienda / Alquiler</option>
+                        <option value="Servicios">Servicios e internet</option>
+                        <option value="Educación">Educación</option>
+                        <option value="Otros">Otros</option>
                     </select>
                 </div>
                 <div class="sm:col-span-3">
-                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Monto Mensual ($ COP)</label>
-                    <input type="number" step="1000" name="obligationAmount" placeholder="Ej. 250000"
-                           class="w-full h-9 px-3 rounded-xl bg-surface text-xs font-extrabold text-secondary border border-outline-variant/40"/>
+                    <label class="text-[11px] font-semibold text-on-surface-variant">Monto mensual ($ COP)</label>
+                    <input type="number" step="1000" name="obligationAmount" placeholder="250000"
+                           class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40"/>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="text-[10px] font-bold text-on-surface-variant uppercase">Día del Mes (1-31)</label>
+                    <label class="text-[11px] font-semibold text-on-surface-variant">Día (1-31)</label>
                     <input type="number" min="1" max="31" name="obligationDueDay" value="15"
-                           class="w-full h-9 px-2.5 rounded-xl bg-surface text-xs font-extrabold text-primary text-center border border-outline-variant/40"/>
+                           class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40"/>
                 </div>
             </div>
         `;

@@ -201,7 +201,7 @@ public class FinancialProfileService {
             Budget budget
     ) {
         List<String> notes = new ArrayList<>();
-        notes.add("ESTIMACIÓN INICIAL: Este presupuesto se basa en tus datos declarados. Al cerrar tu primer mes de facturas y gastos confirmados generaremos un plan ajustado a tu comportamiento real.");
+        notes.add("Este presupuesto se calcula con tus datos actuales y se irá ajustando conforme registres los gastos del mes.");
 
         BigDecimal essentialDeclared = obligations.stream()
                 .filter(RecurringObligation::isEssential)
@@ -211,13 +211,13 @@ public class FinancialProfileService {
         if (essentialDeclared.compareTo(budget.getNeedsLimit()) > 0) {
             BigDecimal excess = essentialDeclared.subtract(budget.getNeedsLimit());
             notes.add(String.format(
-                    "Atención realista (RF-13): Tus compromisos esenciales declarados ($%,.2f COP) superan en $%,.2f COP el límite teórico de Necesidades (%d%% = $%,.2f COP). No te recomendamos incumplir obligaciones básicas; te sugerimos cubrir esa diferencia reduciendo temporalmente el bloque de Deseos (%d%%) o ajustando tu regla porcentual (por ejemplo a 65/20/15).",
+                    "Tus pagos fijos esenciales ($%,.0f COP) superan en $%,.0f COP el monto asignado a Necesidades (%d%% = $%,.0f COP). Puedes compensarlo reduciendo el porcentaje de Deseos (%d%%) o ajustando la distribución.",
                     essentialDeclared, excess, profile.getNeedsPct(), budget.getNeedsLimit(), profile.getWantsPct()
             ));
         } else {
             BigDecimal remainingNeedsMargin = budget.getNeedsLimit().subtract(essentialDeclared);
             notes.add(String.format(
-                    "Tus compromisos recurrentes esenciales suman $%,.2f COP, dejándote un margen estimado de $%,.2f COP dentro de tu bloque de Necesidades (%d%%) para mercado y transporte variable.",
+                    "Tus pagos fijos suman $%,.0f COP, dejando un margen de $%,.0f COP dentro de Necesidades (%d%%) para alimentación y transporte.",
                     essentialDeclared, remainingNeedsMargin, profile.getNeedsPct()
             ));
         }
