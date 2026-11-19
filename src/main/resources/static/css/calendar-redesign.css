@@ -120,8 +120,8 @@
 
 .cc-month-jump summary {
     list-style: none;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -171,9 +171,9 @@
 }
 
 .cc-segmented-btn {
-    min-height: 34px;
-    min-width: 68px;
-    padding: 0 0.85rem;
+    min-height: 40px;
+    min-width: 72px;
+    padding: 0 0.9rem;
     border: 0;
     border-radius: 0.65rem;
     background: transparent;
@@ -627,9 +627,9 @@ html.dark .cc-chip-expense {
 }
 
 .cc-icon-btn {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
     border-radius: 0.7rem;
     border: 0;
     background: transparent;
@@ -1006,4 +1006,105 @@ html.dark .cc-chip-expense {
         grid-template-columns: 1fr;
         padding: 0.75rem;
     }
+}
+
+/* ==========================================================================
+   PASO 6: Transición de mes, foco por teclado, gating hover y reduced-motion
+   ========================================================================== */
+
+.cc-enter-next {
+    animation: ccMonthSlideNext 200ms var(--ease-out);
+}
+
+.cc-enter-prev {
+    animation: ccMonthSlidePrev 200ms var(--ease-out);
+}
+
+@keyframes ccMonthSlideNext {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes ccMonthSlidePrev {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Foco por teclado visible con contraste AA en todos los controles del calendario */
+.cc-segmented-btn:focus-visible,
+.cc-nav-btn:focus-visible,
+.cc-icon-btn:focus-visible,
+.cc-primary-btn:focus-visible,
+.cc-cell-add-btn:focus-visible,
+.cc-metric-action:focus-visible,
+.cc-month-jump summary:focus-visible,
+.cc-quick-pill:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+/* Evitar sticky hover en pantallas táctiles (review-animations #8) */
+@media (hover: none) and (pointer: coarse) {
+    .cc-day-cell:hover,
+    .cc-metric-chip:hover,
+    .cc-week-card:hover,
+    .cc-nav-btn:hover,
+    .cc-icon-btn:hover,
+    .cc-metric-action:hover,
+    .cc-quick-pill:hover {
+        background-color: inherit;
+        border-color: inherit;
+    }
+    .cc-cell-add-btn {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Accesibilidad: prefers-reduced-motion mantiene opacidad suave y elimina desplazamientos */
+@media (prefers-reduced-motion: reduce) {
+    .cc-enter-next,
+    .cc-enter-prev,
+    .cc-view-panel.is-entering,
+    .cc-day-panel,
+    .cc-quick-popover,
+    .cc-month-jump-panel {
+        animation: ccReducedFade 120ms ease-out !important;
+    }
+    .cc-day-cell,
+    .cc-cell-add-btn,
+    .cc-week-card,
+    .cc-icon-btn,
+    .cc-primary-btn,
+    .cc-quick-pill,
+    .cc-sheet-backdrop {
+        transition: opacity 120ms ease, background-color 120ms ease, border-color 120ms ease !important;
+    }
+    .cc-metric-action:active,
+    .cc-segmented-btn:active,
+    .cc-nav-btn:active,
+    .cc-icon-btn:active,
+    .cc-primary-btn:active,
+    .cc-cell-add-btn:active,
+    .cc-quick-pill:active,
+    .cc-month-jump summary:active {
+        transform: none !important;
+    }
+}
+
+@keyframes ccReducedFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

@@ -364,13 +364,6 @@ textarea {
 
 .calendar-day-card {
     border-radius: 1.35rem;
-    transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease, border-color 0.18s ease;
-}
-.calendar-day-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px -8px rgba(99, 13, 50, 0.16);
-}
-html.dark .calendar-day-card:hover {
-    box-shadow: 0 12px 24px -8px rgba(255, 92, 124, 0.22);
+    transition: background-color 150ms ease, border-color 150ms ease;
 }
 

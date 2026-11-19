@@ -701,6 +701,57 @@
         });
     }
 
+    // =========================================================================
+    // PASO 6: Navegación con flechas del teclado y transición direccional de mes
+    // =========================================================================
+    if (monthGrid) {
+        monthGrid.addEventListener('keydown', (e) => {
+            const cell = e.target.closest('.cc-day-cell[data-day]');
+            if (!cell) return;
+            const currentDay = parseInt(cell.getAttribute('data-day'), 10);
+            if (!currentDay) return;
+
+            let nextDay = null;
+            if (e.key === 'ArrowRight') nextDay = currentDay + 1;
+            else if (e.key === 'ArrowLeft') nextDay = currentDay - 1;
+            else if (e.key === 'ArrowDown') nextDay = currentDay + 7;
+            else if (e.key === 'ArrowUp') nextDay = currentDay - 7;
+            else if (e.key === 'Home') nextDay = 1;
+            else if (e.key === 'End') nextDay = daysInCurrentMonth;
+            else if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openDayPanel(currentDay);
+                return;
+            } else if (e.key === '+') {
+                e.preventDefault();
+                openQuickPopover(currentDay, cell);
+                return;
+            }
+
+            if (nextDay !== null) {
+                e.preventDefault();
+                const clamped = Math.max(1, Math.min(daysInCurrentMonth, nextDay));
+                const nextCell = monthGrid.querySelector(`.cc-day-cell[data-day="${clamped}"]`);
+                if (nextCell) nextCell.focus();
+            }
+        });
+    }
+
+    if (navPrevBtn) {
+        navPrevBtn.addEventListener('click', (e) => {
+            if (!e.defaultPrevented) {
+                try { sessionStorage.setItem('cuentaclara_cal_dir', 'prev'); } catch (_) {}
+            }
+        });
+    }
+    if (navNextBtn) {
+        navNextBtn.addEventListener('click', (e) => {
+            if (!e.defaultPrevented) {
+                try { sessionStorage.setItem('cuentaclara_cal_dir', 'next'); } catch (_) {}
+            }
+        });
+    }
+
     // Compatibilidad con llamadas globales
     window.CuentaClaraCalendar = {
         openDayPanel,
@@ -715,6 +766,17 @@
     };
 
     populateOutsideMonthDays();
+
+    // Aplicar fundido + desplazamiento corto al cambiar de mes
+    try {
+        const navDir = sessionStorage.getItem('cuentaclara_cal_dir');
+        if (navDir === 'next' && viewMonthEl) {
+            viewMonthEl.classList.add('cc-enter-next');
+        } else if (navDir === 'prev' && viewMonthEl) {
+            viewMonthEl.classList.add('cc-enter-prev');
+        }
+        sessionStorage.removeItem('cuentaclara_cal_dir');
+    } catch (_) {}
 
     // Restaurar vista elegida si el usuario navegó de mes en Semana/Día
     try {
