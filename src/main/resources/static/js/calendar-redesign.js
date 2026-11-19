@@ -355,7 +355,10 @@
     // Cerrar popover al hacer clic fuera
     document.addEventListener('click', (e) => {
         if (quickPopover && !quickPopover.classList.contains('hidden')) {
-            if (!quickPopover.contains(e.target) && !e.target.closest('[data-quick-add-day]') && !e.target.closest('#cc-panel-add-btn')) {
+            if (!quickPopover.contains(e.target)
+                && !e.target.closest('[data-quick-add-day]')
+                && !e.target.closest('#cc-panel-add-btn')
+                && !e.target.closest('[data-day-view-add]')) {
                 closeQuickPopover();
             }
         }
@@ -376,12 +379,335 @@
         }
     });
 
+    // =========================================================================
+    // PASO 5: Selector Mes / Semana / Día + Vista Semanal y Vista Diaria
+    // =========================================================================
+    const viewMonthEl = document.getElementById('cc-view-month');
+    const viewWeekEl = document.getElementById('cc-view-week');
+    const viewDayEl = document.getElementById('cc-view-day');
+    const viewTabs = document.querySelectorAll('.cc-segmented-btn[data-view]');
+    const navPrevBtn = document.getElementById('cc-nav-prev');
+    const navTodayBtn = document.getElementById('cc-nav-today');
+    const navNextBtn = document.getElementById('cc-nav-next');
+
+    const WEEKDAY_SHORT = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const daysInCurrentMonth = new Date(selectedYear, selectedMonthNum, 0).getDate();
+
+    function getDefaultAnchorDay() {
+        if (activeDayNum && activeDayNum >= 1 && activeDayNum <= daysInCurrentMonth) {
+            return activeDayNum;
+        }
+        const todayCell = monthGrid ? monthGrid.querySelector('.cc-day-cell.is-today[data-day]') : null;
+        if (todayCell) {
+            return parseInt(todayCell.getAttribute('data-day'), 10) || 1;
+        }
+        return 1;
+    }
+
+    function getMondayOffset(year, monthNum, day) {
+        const jsDay = new Date(year, monthNum - 1, day).getDay(); // 0=Dom .. 6=Sab
+        return jsDay === 0 ? 6 : jsDay - 1; // 0=Lun .. 6=Dom
+    }
+
+    function renderWeekView(anchorDay) {
+        if (!viewWeekEl) return;
+        const clampedDay = Math.max(1, Math.min(daysInCurrentMonth, anchorDay));
+        activeDayNum = clampedDay;
+
+        const mondayOffset = getMondayOffset(selectedYear, selectedMonthNum, clampedDay);
+        const startDay = clampedDay - mondayOffset; // puede ser <= 0 o > daysInCurrentMonth
+
+        const grid = document.createElement('div');
+        grid.className = 'cc-week-grid';
+
+        for (let i = 0; i < 7; i++) {
+            const d = startDay + i;
+            const dateObj = new Date(selectedYear, selectedMonthNum - 1, d);
+            const inMonth = (dateObj.getFullYear() === selectedYear && (dateObj.getMonth() + 1) === selectedMonthNum);
+            const dayData = inMonth ? readDayData(d) : null;
+
+            const card = document.createElement('div');
+            card.className = 'cc-week-card' + (!inMonth ? ' is-outside' : '') + (dayData && dayData.today ? ' is-today' : '');
+
+            const head = document.createElement('div');
+            head.className = 'cc-week-card-head';
+            head.innerHTML = `
+                <div class="cc-week-day-info">
+                    <span class="cc-week-weekday">${WEEKDAY_SHORT[i]}</span>
+                    <span class="cc-day-num">${dateObj.getDate()}</span>
+                </div>
+            `;
+
+            if (inMonth && dayData) {
+                const addBtn = document.createElement('button');
+                addBtn.type = 'button';
+                addBtn.className = 'cc-icon-btn';
+                addBtn.setAttribute('data-quick-add-day', String(d));
+                addBtn.setAttribute('title', 'Registrar gasto');
+                addBtn.setAttribute('aria-label', 'Registrar gasto el día ' + d);
+                addBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add</span>';
+                addBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openQuickPopover(d, addBtn);
+                });
+                head.appendChild(addBtn);
+            }
+            card.appendChild(head);
+
+            const itemsWrap = document.createElement('div');
+            itemsWrap.className = 'cc-week-items';
+
+            if (dayData) {
+                dayData.obligations.forEach(ob => {
+                    const chip = document.createElement('div');
+                    chip.className = 'cc-chip ' + (ob.paid ? 'cc-chip-paid' : 'cc-chip-pending');
+                    chip.innerHTML = `<span class="cc-chip-title">${escapeHtml(ob.name)}</span><span class="cc-chip-amt">${formatCurrency(ob.amount)}</span>`;
+                    itemsWrap.appendChild(chip);
+                });
+
+                dayData.transactions.forEach(tx => {
+                    const chip = document.createElement('div');
+                    chip.className = 'cc-chip cc-chip-expense';
+                    chip.innerHTML = `<span class="cc-chip-title">${escapeHtml(tx.merchant)}</span><span class="cc-chip-amt">${formatCurrency(tx.amount)}</span>`;
+                    itemsWrap.appendChild(chip);
+                });
+
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', () => openDayPanel(d));
+            }
+            card.appendChild(itemsWrap);
+
+            if (dayData && dayData.total > 0) {
+                const foot = document.createElement('div');
+                foot.className = 'cc-week-total';
+                foot.innerHTML = `<span>Total</span><span>${formatCurrency(dayData.total)}</span>`;
+                card.appendChild(foot);
+            }
+
+            grid.appendChild(card);
+        }
+
+        viewWeekEl.innerHTML = '';
+        viewWeekEl.appendChild(grid);
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
+    }
+
+    function renderDayView(dayNum) {
+        if (!viewDayEl) return;
+        const clampedDay = Math.max(1, Math.min(daysInCurrentMonth, dayNum));
+        const data = readDayData(clampedDay);
+        if (!data) return;
+        activeDayNum = clampedDay;
+
+        const container = document.createElement('div');
+        container.className = 'cc-day-focus';
+
+        const head = document.createElement('div');
+        head.className = 'cc-day-focus-head';
+        head.innerHTML = `
+            <div>
+                <h2 class="text-lg font-extrabold text-primary m-0">${escapeHtml(data.label)}</h2>
+                <span class="text-xs font-semibold text-secondary">${data.total > 0 ? ('Total del día: ' + formatCurrency(data.total)) : 'Sin gastos registrados'}</span>
+            </div>
+        `;
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.setAttribute('data-day-view-add', String(clampedDay));
+        addBtn.className = 'cc-primary-btn';
+        addBtn.style.width = 'auto';
+        addBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add</span><span>Registrar gasto</span>';
+        addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openQuickPopover(clampedDay, addBtn);
+        });
+        head.appendChild(addBtn);
+        container.appendChild(head);
+
+        if (data.obligations.length > 0) {
+            const obWrap = document.createElement('div');
+            obWrap.innerHTML = '<span class="cc-panel-section-label">Pagos fijos del día</span>';
+            const list = document.createElement('div');
+            list.className = 'flex flex-col gap-2';
+            data.obligations.forEach(ob => {
+                const row = document.createElement('div');
+                row.className = 'cc-panel-item ' + (ob.paid ? 'is-paid' : 'is-pending');
+                row.innerHTML = `
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-xs font-bold text-on-surface">${escapeHtml(ob.name)}</span>
+                        <span class="text-[11px] text-on-surface-variant">${escapeHtml(ob.category)} · ${formatCurrency(ob.amount)}</span>
+                    </div>
+                `;
+                if (!ob.paid) {
+                    const payBtn = document.createElement('button');
+                    payBtn.type = 'button';
+                    payBtn.className = 'px-3 py-1.5 rounded-lg bg-primary-container text-on-primary text-xs font-semibold border-0 cursor-pointer';
+                    payBtn.textContent = 'Registrar pago';
+                    payBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openQuickPopover(clampedDay, payBtn, {
+                            merchant: ob.name,
+                            amount: Math.round(ob.amount),
+                            category: ob.category,
+                            block: ob.block || 'NEEDS',
+                            desc: 'Pago mensual de ' + ob.name
+                        });
+                    });
+                    row.appendChild(payBtn);
+                } else {
+                    const badge = document.createElement('span');
+                    badge.className = 'px-2.5 py-0.5 rounded-md bg-emerald-600 text-white text-[11px] font-bold';
+                    badge.textContent = 'Al día';
+                    row.appendChild(badge);
+                }
+                list.appendChild(row);
+            });
+            obWrap.appendChild(list);
+            container.appendChild(obWrap);
+        }
+
+        const txWrap = document.createElement('div');
+        txWrap.innerHTML = '<span class="cc-panel-section-label">Movimientos registrados</span>';
+        const txList = document.createElement('div');
+        txList.className = 'flex flex-col gap-2';
+        if (data.transactions.length === 0) {
+            txList.innerHTML = '<div class="p-4 rounded-xl bg-surface-container-low text-xs text-on-surface-variant text-center">No hay movimientos en este día.</div>';
+        } else {
+            data.transactions.forEach(tx => {
+                const row = document.createElement('div');
+                row.className = 'cc-panel-item';
+                row.innerHTML = `
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-xs font-bold text-primary">${escapeHtml(tx.merchant)}</span>
+                        <span class="text-[11px] text-on-surface-variant">${escapeHtml(tx.category)}${tx.desc ? ' · ' + escapeHtml(tx.desc) : ''}</span>
+                    </div>
+                    <span class="text-xs font-extrabold text-secondary flex-shrink-0">${formatCurrency(tx.amount)}</span>
+                `;
+                txList.appendChild(row);
+            });
+        }
+        txWrap.appendChild(txList);
+        container.appendChild(txWrap);
+
+        viewDayEl.innerHTML = '';
+        viewDayEl.appendChild(container);
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
+    }
+
+    function animateViewPanel(el) {
+        if (!el) return;
+        el.classList.remove('is-entering');
+        void el.offsetWidth;
+        el.classList.add('is-entering');
+    }
+
+    function setView(nextView) {
+        if (!['month', 'week', 'day'].includes(nextView)) nextView = 'month';
+        activeView = nextView;
+        try { sessionStorage.setItem('cuentaclara_cal_view', nextView); } catch (_) {}
+
+        viewTabs.forEach(tab => {
+            tab.setAttribute('aria-selected', tab.getAttribute('data-view') === nextView ? 'true' : 'false');
+        });
+
+        closeQuickPopover();
+        if (nextView === 'day') {
+            closeDayPanel();
+        }
+
+        if (viewMonthEl) viewMonthEl.classList.toggle('hidden', nextView !== 'month');
+        if (viewWeekEl) viewWeekEl.classList.toggle('hidden', nextView !== 'week');
+        if (viewDayEl) viewDayEl.classList.toggle('hidden', nextView !== 'day');
+
+        const anchor = getDefaultAnchorDay();
+        if (nextView === 'month') {
+            animateViewPanel(viewMonthEl);
+        } else if (nextView === 'week') {
+            renderWeekView(anchor);
+            animateViewPanel(viewWeekEl);
+        } else if (nextView === 'day') {
+            renderDayView(anchor);
+            animateViewPanel(viewDayEl);
+        }
+    }
+
+    viewTabs.forEach(tab => {
+        tab.addEventListener('click', () => setView(tab.getAttribute('data-view')));
+    });
+
+    // Navegación Anterior / Hoy / Siguiente adaptada a la vista activa
+    if (navPrevBtn) {
+        navPrevBtn.addEventListener('click', (e) => {
+            if (activeView === 'week') {
+                const targetDay = getDefaultAnchorDay() - 7;
+                if (targetDay >= 1) {
+                    e.preventDefault();
+                    renderWeekView(targetDay);
+                    animateViewPanel(viewWeekEl);
+                }
+            } else if (activeView === 'day') {
+                const targetDay = getDefaultAnchorDay() - 1;
+                if (targetDay >= 1) {
+                    e.preventDefault();
+                    renderDayView(targetDay);
+                    animateViewPanel(viewDayEl);
+                }
+            }
+        });
+    }
+
+    if (navNextBtn) {
+        navNextBtn.addEventListener('click', (e) => {
+            if (activeView === 'week') {
+                const targetDay = getDefaultAnchorDay() + 7;
+                if (targetDay <= daysInCurrentMonth) {
+                    e.preventDefault();
+                    renderWeekView(targetDay);
+                    animateViewPanel(viewWeekEl);
+                }
+            } else if (activeView === 'day') {
+                const targetDay = getDefaultAnchorDay() + 1;
+                if (targetDay <= daysInCurrentMonth) {
+                    e.preventDefault();
+                    renderDayView(targetDay);
+                    animateViewPanel(viewDayEl);
+                }
+            }
+        });
+    }
+
+    if (navTodayBtn) {
+        navTodayBtn.addEventListener('click', (e) => {
+            const currentRealMonth = shell.getAttribute('data-current-real-month');
+            if (currentRealMonth && currentRealMonth === selectedMonth) {
+                const todayCell = monthGrid ? monthGrid.querySelector('.cc-day-cell.is-today[data-day]') : null;
+                if (todayCell) {
+                    e.preventDefault();
+                    const todayDay = parseInt(todayCell.getAttribute('data-day'), 10);
+                    if (activeView === 'week') {
+                        renderWeekView(todayDay);
+                        animateViewPanel(viewWeekEl);
+                    } else if (activeView === 'day') {
+                        renderDayView(todayDay);
+                        animateViewPanel(viewDayEl);
+                    } else {
+                        openDayPanel(todayDay);
+                    }
+                }
+            }
+        });
+    }
+
     // Compatibilidad con llamadas globales
     window.CuentaClaraCalendar = {
         openDayPanel,
         closeDayPanel,
         openQuickPopover,
         closeQuickPopover,
+        setView,
         getAllMonthDays,
         readDayData,
         formatCurrency,
@@ -389,4 +715,12 @@
     };
 
     populateOutsideMonthDays();
+
+    // Restaurar vista elegida si el usuario navegó de mes en Semana/Día
+    try {
+        const savedView = sessionStorage.getItem('cuentaclara_cal_view');
+        if (savedView === 'week' || savedView === 'day') {
+            setView(savedView);
+        }
+    } catch (_) {}
 })();
