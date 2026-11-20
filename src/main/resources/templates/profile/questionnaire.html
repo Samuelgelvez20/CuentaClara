@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
     <title>CuentaClara — Presupuesto 50/30/20 (PC)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -95,105 +96,24 @@
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 
-<!-- LEFT FIXED SIDEBAR (Solo escritorio >= lg) -->
-<aside class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 flex-col justify-between shadow-[0_1px_8px_rgba(0,53,39,0.06)]">
-    <div class="flex flex-col flex-1 overflow-y-auto">
-        <div class="p-space-lg flex items-center gap-space-sm">
-            <div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shadow-sm">
-                <span class="material-symbols-outlined text-secondary-fixed text-[22px]">account_balance</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-title-md text-title-md text-primary leading-tight tracking-tight font-bold">CuentaClara</span>
-                <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
-            </div>
-        </div>
-        <div class="px-space-md py-space-xs">
-            <div class="px-space-sm pb-2">
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">Menú</span>
-            </div>
-            <nav class="flex flex-col gap-1.5">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Historial de gastos</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px]">upload_file</span>
-                    <span>Facturas y recibos</span>
-                </a>
-                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">savings</span>
-                    <span>Presupuesto y deudas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/recommendations">
-                    <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
-                    <span>Recomendaciones</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-                    <span>Consultas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px]">tune</span>
-                    <span>Configuración</span>
-                </a>
-            </nav>
-        </div>
-    </div>
-    <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/40">
-        <div class="flex items-center justify-between p-space-xs rounded-lg bg-surface-container-lowest shadow-sm">
-            <div class="flex items-center gap-space-xs overflow-hidden">
-                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
-                </div>
-                <div class="flex flex-col truncate">
-                    <span class="font-title-md text-body-sm text-on-surface truncate font-semibold" th:text="${user.fullName}">Usuario</span>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
-                </div>
-            </div>
-            <form method="post" action="/auth/logout" class="m-0">
-                <button class="p-1.5 rounded text-on-surface-variant hover:text-error transition-colors" title="Cerrar sesión" type="submit">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</aside>
+<!-- LEFT SIDEBAR COMPARTIDO (>= lg, colapsable) -->
+<div th:replace="~{fragments/app-sidebar :: sidebar('profile')}"></div>
 
 <!-- RIGHT DESKTOP WORKSPACE -->
-<div class="pl-0 lg:pl-72 flex flex-col min-h-screen">
-    <header class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-40 border-b border-outline-variant/20">
-        <div class="h-20 w-full px-space-xl flex items-center justify-between gap-space-md">
-            <div class="flex items-center gap-space-xxs text-on-surface-variant font-label-md text-label-md">
-                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary">Inicio</a>
-                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span class="text-primary font-semibold">Presupuesto y pagos fijos</span>
+<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0 transition-[padding] duration-200 ease-out">
+    <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-40 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
+        <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+            <div class="flex items-center gap-2 text-xs text-on-surface-variant min-w-0">
+                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary font-semibold">Inicio</a>
+                <span class="material-symbols-outlined text-[14px]" aria-hidden="true">chevron_right</span>
+                <span class="text-primary font-semibold truncate">Presupuesto y pagos fijos</span>
             </div>
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
-                        title="Alternar tema claro / oscuro"
-                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
-                    <span>Tema</span>
-                </button>
-                <a href="/settings" title="Configuración"
-                   class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
-                    <span>Ajustes</span>
-                </a>
-                <a href="/dashboard" class="h-9 px-4 bg-primary-container hover:opacity-95 text-on-primary rounded-xl font-title-md text-xs font-semibold flex items-center gap-1.5 transition-all no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-            </div>
+            <div th:replace="~{fragments/mobile-nav :: headerUtilityActions('profile')}"></div>
         </div>
     </header>
 
-    <main class="w-full pt-20 bg-surface flex-1">
-        <div class="flex flex-col w-full px-space-xl py-space-lg gap-space-xl max-w-[1600px] mx-auto">
+    <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
+        <div class="flex flex-col w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 gap-5 max-w-[1600px] mx-auto">
 
             <div th:if="${successMessage}" class="p-4 rounded-xl bg-secondary-container text-on-secondary-fixed font-body-md flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">check_circle</span>
@@ -217,7 +137,7 @@
             </div>
 
             <!-- Formulario Real Conectado a POST /profile -->
-            <form method="post" action="/profile" class="w-full bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-space-xl flex flex-col gap-space-lg m-0">
+            <form id="cc-profile-form" method="post" action="/profile" class="w-full bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-4 sm:p-6 flex flex-col gap-space-lg m-0">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
 
                     <!-- Section 1: Ingreso Mensual -->
@@ -269,13 +189,19 @@
 
                     <!-- Section 3: Interactive Distribution Sliders 50/30/20 -->
                     <div class="lg:col-span-5 flex flex-col gap-space-md">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
                             <span class="text-xs font-bold text-primary">
                                 Distribución 50 / 30 / 20
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-bold" id="sumBadge">
-                                Suma: 100% Correcto
-                            </span>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="resetPreset503020()"
+                                        class="px-2 py-1 rounded-md bg-surface-container hover:bg-surface-container-high text-[11px] font-bold text-primary border border-outline-variant/40 cursor-pointer">
+                                    50/30/20
+                                </button>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-bold tabular-nums" id="sumBadge">
+                                    Suma: 100% Correcto
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Segmented Bar Visualization -->
@@ -283,7 +209,7 @@
                             <div class="w-full h-3 rounded-full bg-surface-container-high overflow-hidden flex">
                                 <div class="h-full bg-secondary transition-all duration-300" id="barNeeds" style="width: 50%;"></div>
                                 <div class="h-full bg-amber-600 transition-all duration-300" id="barWants" style="width: 30%;"></div>
-                                <div class="h-full bg-primary-container transition-all duration-300" id="barSavings" style="width: 20%;"></div>
+                                <div class="h-full bg-emerald-600 transition-all duration-300" id="barSavings" style="width: 20%;"></div>
                             </div>
                         </div>
 
@@ -392,18 +318,23 @@
                                     </div>
                                     <div class="sm:col-span-3">
                                         <label class="text-[11px] font-semibold text-on-surface-variant">Categoría</label>
-                                        <input type="text" name="obligationCategory" value="Vivienda" readonly
-                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                        <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                                            <option value="Vivienda" selected>Vivienda / Alquiler</option>
+                                            <option value="Deudas y Préstamos">Deudas y préstamos</option>
+                                            <option value="Servicios">Servicios e internet</option>
+                                            <option value="Alimentación">Alimentación</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
                                     </div>
                                     <div class="sm:col-span-3">
                                         <label class="text-[11px] font-semibold text-on-surface-variant">Monto mensual ($ COP)</label>
-                                        <input type="number" step="1000" name="obligationAmount" placeholder="1450000"
-                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40"/>
+                                        <input type="number" inputmode="numeric" step="1000" name="obligationAmount" placeholder="1450000"
+                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40 tabular-nums"/>
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="text-[11px] font-semibold text-on-surface-variant">Día (1-31)</label>
-                                        <input type="number" min="1" max="31" name="obligationDueDay" value="5"
-                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40"/>
+                                        <input type="number" inputmode="numeric" min="1" max="31" name="obligationDueDay" value="5"
+                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40 tabular-nums"/>
                                     </div>
                                 </div>
                             </div>
@@ -423,18 +354,23 @@
                                     </div>
                                     <div class="sm:col-span-3">
                                         <label class="text-[11px] font-semibold text-on-surface-variant">Categoría</label>
-                                        <input type="text" name="obligationCategory" value="Deudas y Préstamos" readonly
-                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40"/>
+                                        <select name="obligationCategory" class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-semibold text-on-surface border border-outline-variant/40">
+                                            <option value="Vivienda">Vivienda / Alquiler</option>
+                                            <option value="Deudas y Préstamos" selected>Deudas y préstamos</option>
+                                            <option value="Servicios">Servicios e internet</option>
+                                            <option value="Alimentación">Alimentación</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
                                     </div>
                                     <div class="sm:col-span-3">
                                         <label class="text-[11px] font-semibold text-on-surface-variant">Monto mensual ($ COP)</label>
-                                        <input type="number" step="1000" name="obligationAmount" placeholder="350000"
-                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40"/>
+                                        <input type="number" inputmode="numeric" step="1000" name="obligationAmount" placeholder="350000"
+                                               class="w-full h-9 px-3 rounded-lg bg-surface text-xs font-bold text-secondary border border-outline-variant/40 tabular-nums"/>
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="text-[11px] font-semibold text-on-surface-variant">Día (1-31)</label>
-                                        <input type="number" min="1" max="31" name="obligationDueDay" value="12"
-                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40"/>
+                                        <input type="number" inputmode="numeric" min="1" max="31" name="obligationDueDay" value="12"
+                                               class="w-full h-9 px-2.5 rounded-lg bg-surface text-xs font-bold text-primary text-center border border-outline-variant/40 tabular-nums"/>
                                     </div>
                                 </div>
                             </div>
@@ -585,6 +521,30 @@
         window.addEventListener('cuentaclara:currency-changed', updateUI);
         window.addEventListener('cuentaclara:language-changed', updateUI);
         document.addEventListener('DOMContentLoaded', updateUI);
+
+        window.resetPreset503020 = function () {
+            rangeNeeds.value = 50;
+            rangeWants.value = 30;
+            rangeSavings.value = 20;
+            updateUI();
+        };
+
+        const profileForm = document.getElementById('cc-profile-form');
+        if (profileForm) {
+            profileForm.addEventListener('submit', (e) => {
+                const n = parseInt(rangeNeeds.value, 10) || 0;
+                const w = parseInt(rangeWants.value, 10) || 0;
+                const s = parseInt(rangeSavings.value, 10) || 0;
+                if (n + w + s !== 100) {
+                    e.preventDefault();
+                    rangeNeeds.focus();
+                    const sumBadge = document.getElementById('sumBadge');
+                    if (sumBadge) {
+                        sumBadge.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+        }
 
         updateUI();
     })();

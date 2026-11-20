@@ -3,6 +3,8 @@
    ========================================================================== */
 
 :root {
+    color-scheme: light;
+    accent-color: var(--secondary);
     /* DEFAULT PALETTE: VINO TINTO (Elegante, Distintivo, Fintech Premium) */
     --primary: #4a0020;
     --primary-container: #630d32;
@@ -198,6 +200,7 @@
    ========================================================================== */
 
 html.dark {
+    color-scheme: dark;
     --primary: #ff85a2;
     --primary-container: #7a113a;
     --on-primary: #ffffff;
@@ -346,20 +349,20 @@ html.dark[data-theme="graphite"] {
     --outline-variant: #3f3f46;
 }
 
-/* Transiciones suaves y estética amigable con esquinas redondeadas */
-body, aside, main, header, div, nav, button, input, select, textarea {
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+/* Transiciones suaves de tema sin interferir con transformaciones puntuales */
+body, aside, main, header, nav, button, input, select, textarea {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-
-.rounded-lg { border-radius: 1rem !important; }
-.rounded-xl { border-radius: 1.35rem !important; }
-.rounded-2xl { border-radius: 1.75rem !important; }
-.rounded-3xl { border-radius: 2.15rem !important; }
 
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 select,
 textarea {
-    border-radius: 1rem !important;
+    border-radius: 0.75rem;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
 }
 
 .calendar-day-card {
@@ -368,23 +371,25 @@ textarea {
 }
 
 /* ==========================================================================
-   NAVEGACIÓN FLOTANTE INFERIOR EN MÓVIL + REGLAS MOBILE-NATIVE
+   NAVEGACIÓN FLOTANTE INFERIOR EN MÓVIL + REGLAS FORM-FACTOR & MOBILE-NATIVE
    ========================================================================== */
 html {
     -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
     overscroll-behavior: none;
     background-color: var(--surface);
+    scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 body {
     background-color: var(--surface);
     min-height: 100dvh;
+    overflow-wrap: break-word;
 }
 
 aside nav a,
 #cc-sidebar .cc-nav-link {
-    border-radius: 0.75rem !important;
+    border-radius: 0.75rem;
 }
 
 .tabular-nums {
@@ -395,6 +400,49 @@ button, a, [role="button"] {
     touch-action: manipulation;
 }
 
+@media (pointer: coarse) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+        font-size: max(1rem, 1em);
+    }
+    :where(button, select, textarea, [role="button"], nav a) {
+        min-block-size: 44px;
+    }
+}
+
+/* Riel colapsable compartido en escritorio (>= 1024px) */
+@media (min-width: 1024px) {
+    body.cc-sidebar-collapsed #cc-sidebar {
+        width: 78px;
+    }
+    body.cc-sidebar-collapsed #cc-main-shell {
+        padding-left: 78px;
+    }
+    body.cc-sidebar-collapsed #cc-top-header {
+        left: 78px;
+    }
+    body.cc-sidebar-collapsed .cc-sidebar-text {
+        display: none;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-nav-link {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-sidebar-user {
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.45rem;
+        padding: 0.5rem 0.35rem;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-sidebar-brand {
+        padding: 1rem 0.75rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
 .cc-mobile-bottom-nav {
     position: fixed;
     left: 0.75rem;
@@ -402,11 +450,11 @@ button, a, [role="button"] {
     bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
     z-index: 45;
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     align-items: center;
-    gap: 0.12rem;
+    gap: 0.25rem;
     padding: 0.35rem;
-    border-radius: 1.35rem !important;
+    border-radius: 1.35rem;
     background-color: color-mix(in srgb, var(--surface-container-lowest) 92%, transparent);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);

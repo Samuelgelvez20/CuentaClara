@@ -2,7 +2,8 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
     <title>CuentaClara — Iniciar Sesión</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -10,7 +11,6 @@
     <script src="/js/cuentaclara-theme.js"></script>
     <style>
         @layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } }
-        ::-webkit-scrollbar { display: none; }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="tailwind-config">
@@ -94,8 +94,8 @@
     </script>
 </head>
 <body class="bg-surface font-body-md text-on-surface">
-<main class="min-h-screen w-full flex items-center justify-center p-space-md">
-    <div class="w-full max-w-[1480px] mx-auto min-h-[800px] rounded-xl overflow-hidden shadow-xl bg-surface-container-lowest grid grid-cols-1 lg:grid-cols-12 border border-outline-variant/30">
+<main class="min-h-screen w-full flex items-center justify-center p-3 sm:p-6">
+    <div class="w-full max-w-[1480px] mx-auto lg:min-h-[700px] rounded-xl overflow-hidden shadow-xl bg-surface-container-lowest grid grid-cols-1 lg:grid-cols-12 border border-outline-variant/30">
 
         <!-- LEFT PANEL -->
         <div class="relative lg:col-span-5 bg-primary-container text-white p-8 lg:p-12 flex flex-col justify-between overflow-hidden">
@@ -164,16 +164,16 @@
                 </div>
 
                 <!-- Authentication Form -->
-                <form id="auth-form" method="post" action="/auth/login" class="flex flex-col gap-3.5">
+                <form id="auth-form" method="post" action="/auth/login" data-loading-submit class="flex flex-col gap-3.5">
                     <!-- Field: Full Name (Visible in Register Mode) -->
                     <div id="fieldName" class="hidden flex-col gap-1.5">
                         <label class="font-label-md text-label-md text-on-surface font-semibold" for="nameInput">
                             Nombre completo
                         </label>
                         <div class="relative flex items-center">
-                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">person</span>
-                            <input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/40 border border-outline-variant/50 focus:outline-none focus:ring-2 focus:ring-secondary/40 transition-all"
-                                   id="nameInput" name="fullName" placeholder="Carlos Mendoza" type="text"/>
+                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none" aria-hidden="true">person</span>
+                            <input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/65 border border-outline-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary/40 transition-all"
+                                   id="nameInput" name="fullName" autocomplete="name" placeholder="Carlos Mendoza" type="text"/>
                         </div>
                     </div>
 
@@ -183,9 +183,9 @@
                             Correo electrónico
                         </label>
                         <div class="relative flex items-center">
-                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">alternate_email</span>
-                            <input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/40 border border-outline-variant/50 focus:outline-none focus:ring-2 focus:ring-secondary/40 transition-all"
-                                   id="emailInput" name="email" placeholder="nombre@correo.com" required type="email"/>
+                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none" aria-hidden="true">alternate_email</span>
+                            <input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/65 border border-outline-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary/40 transition-all"
+                                   id="emailInput" name="email" autocomplete="email" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="email" placeholder="nombre@correo.com" required type="email"/>
                         </div>
                     </div>
 
@@ -195,12 +195,13 @@
                             Contraseña
                         </label>
                         <div class="relative flex items-center">
-                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">lock</span>
-                            <input class="w-full h-11 pl-10 pr-11 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/40 border border-outline-variant/50 focus:outline-none focus:ring-2 focus:ring-secondary/40 transition-all"
-                                   id="passwordInput" name="password" minlength="8" placeholder="Mínimo 8 caracteres" required type="password"/>
-                            <button class="absolute right-3 p-1 text-on-surface-variant hover:text-on-surface rounded transition-colors flex items-center justify-center"
+                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none" aria-hidden="true">lock</span>
+                            <input class="w-full h-11 pl-10 pr-11 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/65 border border-outline-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary/40 transition-all"
+                                   id="passwordInput" name="password" autocomplete="current-password" minlength="8" placeholder="Mínimo 8 caracteres" required type="password"/>
+                            <button id="togglePasswordBtn" aria-pressed="false" aria-label="Mostrar contraseña"
+                                    class="absolute right-2 min-w-[36px] min-h-[36px] p-1 text-on-surface-variant hover:text-on-surface rounded-lg transition-colors flex items-center justify-center bg-transparent border-0 cursor-pointer"
                                     onclick="togglePasswordVisibility()" type="button">
-                                <span class="material-symbols-outlined text-[20px]" id="eyeIcon">visibility</span>
+                                <span class="material-symbols-outlined text-[20px]" id="eyeIcon" aria-hidden="true">visibility</span>
                             </button>
                         </div>
                     </div>
@@ -273,7 +274,7 @@
                     </div>
 
                     <!-- Primary Submit Button -->
-                    <button class="w-full h-11 mt-1 rounded-xl bg-primary-container text-on-primary font-title-md text-sm font-semibold shadow-sm hover:bg-primary transition-all flex items-center justify-center gap-2" type="submit">
+                    <button id="authSubmitBtn" data-loading-text="Ingresando..." class="w-full h-11 mt-1 rounded-xl bg-primary-container text-on-primary font-title-md text-sm font-semibold shadow-sm hover:bg-primary transition-all flex items-center justify-center gap-2 cursor-pointer" type="submit">
                         <span id="submitBtnLabel">Iniciar sesión</span>
                     </button>
                 </form>
@@ -340,6 +341,9 @@
         const obligationsSection = document.getElementById('registerObligationsSection');
         const submitBtnLabel = document.getElementById('submitBtnLabel');
 
+        const passwordInput = document.getElementById('passwordInput');
+        const submitBtn = document.getElementById('authSubmitBtn');
+
         if (mode === 'login') {
             form.action = '/auth/login';
             tabLogin.className = 'flex-1 py-2 px-4 rounded-lg font-title-md text-sm font-semibold text-on-primary bg-primary shadow-xs transition-all flex items-center justify-center gap-2';
@@ -349,6 +353,8 @@
             obligationsSection.classList.add('hidden');
             obligationsSection.classList.remove('flex');
             nameInput.required = false;
+            if (passwordInput) passwordInput.setAttribute('autocomplete', 'current-password');
+            if (submitBtn) submitBtn.setAttribute('data-loading-text', 'Ingresando...');
             submitBtnLabel.textContent = 'Iniciar sesión';
         } else {
             form.action = '/auth/register';
@@ -359,6 +365,8 @@
             obligationsSection.classList.remove('hidden');
             obligationsSection.classList.add('flex');
             nameInput.required = true;
+            if (passwordInput) passwordInput.setAttribute('autocomplete', 'new-password');
+            if (submitBtn) submitBtn.setAttribute('data-loading-text', 'Creando cuenta...');
             submitBtnLabel.textContent = 'Crear cuenta';
         }
     }
@@ -391,9 +399,14 @@
     function togglePasswordVisibility() {
         const passwordInput = document.getElementById('passwordInput');
         const eyeIcon = document.getElementById('eyeIcon');
+        const btn = document.getElementById('togglePasswordBtn');
         const isPassword = passwordInput.getAttribute('type') === 'password';
         passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
         eyeIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+        if (btn) {
+            btn.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+            btn.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        }
     }
 
     switchAuthTab(initialMode);

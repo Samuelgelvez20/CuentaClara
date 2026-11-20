@@ -1188,38 +1188,9 @@ html.dark .cc-chip-expense {
 }
 
 /* ==========================================================================
-   VIDEO DASHBOARD UPGRADES: Slim Icon-Rail, Filter Pills, Capacity Bars, Expandable Cards
+   VIDEO DASHBOARD UPGRADES: Filter Pills, Capacity Bars, Expandable Cards
+   (El riel colapsable del sidebar ahora se comparte globalmente en cuentaclara-theme.css)
    ========================================================================== */
-
-/* 1. Barra lateral colapsable en escritorio (>= 1024px) */
-@media (min-width: 1024px) {
-    body.cc-sidebar-collapsed #cc-sidebar {
-        width: 78px;
-    }
-    body.cc-sidebar-collapsed #cc-main-shell {
-        padding-left: 78px;
-    }
-    body.cc-sidebar-collapsed #cc-top-header {
-        left: 78px;
-    }
-    body.cc-sidebar-collapsed .cc-sidebar-text {
-        display: none;
-    }
-    body.cc-sidebar-collapsed #cc-sidebar .cc-nav-link {
-        justify-content: center;
-        padding-left: 0;
-        padding-right: 0;
-    }
-    body.cc-sidebar-collapsed #cc-sidebar .cc-sidebar-user {
-        justify-content: center;
-        padding: 0.45rem;
-    }
-    body.cc-sidebar-collapsed #cc-sidebar .p-space-lg {
-        padding: 1rem 0.75rem;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-}
 
 /* 2. Pills interactivos de filtro con conteo (estilo Haulix / Phenomenon) */
 .cc-filter-pills {

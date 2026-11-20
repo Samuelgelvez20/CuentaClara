@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
     <title>CuentaClara — Mi Calendario y Organizador de Gastos</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -91,86 +92,8 @@
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased">
 
-<!-- LEFT SIDEBAR (Solo escritorio >= lg; en móvil se usa la barra flotante inferior) -->
-<aside id="cc-sidebar" class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex-col justify-between border-r border-outline-variant/25 shadow-sm transition-all duration-200 ease-out">
-    <div class="flex flex-col flex-1 overflow-y-auto">
-        <div class="p-space-lg flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0">
-                <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[24px]">calendar_month</span>
-                </div>
-                <div class="flex flex-col cc-sidebar-text min-w-0">
-                    <span class="text-lg text-primary leading-tight font-extrabold tracking-tight">CuentaClara</span>
-                    <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
-                </div>
-            </div>
-            <button type="button" onclick="toggleDesktopSidebar()" id="cc-sidebar-collapse-btn" aria-label="Contraer o expandir menú" title="Contraer barra lateral"
-                    class="hidden lg:flex w-9 h-9 flex-shrink-0 rounded-xl text-on-surface-variant hover:bg-surface-container-high items-center justify-center border-0 bg-transparent cursor-pointer">
-                <span class="material-symbols-outlined text-[19px]" id="cc-sidebar-collapse-icon">dock_to_left</span>
-            </button>
-            <button type="button" onclick="closeMobileSidebar()" aria-label="Cerrar menú"
-                    class="lg:hidden w-10 h-10 rounded-xl text-on-surface-variant hover:bg-surface-container-high flex items-center justify-center border-0 bg-transparent cursor-pointer">
-                <span class="material-symbols-outlined text-[20px]">close</span>
-            </button>
-        </div>
-
-        <div class="px-space-md py-space-xs">
-            <div class="px-space-sm pb-2 cc-sidebar-text">
-                <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Menú</span>
-            </div>
-            <nav class="flex flex-col gap-1.5">
-                <a aria-current="page" title="Calendario" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed flex-shrink-0">calendar_month</span>
-                    <span class="cc-sidebar-text">Calendario</span>
-                </a>
-                <a title="Historial de gastos" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
-                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">receipt_long</span>
-                    <span class="cc-sidebar-text">Historial de gastos</span>
-                </a>
-                <a title="Facturas y recibos" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">upload_file</span>
-                    <span class="cc-sidebar-text">Facturas y recibos</span>
-                    <span th:if="${!#lists.isEmpty(pendingConfirmations)}" class="cc-sidebar-text ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold" th:text="${#lists.size(pendingConfirmations)}"></span>
-                </a>
-                <a title="Presupuesto y deudas" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">savings</span>
-                    <span class="cc-sidebar-text">Presupuesto y deudas</span>
-                </a>
-                <a title="Recomendaciones" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/recommendations">
-                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">auto_awesome</span>
-                    <span class="cc-sidebar-text">Recomendaciones</span>
-                </a>
-                <a title="Consultas" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">chat_bubble</span>
-                    <span class="cc-sidebar-text">Consultas</span>
-                </a>
-                <a title="Configuración" class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">tune</span>
-                    <span class="cc-sidebar-text">Configuración</span>
-                </a>
-            </nav>
-        </div>
-    </div>
-
-    <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/35">
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest shadow-xs border border-outline-variant/20 cc-sidebar-user">
-            <div class="flex items-center gap-2.5 overflow-hidden">
-                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
-                </div>
-                <div class="flex flex-col truncate cc-sidebar-text">
-                    <span class="text-xs text-on-surface truncate font-bold" th:text="${user.fullName}">Usuario</span>
-                    <span class="text-[11px] text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
-                </div>
-            </div>
-            <form method="post" action="/auth/logout" class="m-0 cc-sidebar-text">
-                <button class="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" title="Cerrar sesión" type="submit">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</aside>
+<!-- LEFT SIDEBAR COMPARTIDO (>= lg, colapsable) -->
+<div th:replace="~{fragments/app-sidebar :: sidebar('dashboard')}"></div>
 
 <!-- RIGHT DESKTOP/MOBILE WORKSPACE -->
 <div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0 overflow-x-clip transition-[padding] duration-200 ease-out">
@@ -192,20 +115,11 @@
                 </form>
             </div>
             <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
-                        title="Alternar tema claro / oscuro"
-                        class="min-w-[40px] min-h-[40px] flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
-                    <span class="hidden sm:inline">Tema</span>
-                </button>
-                <a href="/settings" title="Configuración"
-                   class="hidden md:flex min-h-[40px] items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
-                    <span>Ajustes</span>
-                </a>
+                <div th:replace="~{fragments/mobile-nav :: headerUtilityActions('dashboard')}"></div>
                 <button type="button" onclick="openObligationModal()" title="Nuevo pago fijo"
-                        class="min-w-[40px] min-h-[40px] px-2.5 sm:px-3.5 bg-surface-container-lowest hover:bg-surface-container-high text-primary border border-outline-variant/40 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">add</span>
+                        aria-label="Nuevo pago fijo"
+                        class="min-w-[40px] min-h-[40px] px-2.5 sm:px-3.5 bg-surface-container-lowest hover:bg-surface-container-high text-primary border border-outline-variant/40 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">add</span>
                     <span class="hidden sm:inline">Pago fijo</span>
                 </button>
             </div>
@@ -363,6 +277,13 @@
                 <!-- Área principal del calendario (izquierda: vista Mes/Semana/Día; derecha: panel de día en Paso 4) -->
                 <div class="cc-cal-workspace" id="cc-cal-workspace">
                     <div class="cc-cal-main" id="cc-cal-main">
+
+                        <!-- Mini leyenda de puntos en móvil -->
+                        <div class="sm:hidden flex items-center justify-center gap-3 px-3 py-1.5 text-[10px] font-semibold text-on-surface-variant border-b border-outline-variant/25 bg-surface-container-low/50">
+                            <span class="inline-flex items-center gap-1"><span class="cc-dot cc-dot-pending"></span>Pendiente</span>
+                            <span class="inline-flex items-center gap-1"><span class="cc-dot cc-dot-paid"></span>Al día</span>
+                            <span class="inline-flex items-center gap-1"><span class="cc-dot cc-dot-expense"></span>Gasto</span>
+                        </div>
 
                         <!-- VISTA MENSUAL -->
                         <div id="cc-view-month" class="cc-view-panel" role="tabpanel" aria-labelledby="cc-tab-month">
@@ -687,7 +608,10 @@
                         </div>
 
                         <div th:if="${latestClosure != null}" class="p-4 rounded-xl bg-primary-container text-on-primary space-y-2 mt-1">
-                            <span class="text-xs uppercase text-secondary-fixed font-bold">Balance del mes</span>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs uppercase text-secondary-fixed font-bold">Balance del mes</span>
+                                <a th:href="@{/recommendations(month=${selectedMonth})}" class="text-[11px] font-bold text-secondary-fixed underline">Abrir en Plan IA &rarr;</a>
+                            </div>
                             <p class="text-xs text-white/90 m-0" th:text="${latestClosure.report.verdictSummary}"></p>
                             <ul class="list-disc pl-4 space-y-1 text-xs text-white">
                                 <li th:each="r : ${latestClosure.recommendations}" th:text="${r.explanation}"></li>
@@ -774,10 +698,10 @@
 
         <div>
             <label for="cc-quick-amount" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Valor ($ COP)</label>
-            <input type="number" step="1000" min="0" name="totalAmount" id="cc-quick-amount" required
+            <input type="number" inputmode="numeric" step="1000" min="0" name="totalAmount" id="cc-quick-amount" required
                    placeholder="45000"
                    oninput="this.setCustomValidity('')"
-                   class="cc-quick-field font-extrabold text-secondary"/>
+                   class="cc-quick-field font-extrabold text-secondary tabular-nums"/>
             <div class="cc-quick-amount-pills">
                 <button type="button" class="cc-quick-pill" data-quick-delta="1000">+1.000</button>
                 <button type="button" class="cc-quick-pill" data-quick-delta="5000">+5.000</button>
@@ -841,13 +765,13 @@
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-semibold text-on-surface mb-1">Monto mensual ($ COP)</label>
-                    <input type="number" step="1000" min="0" name="estimatedAmount" required placeholder="1200000"
-                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-secondary"/>
+                    <input type="number" inputmode="numeric" step="1000" min="0" name="estimatedAmount" required placeholder="1200000"
+                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-secondary tabular-nums"/>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-on-surface mb-1">Día de pago (1-31)</label>
-                    <input type="number" min="1" max="31" name="dueDay" required value="5"
-                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-primary"/>
+                    <input type="number" inputmode="numeric" min="1" max="31" name="dueDay" required value="5"
+                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-primary tabular-nums"/>
                 </div>
             </div>
             <div>
@@ -871,26 +795,6 @@
 
 <script src="/js/calendar-redesign.js"></script>
 <script>
-    function applyDesktopSidebarState(collapsed) {
-        document.body.classList.toggle('cc-sidebar-collapsed', collapsed);
-        const icon = document.getElementById('cc-sidebar-collapse-icon');
-        const btn = document.getElementById('cc-sidebar-collapse-btn');
-        if (icon) icon.textContent = collapsed ? 'dock_to_right' : 'dock_to_left';
-        if (btn) btn.title = collapsed ? 'Expandir barra lateral' : 'Contraer barra lateral';
-    }
-
-    function toggleDesktopSidebar() {
-        const next = !document.body.classList.contains('cc-sidebar-collapsed');
-        applyDesktopSidebarState(next);
-        try { localStorage.setItem('cuentaclara_sidebar_collapsed', next ? '1' : '0'); } catch (_) {}
-    }
-
-    try {
-        if (localStorage.getItem('cuentaclara_sidebar_collapsed') === '1') {
-            applyDesktopSidebarState(true);
-        }
-    } catch (_) {}
-
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
             const searchInput = document.getElementById('cc-top-search');

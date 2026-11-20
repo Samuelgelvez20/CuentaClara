@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
     <title>CuentaClara — Cargar y Confirmar Factura (PC)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -95,105 +96,24 @@
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 
-<!-- LEFT FIXED SIDEBAR (Solo escritorio >= lg) -->
-<aside class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 flex-col justify-between shadow-[0_1px_8px_rgba(0,53,39,0.06)]">
-    <div class="flex flex-col flex-1 overflow-y-auto">
-        <div class="p-space-lg flex items-center gap-space-sm">
-            <div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shadow-sm">
-                <span class="material-symbols-outlined text-secondary-fixed text-[22px]">account_balance</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-title-md text-title-md text-primary leading-tight tracking-tight font-bold">CuentaClara</span>
-                <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
-            </div>
-        </div>
-        <div class="px-space-md py-space-xs">
-            <div class="px-space-sm pb-2">
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">Menú</span>
-            </div>
-            <nav class="flex flex-col gap-1.5">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Historial de gastos</span>
-                </a>
-                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">upload_file</span>
-                    <span>Facturas y recibos</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px]">savings</span>
-                    <span>Presupuesto y deudas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/recommendations">
-                    <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
-                    <span>Recomendaciones</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-                    <span>Consultas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px]">tune</span>
-                    <span>Configuración</span>
-                </a>
-            </nav>
-        </div>
-    </div>
-    <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/40">
-        <div class="flex items-center justify-between p-space-xs rounded-lg bg-surface-container-lowest shadow-sm">
-            <div class="flex items-center gap-space-xs overflow-hidden">
-                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
-                </div>
-                <div class="flex flex-col truncate">
-                    <span class="font-title-md text-body-sm text-on-surface truncate font-semibold" th:text="${user.fullName}">Usuario</span>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
-                </div>
-            </div>
-            <form method="post" action="/auth/logout" class="m-0">
-                <button class="p-1.5 rounded text-on-surface-variant hover:text-error transition-colors" title="Cerrar sesión" type="submit">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</aside>
+<!-- LEFT SIDEBAR COMPARTIDO (>= lg, colapsable) -->
+<div th:replace="~{fragments/app-sidebar :: sidebar('upload')}"></div>
 
 <!-- RIGHT DESKTOP WORKSPACE -->
-<div class="pl-0 lg:pl-72 flex flex-col min-h-screen">
-    <header class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-40 border-b border-outline-variant/20">
-        <div class="h-20 w-full px-space-xl flex items-center justify-between gap-space-md">
-            <div class="flex items-center gap-space-xxs text-on-surface-variant font-label-md text-label-md">
-                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary">Inicio</a>
-                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span class="text-primary font-semibold">Facturas y recibos</span>
+<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0 transition-[padding] duration-200 ease-out">
+    <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-40 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
+        <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+            <div class="flex items-center gap-2 text-xs text-on-surface-variant min-w-0">
+                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary font-semibold">Inicio</a>
+                <span class="material-symbols-outlined text-[14px]" aria-hidden="true">chevron_right</span>
+                <span class="text-primary font-semibold truncate">Facturas y recibos</span>
             </div>
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
-                        title="Alternar tema claro / oscuro"
-                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
-                    <span>Tema</span>
-                </button>
-                <a href="/settings" title="Configuración"
-                   class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
-                    <span>Ajustes</span>
-                </a>
-                <a href="/dashboard" class="h-9 px-4 rounded-xl bg-primary-container text-on-primary text-xs font-semibold flex items-center gap-1.5 no-underline hover:opacity-95">
-                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-            </div>
+            <div th:replace="~{fragments/mobile-nav :: headerUtilityActions('upload')}"></div>
         </div>
     </header>
 
-    <main class="w-full pt-20 bg-surface flex-1">
-        <div class="px-space-xl py-space-lg flex flex-col gap-space-lg max-w-[1600px] mx-auto w-full">
+    <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
+        <div class="px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-5 max-w-[1600px] mx-auto w-full">
 
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
@@ -211,53 +131,55 @@
                 <!-- LEFT COLUMN: Dropzone de Factura + Formulario Gasto Manual -->
                 <div class="lg:col-span-6 flex flex-col gap-space-lg">
                     <!-- 1. Subir Comprobante XML / PDF / Foto -->
-                    <form method="post" action="/dashboard/upload" enctype="multipart/form-data"
-                          class="rounded-2xl p-space-xl bg-surface-container-lowest flex flex-col items-center justify-center text-center border border-dashed border-outline-variant m-0">
+                    <form id="cc-upload-form" method="post" action="/dashboard/upload" enctype="multipart/form-data" data-loading-submit
+                          class="rounded-2xl p-5 sm:p-7 bg-surface-container-lowest flex flex-col items-center justify-center text-center border-2 border-dashed border-outline-variant/70 hover:border-secondary transition-colors m-0">
                         <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary mb-3">
-                            <span class="material-symbols-outlined text-[26px] text-secondary">upload_file</span>
+                            <span class="material-symbols-outlined text-[26px] text-secondary" aria-hidden="true">upload_file</span>
                         </div>
                         <h3 class="text-base font-bold text-on-surface mb-1 m-0">
                             Subir archivo de factura o recibo
                         </h3>
                         <p class="text-xs text-on-surface-variant max-w-md mb-4">
-                            Formatos admitidos: XML, PDF, JPG o PNG (máx. 10 MB).
+                            Arrastra un archivo aquí o selecciónalo: XML, PDF, JPG o PNG (máx. 10 MB).
                         </p>
-                        <input type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required
+                        <input id="cc-upload-file-input" type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required
+                               aria-label="Seleccionar archivo de factura o recibo"
                                class="w-full max-w-md p-2 rounded-xl bg-surface-container-low font-data-mono text-xs border border-outline-variant/30"/>
-                        <label class="mt-3 flex items-center gap-2 text-xs text-on-surface-variant cursor-pointer">
+                        <div id="cc-upload-file-preview" class="hidden mt-2.5 px-3 py-1.5 rounded-lg bg-secondary-container/60 text-primary text-xs font-semibold max-w-md truncate tabular-nums"></div>
+                        <label class="mt-3 flex items-center gap-2 text-xs text-on-surface-variant cursor-pointer min-h-[44px]">
                             <input type="checkbox" name="statement" value="true" class="w-4 h-4 accent-secondary rounded"/>
                             <span>Es un extracto PDF con varios movimientos</span>
                         </label>
-                        <button type="submit" class="mt-4 w-full max-w-md h-10 px-space-lg rounded-xl bg-primary-container hover:bg-primary text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+                        <button type="submit" data-loading-text="Procesando archivo..." class="mt-3 w-full max-w-md h-10 px-space-lg rounded-xl bg-primary-container hover:bg-primary text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer">
                             <span>Procesar archivo</span>
                         </button>
                     </form>
 
                     <!-- 2. Gasto Manual -->
-                    <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data"
-                          class="rounded-2xl p-space-lg bg-surface-container-lowest flex flex-col gap-space-md border border-outline-variant/30 m-0">
+                    <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data" data-loading-submit
+                          class="rounded-2xl p-5 sm:p-6 bg-surface-container-lowest flex flex-col gap-space-md border border-outline-variant/30 m-0">
                         <div class="flex items-center justify-between">
                             <h3 class="text-base text-primary font-bold m-0">Registrar gasto manual</h3>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Concepto o comercio *</label>
-                                <input type="text" name="merchantName" required placeholder="Supermercado, almuerzo..."
+                                <label for="cc-manual-merchant" class="text-xs font-semibold text-on-surface-variant">Concepto o comercio *</label>
+                                <input id="cc-manual-merchant" type="text" name="merchantName" required placeholder="Supermercado, almuerzo..."
                                        class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs border border-outline-variant/30"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Valor ($ COP) *</label>
-                                <input type="number" step="0.01" name="totalAmount" required placeholder="28000"
-                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs font-bold text-primary border border-outline-variant/30"/>
+                                <label for="cc-manual-amount" class="text-xs font-semibold text-on-surface-variant">Valor ($ COP) *</label>
+                                <input id="cc-manual-amount" type="number" inputmode="decimal" step="0.01" min="0" name="totalAmount" required placeholder="28000"
+                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs font-bold text-primary border border-outline-variant/30 tabular-nums"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Fecha</label>
-                                <input type="date" name="transactionDate"
-                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs border border-outline-variant/30"/>
+                                <label for="cc-manual-date" class="text-xs font-semibold text-on-surface-variant">Fecha</label>
+                                <input id="cc-manual-date" type="date" name="transactionDate"
+                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs border border-outline-variant/30 tabular-nums"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Categoría</label>
-                                <select name="category" class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs font-semibold border border-outline-variant/30">
+                                <label for="cc-manual-category" class="text-xs font-semibold text-on-surface-variant">Categoría</label>
+                                <select id="cc-manual-category" name="category" class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs font-semibold border border-outline-variant/30">
                                     <option value="">Asignar automáticamente</option>
                                     <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}"></option>
                                 </select>
@@ -265,17 +187,17 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Descripción</label>
-                                <input type="text" name="description" placeholder="Detalle opcional del gasto"
+                                <label for="cc-manual-desc" class="text-xs font-semibold text-on-surface-variant">Descripción</label>
+                                <input id="cc-manual-desc" type="text" name="description" placeholder="Detalle opcional del gasto"
                                        class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs border border-outline-variant/30"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Comprobante (opcional)</label>
-                                <input type="file" name="attachment" accept=".xml,.pdf,image/jpeg,image/png"
+                                <label for="cc-manual-attachment" class="text-xs font-semibold text-on-surface-variant">Comprobante (opcional)</label>
+                                <input id="cc-manual-attachment" type="file" name="attachment" accept=".xml,.pdf,image/jpeg,image/png"
                                        class="mt-1 w-full p-1.5 rounded-xl bg-surface-container-low font-data-mono text-[12px] border border-outline-variant/30"/>
                             </div>
                         </div>
-                        <button type="submit" class="w-full h-10 px-space-lg rounded-xl bg-secondary hover:bg-primary-container text-on-secondary text-xs font-semibold flex items-center justify-center gap-2">
+                        <button type="submit" data-loading-text="Guardando gasto..." class="w-full h-10 px-space-lg rounded-xl bg-secondary hover:bg-primary-container text-on-secondary text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer">
                             <span>Guardar gasto</span>
                         </button>
                     </form>
@@ -301,7 +223,7 @@
                                   th:text="${item.extraction != null ? item.extraction.extractionMethod : item.document.sourceType}">XML</span>
                         </div>
 
-                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" class="flex flex-col gap-space-md m-0">
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" data-loading-submit class="flex flex-col gap-space-md m-0">
                             <div class="p-space-md rounded-xl bg-surface-container-low grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-xs font-semibold text-on-surface-variant">Comercio / Emisor</label>
@@ -332,9 +254,12 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-xs text-on-surface font-semibold block mb-1">Categoría</label>
-                                    <input type="text" name="category" required
+                                    <input type="text" name="category" list="cc-upload-categories" required
                                            class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-primary text-xs font-bold border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.suggestedCategory : 'Alimentación'}"/>
+                                    <datalist id="cc-upload-categories">
+                                        <option th:each="cat : ${availableCategories}" th:value="${cat}"></option>
+                                    </datalist>
                                 </div>
                                 <div>
                                     <label class="text-xs text-on-surface font-semibold block mb-1">Bloque</label>
@@ -348,16 +273,16 @@
                             <div class="p-space-md rounded-xl bg-surface-container flex flex-col gap-space-xs">
                                 <div class="flex items-center justify-between text-xs text-on-surface-variant">
                                     <span>Subtotal</span>
-                                    <span class="font-data-mono" th:text="'$ ' + ${item.extraction != null ? item.extraction.subtotalAmount : 0} + ' COP'"></span>
+                                    <span class="font-data-mono tabular-nums" th:text="'$ ' + ${item.extraction != null ? item.extraction.subtotalAmount : 0} + ' COP'"></span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs text-on-surface-variant">
                                     <span>Impuestos</span>
-                                    <span class="font-data-mono" th:text="'$ ' + ${item.extraction != null ? item.extraction.taxAmount : 0} + ' COP'"></span>
+                                    <span class="font-data-mono tabular-nums" th:text="'$ ' + ${item.extraction != null ? item.extraction.taxAmount : 0} + ' COP'"></span>
                                 </div>
                                 <div class="pt-space-xs mt-space-xxs flex items-center justify-between text-primary">
                                     <span class="text-xs font-bold text-on-surface-variant">Total ($ COP)</span>
-                                    <input type="number" step="0.01" name="totalAmount" required
-                                           class="w-44 p-2 rounded-lg bg-surface-container-lowest text-base text-primary font-bold text-right border border-outline-variant/30"
+                                    <input type="number" inputmode="decimal" step="0.01" name="totalAmount" required
+                                           class="w-44 p-2 rounded-lg bg-surface-container-lowest text-base text-primary font-bold text-right border border-outline-variant/30 tabular-nums"
                                            th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
                                 </div>
                             </div>
@@ -366,7 +291,7 @@
                                 <strong class="text-primary">CUFE:</strong> <span th:text="${item.document.cufe}"></span>
                             </div>
 
-                            <button type="submit" class="w-full h-10 px-space-xl rounded-xl bg-primary-container hover:bg-primary text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+                            <button type="submit" data-loading-text="Guardando comprobante..." class="w-full h-10 px-space-xl rounded-xl bg-primary-container hover:bg-primary text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
                                 <span>Confirmar y guardar</span>
                             </button>
                         </form>
@@ -377,5 +302,46 @@
     </main>
 </div>
 <div th:replace="~{fragments/mobile-nav :: bottomNav('upload')}"></div>
+
+<script>
+    (function () {
+        const form = document.getElementById('cc-upload-form');
+        const input = document.getElementById('cc-upload-file-input');
+        const preview = document.getElementById('cc-upload-file-preview');
+        if (!form || !input || !preview) return;
+
+        function showSelectedFile(file) {
+            if (!file) {
+                preview.classList.add('hidden');
+                preview.textContent = '';
+                return;
+            }
+            const kb = Math.max(1, Math.round(file.size / 1024));
+            preview.textContent = `Archivo listo: ${file.name} (${kb} KB)`;
+            preview.classList.remove('hidden');
+        }
+
+        input.addEventListener('change', () => showSelectedFile(input.files && input.files[0]));
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            form.addEventListener(evt, (e) => {
+                e.preventDefault();
+                form.classList.add('border-secondary', 'bg-secondary-container/20');
+            });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            form.addEventListener(evt, (e) => {
+                e.preventDefault();
+                form.classList.remove('border-secondary', 'bg-secondary-container/20');
+            });
+        });
+        form.addEventListener('drop', (e) => {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                input.files = e.dataTransfer.files;
+                showSelectedFile(e.dataTransfer.files[0]);
+            }
+        });
+    })();
+</script>
 </body>
 </html>

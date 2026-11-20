@@ -23,6 +23,8 @@
         "Historial de gastos": "Expense history",
         "Facturas y recibos": "Invoices & receipts",
         "Presupuesto y deudas": "Budget & fixed payments",
+        "Recomendaciones": "Recommendations",
+        "Plan IA": "AI Plan",
         "Consultas": "Queries",
         "Configuración": "Settings",
         "Tema": "Theme",
@@ -516,12 +518,49 @@
         return resolved;
     }
 
+    const SIDEBAR_COLLAPSED_KEY = 'cuentaclara_sidebar_collapsed';
+
+    function applyDesktopSidebarState(collapsed) {
+        if (document.body) {
+            document.body.classList.toggle('cc-sidebar-collapsed', Boolean(collapsed));
+        }
+        const icon = document.getElementById('cc-sidebar-collapse-icon');
+        const btn = document.getElementById('cc-sidebar-collapse-btn');
+        if (icon) icon.textContent = collapsed ? 'dock_to_right' : 'dock_to_left';
+        if (btn) btn.title = collapsed ? 'Expandir barra lateral' : 'Contraer barra lateral';
+    }
+
+    function toggleDesktopSidebar() {
+        const next = !(document.body && document.body.classList.contains('cc-sidebar-collapsed'));
+        applyDesktopSidebarState(next);
+        try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, next ? '1' : '0'); } catch (_) {}
+    }
+
+    window.toggleDesktopSidebar = toggleDesktopSidebar;
+
     // Aplicar tema y modo antes de pintar
     applyTheme(getPreferredTheme());
     applyMode(getPreferredMode());
 
     document.addEventListener('DOMContentLoaded', () => {
         refreshPageLocalization();
+        try {
+            if (localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1') {
+                applyDesktopSidebarState(true);
+            }
+        } catch (_) {}
+
+        // Protección anti doble envío con indicador de carga tras clic válido
+        document.querySelectorAll('form[data-loading-submit]').forEach(form => {
+            form.addEventListener('submit', () => {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (!submitBtn || submitBtn.disabled) return;
+                const loadingLabel = submitBtn.getAttribute('data-loading-text') || 'Procesando...';
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-75', 'cursor-wait');
+                submitBtn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin" aria-hidden="true">progress_activity</span><span>${loadingLabel}</span>`;
+            });
+        });
     });
 
     // API pública global

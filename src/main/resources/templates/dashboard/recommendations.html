@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
     <title>CuentaClara — Recomendaciones y Plan Mensual</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -53,99 +54,24 @@
 </head>
 <body class="bg-surface text-on-surface antialiased">
 
-<!-- LEFT FIXED SIDEBAR (Solo escritorio >= lg) -->
-<aside class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex-col justify-between border-r border-outline-variant/25 shadow-sm">
-    <div class="flex flex-col flex-1 overflow-y-auto">
-        <div class="p-6 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md">
-                <span class="material-symbols-outlined text-secondary-fixed text-[24px]">calendar_month</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="text-lg text-primary leading-tight font-extrabold tracking-tight">CuentaClara</span>
-                <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
-            </div>
-        </div>
-
-        <div class="px-4 py-1">
-            <div class="px-3 pb-2">
-                <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Menú</span>
-            </div>
-            <nav class="flex flex-col gap-1.5">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Historial de gastos</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px]">upload_file</span>
-                    <span>Facturas y recibos</span>
-                    <span th:if="${pendingConfirmations != null and !#lists.isEmpty(pendingConfirmations)}"
-                          class="ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold"
-                          th:text="${#lists.size(pendingConfirmations)}"></span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px]">savings</span>
-                    <span>Presupuesto y deudas</span>
-                </a>
-                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/recommendations">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">auto_awesome</span>
-                    <span>Recomendaciones</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-                    <span>Consultas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px]">tune</span>
-                    <span>Configuración</span>
-                </a>
-            </nav>
-        </div>
-    </div>
-
-    <div class="p-4 flex flex-col gap-2 bg-surface-container-high/35">
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest shadow-xs border border-outline-variant/20">
-            <div class="flex items-center gap-2.5 overflow-hidden">
-                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
-                </div>
-                <div class="flex flex-col truncate">
-                    <span class="text-xs text-on-surface truncate font-bold" th:text="${user.fullName}">Usuario</span>
-                    <span class="text-[11px] text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
-                </div>
-            </div>
-            <form method="post" action="/auth/logout" class="m-0">
-                <button class="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" title="Cerrar sesión" type="submit">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</aside>
+<!-- LEFT SIDEBAR COMPARTIDO (>= lg, colapsable) -->
+<div th:replace="~{fragments/app-sidebar :: sidebar('recommendations')}"></div>
 
 <!-- RIGHT WORKSPACE -->
-<div class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0">
-    <header class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20">
-        <div class="h-16 lg:h-20 w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0 transition-[padding] duration-200 ease-out">
+    <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
+        <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-3">
             <div class="flex items-center gap-2 text-xs text-on-surface-variant min-w-0">
                 <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary font-semibold">Inicio</a>
-                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span class="text-primary font-bold truncate">Recomendaciones y Plan</span>
+                <span class="material-symbols-outlined text-[14px]" aria-hidden="true">chevron_right</span>
+                <span class="text-primary font-bold truncate">Recomendaciones</span>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-[11px] font-bold text-primary border border-outline-variant/35">
-                    <span class="material-symbols-outlined text-[15px] text-secondary">auto_awesome</span>
+                    <span class="material-symbols-outlined text-[15px] text-secondary" aria-hidden="true">auto_awesome</span>
                     <span th:text="${geminiConfigured ? ('IA: ' + geminiModel) : 'Motor determinista'}">IA: gemini-2.5-flash</span>
                 </span>
-                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
-                        title="Alternar tema claro / oscuro"
-                        class="min-w-[40px] min-h-[40px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
-                    <span class="hidden sm:inline">Tema</span>
-                </button>
+                <div th:replace="~{fragments/mobile-nav :: headerUtilityActions('recommendations')}"></div>
             </div>
         </div>
     </header>
@@ -184,20 +110,20 @@
                     </select>
                 </form>
 
-                <form method="post" action="/recommendations/analyze" class="m-0">
+                <form method="post" action="/recommendations/analyze" data-loading-submit class="m-0">
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
-                    <button type="submit"
+                    <button type="submit" data-loading-text="Analizando mes..."
                             class="w-full sm:w-auto h-10 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary border border-outline-variant/45 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all">
-                        <span class="material-symbols-outlined text-[18px] text-secondary">summarize</span>
+                        <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">summarize</span>
                         <span>Analizar mes</span>
                     </button>
                 </form>
 
-                <form method="post" action="/recommendations/recommend" class="m-0">
+                <form method="post" action="/recommendations/recommend" data-loading-submit class="m-0">
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
-                    <button type="submit"
+                    <button type="submit" data-loading-text="Consultando Gemini..."
                             class="w-full sm:w-auto h-10 px-4 rounded-xl bg-primary-container hover:opacity-95 text-on-primary border-0 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all">
-                        <span class="material-symbols-outlined text-[18px] text-secondary-fixed">auto_awesome</span>
+                        <span class="material-symbols-outlined text-[18px] text-secondary-fixed" aria-hidden="true">auto_awesome</span>
                         <span>Recomendar próximo mes</span>
                     </button>
                 </form>
@@ -352,21 +278,22 @@
                     </form>
                 </div>
 
-                <form method="post" action="/recommendations/plan-decision" class="m-0 flex flex-wrap items-center gap-2">
+                <form id="cc-plan-edit-form" method="post" action="/recommendations/plan-decision" class="m-0 flex flex-wrap items-center gap-2">
                     <input type="hidden" name="budgetId" th:value="${planObj.id}"/>
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
                     <input type="hidden" name="status" value="EDITED"/>
                     <span class="text-[11px] font-bold text-on-surface-variant">Ajustar (% = 100):</span>
-                    <input type="number" name="needsPct" min="0" max="100" th:value="${planObj.needsPct}"
-                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary" aria-label="Necesidades %"/>
-                    <input type="number" name="wantsPct" min="0" max="100" th:value="${planObj.wantsPct}"
-                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary" aria-label="Deseos %"/>
-                    <input type="number" name="savingsPct" min="0" max="100" th:value="${planObj.savingsPct}"
-                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary" aria-label="Ahorro %"/>
+                    <input type="number" inputmode="numeric" name="needsPct" min="0" max="100" th:value="${planObj.needsPct}"
+                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary tabular-nums" aria-label="Necesidades %"/>
+                    <input type="number" inputmode="numeric" name="wantsPct" min="0" max="100" th:value="${planObj.wantsPct}"
+                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary tabular-nums" aria-label="Deseos %"/>
+                    <input type="number" inputmode="numeric" name="savingsPct" min="0" max="100" th:value="${planObj.savingsPct}"
+                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary tabular-nums" aria-label="Ahorro %"/>
                     <button type="submit"
                             class="h-9 px-3 rounded-xl bg-primary-container text-on-primary text-xs font-bold border-0 cursor-pointer hover:opacity-95">
                         Guardar ajuste
                     </button>
+                    <span id="cc-plan-sum-error" class="hidden w-full text-[11px] font-bold text-error" role="alert">Los porcentajes deben sumar exactamente 100%.</span>
                 </form>
             </div>
         </section>
@@ -384,5 +311,49 @@
 </div>
 
 <div th:replace="~{fragments/mobile-nav :: bottomNav('recommendations')}"></div>
+
+<script>
+    (function () {
+        // Renderizado limpio y seguro del markdown ligero devuelto por Gemini (**negritas** y listas)
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        document.querySelectorAll('.cc-narrative-prose').forEach(el => {
+            const raw = el.textContent || '';
+            const safeLines = raw.split(/\r?\n/).map(line => {
+                let htmlLine = escapeHtml(line)
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                if (/^\s*[-*]\s+/.test(htmlLine)) {
+                    htmlLine = '<span class="block pl-3 relative before:content-[\'•\'] before:absolute before:left-0 before:text-secondary before:font-bold">' + htmlLine.replace(/^\s*[-*]\s+/, '') + '</span>';
+                }
+                return htmlLine;
+            });
+            el.innerHTML = safeLines.join('\n');
+            el.classList.add('tabular-nums');
+        });
+
+        // Validación suma 100% en formulario de edición manual del plan
+        const editForm = document.getElementById('cc-plan-edit-form');
+        const sumError = document.getElementById('cc-plan-sum-error');
+        if (editForm) {
+            const inputs = Array.from(editForm.querySelectorAll('input[type="number"]'));
+            inputs.forEach(inp => inp.addEventListener('input', () => {
+                if (sumError) sumError.classList.add('hidden');
+            }));
+            editForm.addEventListener('submit', (e) => {
+                const sum = inputs.reduce((acc, inp) => acc + (parseInt(inp.value, 10) || 0), 0);
+                if (sum !== 100) {
+                    e.preventDefault();
+                    if (sumError) sumError.classList.remove('hidden');
+                    if (inputs[0]) inputs[0].focus();
+                }
+            });
+        }
+    })();
+</script>
 </body>
 </html>
