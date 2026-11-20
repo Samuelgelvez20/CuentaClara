@@ -35,6 +35,13 @@
         <span class="material-symbols-outlined cc-mobile-nav-icon">savings</span>
         <span class="cc-mobile-nav-label">Deudas</span>
     </a>
+    <a href="/recommendations"
+       class="cc-mobile-nav-item"
+       th:classappend="${activePage == 'recommendations'} ? ' is-active' : ''"
+       th:attr="aria-current=${activePage == 'recommendations'} ? 'page' : null">
+        <span class="material-symbols-outlined cc-mobile-nav-icon">auto_awesome</span>
+        <span class="cc-mobile-nav-label">Plan IA</span>
+    </a>
     <a href="/assistant"
        class="cc-mobile-nav-item"
        th:classappend="${activePage == 'assistant'} ? ' is-active' : ''"

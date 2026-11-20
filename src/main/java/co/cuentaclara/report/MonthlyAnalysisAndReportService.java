@@ -315,6 +315,128 @@ public class MonthlyAnalysisAndReportService {
         return reportRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    @Transactional(readOnly = true)
+    public java.util.Optional<MonthlyReportEntity> findLatestReportForPeriod(UUID userId, String periodLabel) {
+        return reportRepository.findFirstByUserIdAndPeriodLabelOrderByCreatedAtDesc(userId, periodLabel);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.Optional<Budget> findSuggestedBudgetById(UUID budgetId) {
+        return budgetId != null ? budgetRepository.findById(budgetId) : java.util.Optional.empty();
+    }
+
+    @Transactional(readOnly = true)
+    public GeminiFinancialAdvisorService.MonthAnalysisSnapshot buildMonthSnapshot(UUID userId, String yearMonthStr) {
+        YearMonth ym = (yearMonthStr != null && !yearMonthStr.isBlank())
+                ? YearMonth.parse(yearMonthStr.trim())
+                : YearMonth.now().minusMonths(1);
+        LocalDate start = ym.atDay(1);
+        LocalDate end = ym.atEndOfMonth();
+
+        FinancialProfile profile = profileRepository.findByUserId(userId)
+                .orElseGet(() -> createDefaultProfileIfMissing(userId));
+
+        BigDecimal recordedIncome = jdbcTemplate.queryForObject(
+                "SELECT COALESCE(SUM(amount), 0) FROM incomes WHERE user_id = ? AND received_date >= ? AND received_date <= ?",
+                BigDecimal.class,
+                userId, Date.valueOf(start), Date.valueOf(end)
+        );
+        BigDecimal actualIncome = (recordedIncome != null && recordedIncome.compareTo(BigDecimal.ZERO) > 0)
+                ? recordedIncome
+                : profile.getNetIncome();
+
+        BigDecimal fixedObligationsTotal = jdbcTemplate.queryForObject(
+                "SELECT COALESCE(SUM(estimated_amount), 0) FROM recurring_obligations WHERE user_id = ?",
+                BigDecimal.class,
+                userId
+        );
+        if (fixedObligationsTotal == null) {
+            fixedObligationsTotal = BigDecimal.ZERO;
+        }
+
+        BigDecimal needsSpent = sumConfirmedByBlock(userId, start, end, BudgetBlock.NEEDS);
+        BigDecimal wantsSpent = sumConfirmedByBlock(userId, start, end, BudgetBlock.WANTS);
+        BigDecimal explicitSavingsSpent = sumConfirmedByBlock(userId, start, end, BudgetBlock.SAVINGS);
+
+        BigDecimal totalOutflows = needsSpent.add(wantsSpent);
+        BigDecimal netRemaining = actualIncome.subtract(totalOutflows).max(BigDecimal.ZERO);
+        BigDecimal savingsAchieved = explicitSavingsSpent.max(netRemaining);
+
+        BigDecimal needsTarget = percentageOf(actualIncome, profile.getNeedsPct());
+        BigDecimal wantsTarget = percentageOf(actualIncome, profile.getWantsPct());
+        BigDecimal savingsTarget = percentageOf(actualIncome, profile.getSavingsPct());
+        boolean essentialExceeded = needsSpent.compareTo(needsTarget) > 0;
+
+        Integer txCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM transactions WHERE user_id = ? AND confirmed = TRUE AND transaction_date >= ? AND transaction_date <= ?",
+                Integer.class,
+                userId, Date.valueOf(start), Date.valueOf(end)
+        );
+
+        Map<String, Object> smallStats = jdbcTemplate.queryForMap(
+                """
+                SELECT COUNT(*) AS cnt, COALESCE(SUM(total_amount), 0) AS total
+                FROM transactions
+                WHERE user_id = ? AND confirmed = TRUE
+                  AND transaction_date >= ? AND transaction_date <= ?
+                  AND budget_block = 'WANTS'
+                  AND total_amount <= 50000
+                """,
+                userId, Date.valueOf(start), Date.valueOf(end)
+        );
+        int smallCount = ((Number) smallStats.get("cnt")).intValue();
+        BigDecimal smallTotal = smallStats.get("total") instanceof BigDecimal bd
+                ? bd
+                : new BigDecimal(smallStats.get("total").toString());
+
+        List<String> topNeeds = findTopCitationsForBlock(userId, start, end, BudgetBlock.NEEDS, 5);
+        List<String> topWants = findTopCitationsForBlock(userId, start, end, BudgetBlock.WANTS, 5);
+
+        return new GeminiFinancialAdvisorService.MonthAnalysisSnapshot(
+                ym.toString(),
+                actualIncome,
+                fixedObligationsTotal,
+                needsSpent,
+                needsTarget,
+                wantsSpent,
+                wantsTarget,
+                savingsAchieved,
+                savingsTarget,
+                profile.getNeedsPct(),
+                profile.getWantsPct(),
+                profile.getSavingsPct(),
+                essentialExceeded,
+                smallCount,
+                smallTotal,
+                txCount != null ? txCount : 0,
+                topNeeds,
+                topWants
+        );
+    }
+
+    public GeminiFinancialAdvisorService.NextMonthAllocation computeNextMonthAllocation(
+            GeminiFinancialAdvisorService.MonthAnalysisSnapshot snapshot,
+            Budget nextPlan
+    ) {
+        YearMonth nextYm = YearMonth.parse(snapshot.periodLabel()).plusMonths(1);
+        BigDecimal indispensable = nextPlan.getNeedsLimit().max(snapshot.fixedObligationsTotal());
+        BigDecimal recommendedSavings = nextPlan.getSavingsTarget();
+        BigDecimal flexibleWants = nextPlan.getWantsLimit();
+        BigDecimal potentialExtraSavings = snapshot.smallExpensesTotal()
+                .divide(BigDecimal.valueOf(2), 0, RoundingMode.HALF_UP);
+
+        return new GeminiFinancialAdvisorService.NextMonthAllocation(
+                nextYm.toString(),
+                nextPlan.getNeedsPct(),
+                nextPlan.getWantsPct(),
+                nextPlan.getSavingsPct(),
+                indispensable,
+                recommendedSavings,
+                flexibleWants,
+                potentialExtraSavings
+        );
+    }
+
     private BigDecimal sumConfirmedByBlock(UUID userId, LocalDate start, LocalDate end, BudgetBlock block) {
         BigDecimal val = jdbcTemplate.queryForObject(
                 """

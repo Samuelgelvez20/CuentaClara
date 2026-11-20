@@ -1,6 +1,8 @@
 spring:
   application:
     name: cuentaclara
+  config:
+    import: optional:file:.env[.properties]
 
   # Datasource principal de la aplicación: usa el rol SIN privilegios de propietario para garantizar RLS (RNF-01)
   datasource:
@@ -56,3 +58,5 @@ cuentaclara:
     chat-model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
     embedding-model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
     embedding-version: ${OPENAI_EMBEDDING_VERSION:v1}
+    gemini-api-key: ${GEMINI_API_KEY:}
+    gemini-model: ${GEMINI_CHAT_MODEL:gemini-2.5-flash}

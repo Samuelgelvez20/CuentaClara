@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <title>CuentaClara — Recomendaciones y Plan Mensual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/cuentaclara-theme.css"/>
+    <script src="/js/cuentaclara-theme.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "var(--primary)",
+                        "primary-container": "var(--primary-container)",
+                        "on-primary": "var(--on-primary)",
+                        "secondary": "var(--secondary)",
+                        "secondary-container": "var(--secondary-container)",
+                        "secondary-fixed": "var(--secondary-fixed)",
+                        "on-secondary": "var(--on-secondary)",
+                        "surface": "var(--surface)",
+                        "surface-container-lowest": "var(--surface-container-lowest)",
+                        "surface-container-low": "var(--surface-container-low)",
+                        "surface-container": "var(--surface-container)",
+                        "surface-container-high": "var(--surface-container-high)",
+                        "on-surface": "var(--on-surface)",
+                        "on-surface-variant": "var(--on-surface-variant)",
+                        "outline-variant": "var(--outline-variant)",
+                        "error": "var(--error)",
+                        "error-container": "var(--error-container)"
+                    },
+                    fontFamily: {
+                        "sans": ["Plus Jakarta Sans", "Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .cc-narrative-prose strong {
+            color: var(--primary);
+            font-weight: 800;
+        }
+        .cc-narrative-prose {
+            white-space: pre-line;
+            line-height: 1.65;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+
+<!-- LEFT FIXED SIDEBAR (Solo escritorio >= lg) -->
+<aside class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex-col justify-between border-r border-outline-variant/25 shadow-sm">
+    <div class="flex flex-col flex-1 overflow-y-auto">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md">
+                <span class="material-symbols-outlined text-secondary-fixed text-[24px]">calendar_month</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-lg text-primary leading-tight font-extrabold tracking-tight">CuentaClara</span>
+                <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-1">
+            <div class="px-3 pb-2">
+                <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Menú</span>
+            </div>
+            <nav class="flex flex-col gap-1.5">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
+                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                    <span>Calendario</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
+                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                    <span>Historial de gastos</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
+                    <span class="material-symbols-outlined text-[20px]">upload_file</span>
+                    <span>Facturas y recibos</span>
+                    <span th:if="${pendingConfirmations != null and !#lists.isEmpty(pendingConfirmations)}"
+                          class="ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold"
+                          th:text="${#lists.size(pendingConfirmations)}"></span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
+                    <span class="material-symbols-outlined text-[20px]">savings</span>
+                    <span>Presupuesto y deudas</span>
+                </a>
+                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/recommendations">
+                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">auto_awesome</span>
+                    <span>Recomendaciones</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
+                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+                    <span>Consultas</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
+                    <span class="material-symbols-outlined text-[20px]">tune</span>
+                    <span>Configuración</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="p-4 flex flex-col gap-2 bg-surface-container-high/35">
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest shadow-xs border border-outline-variant/20">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
+                </div>
+                <div class="flex flex-col truncate">
+                    <span class="text-xs text-on-surface truncate font-bold" th:text="${user.fullName}">Usuario</span>
+                    <span class="text-[11px] text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
+                </div>
+            </div>
+            <form method="post" action="/auth/logout" class="m-0">
+                <button class="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" title="Cerrar sesión" type="submit">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- RIGHT WORKSPACE -->
+<div class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0">
+    <header class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20">
+        <div class="h-16 lg:h-20 w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-xs text-on-surface-variant min-w-0">
+                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary font-semibold">Inicio</a>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                <span class="text-primary font-bold truncate">Recomendaciones y Plan</span>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-[11px] font-bold text-primary border border-outline-variant/35">
+                    <span class="material-symbols-outlined text-[15px] text-secondary">auto_awesome</span>
+                    <span th:text="${geminiConfigured ? ('IA: ' + geminiModel) : 'Motor determinista'}">IA: gemini-2.5-flash</span>
+                </span>
+                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
+                        title="Alternar tema claro / oscuro"
+                        class="min-w-[40px] min-h-[40px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
+                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
+                    <span class="hidden sm:inline">Tema</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full pt-20 lg:pt-24 pb-10 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto flex flex-col gap-6">
+        <!-- Alertas -->
+        <div th:if="${successMessage}" class="p-3.5 rounded-xl bg-emerald-600/10 border border-emerald-600/30 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="p-3.5 rounded-xl bg-error-container text-error text-xs font-semibold flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">error</span>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Cabecera + Selector de mes + Dos botones principales -->
+        <section class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/35 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex flex-col gap-1 min-w-0">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-secondary">Evaluación y planificación mensual</span>
+                <h1 class="text-xl sm:text-2xl font-extrabold text-primary m-0 tracking-tight"
+                    th:text="'Análisis de ' + ${selectedMonthLabel}">Análisis de Octubre 2026</h1>
+                <p class="text-xs text-on-surface-variant m-0">
+                    Las cifras se calculan en SQL sobre tus movimientos confirmados; Gemini redacta el análisis y el plan para <strong class="text-primary" th:text="${nextMonthLabel}">Noviembre 2026</strong>.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-shrink-0">
+                <form method="get" action="/recommendations" class="m-0 flex items-center gap-2">
+                    <label for="rec-month-select" class="sr-only">Seleccionar mes</label>
+                    <select id="rec-month-select" name="month" onchange="this.form.submit()"
+                            class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-xs font-bold text-primary focus:outline-none focus:ring-2 focus:ring-secondary">
+                        <option th:each="opt : ${monthOptions}"
+                                th:value="${opt.value}"
+                                th:text="${opt.label}"
+                                th:selected="${opt.value == selectedMonth}">Octubre 2026</option>
+                    </select>
+                </form>
+
+                <form method="post" action="/recommendations/analyze" class="m-0">
+                    <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                    <button type="submit"
+                            class="w-full sm:w-auto h-10 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary border border-outline-variant/45 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                        <span class="material-symbols-outlined text-[18px] text-secondary">summarize</span>
+                        <span>Analizar mes</span>
+                    </button>
+                </form>
+
+                <form method="post" action="/recommendations/recommend" class="m-0">
+                    <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                    <button type="submit"
+                            class="w-full sm:w-auto h-10 px-4 rounded-xl bg-primary-container hover:opacity-95 text-on-primary border-0 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all">
+                        <span class="material-symbols-outlined text-[18px] text-secondary-fixed">auto_awesome</span>
+                        <span>Recomendar próximo mes</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 4 tarjetas numéricas exactas (SQL) del mes seleccionado -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
+                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Ingreso base del mes</span>
+                <span class="text-xl font-extrabold text-primary tabular-nums"
+                      th:text="'$ ' + ${#numbers.formatDecimal(snapshot.actualIncome, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                <span class="text-[11px] text-on-surface-variant tabular-nums"
+                      th:text="${snapshot.totalTransactionsCount} + ' movimientos confirmados'">0 movimientos</span>
+            </div>
+
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
+                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Obligatorios y deudas</span>
+                <span class="text-xl font-extrabold text-primary tabular-nums"
+                      th:text="'$ ' + ${#numbers.formatDecimal(snapshot.needsSpent, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                <span class="text-[11px] tabular-nums"
+                      th:classappend="${snapshot.essentialExceeded} ? ' text-error font-bold' : ' text-on-surface-variant'"
+                      th:text="'Meta ' + ${snapshot.needsPct} + '%: $ ' + ${#numbers.formatDecimal(snapshot.needsTarget, 1, 'POINT', 0, 'COMMA')}">Meta 50%</span>
+            </div>
+
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
+                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Deseos y gastos hormiga</span>
+                <span class="text-xl font-extrabold text-secondary tabular-nums"
+                      th:text="'$ ' + ${#numbers.formatDecimal(snapshot.wantsSpent, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                <span class="text-[11px] text-on-surface-variant tabular-nums"
+                      th:text="${snapshot.smallExpensesCount} + ' gastos hormiga: $ ' + ${#numbers.formatDecimal(snapshot.smallExpensesTotal, 1, 'POINT', 0, 'COMMA')}">0 gastos hormiga</span>
+            </div>
+
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
+                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Ahorro logrado</span>
+                <span class="text-xl font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums"
+                      th:text="'$ ' + ${#numbers.formatDecimal(snapshot.savingsAchieved, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                <span class="text-[11px] text-on-surface-variant tabular-nums"
+                      th:text="'Meta ' + ${snapshot.savingsPct} + '%: $ ' + ${#numbers.formatDecimal(snapshot.savingsTarget, 1, 'POINT', 0, 'COMMA')}">Meta 20%</span>
+            </div>
+        </section>
+
+        <!-- Bloque 1: Resumen organizado del mes (al pulsar "Analizar mes") -->
+        <section th:if="${summaryNarrative != null}"
+                 class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/35 shadow-xs flex flex-col gap-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-xl bg-secondary-container text-secondary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[18px]">summarize</span>
+                    </span>
+                    <div>
+                        <h2 class="text-base font-extrabold text-primary m-0" th:text="'Resumen organizado — ' + ${selectedMonthLabel}">Resumen del mes</h2>
+                        <span class="text-[11px] text-on-surface-variant" th:text="'Redactado con ' + ${summaryNarrative.providerLabel}">Gemini</span>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 rounded-xl bg-surface-container-low/70 border border-outline-variant/25 text-xs sm:text-sm text-on-surface cc-narrative-prose"
+                 th:text="${summaryNarrative.text}"></div>
+        </section>
+
+        <!-- Bloque 2: Recomendación para el mes siguiente (3 buckets formales + narrativa + decisión RF-16) -->
+        <section th:if="${nextAllocation != null}"
+                 class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/35 shadow-xs flex flex-col gap-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-9 h-9 rounded-xl bg-primary-container text-secondary-fixed flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+                    </span>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-primary m-0"
+                            th:text="'Recomendación para ' + ${nextMonthLabel}">Recomendación para Noviembre 2026</h2>
+                        <span class="text-[11px] text-on-surface-variant tabular-nums"
+                              th:text="'Distribución sugerida: ' + ${nextAllocation.needsPct} + '% Necesidades · ' + ${nextAllocation.wantsPct} + '% Deseos · ' + ${nextAllocation.savingsPct} + '% Ahorro'">50 / 30 / 20</span>
+                    </div>
+                </div>
+                <span th:if="${suggestedBudget != null}"
+                      class="px-3 py-1 rounded-full text-[11px] font-bold bg-surface-container text-primary border border-outline-variant/35"
+                      th:text="'Estado del plan: ' + ${suggestedBudget.status}">SUGGESTED</span>
+            </div>
+
+            <!-- 3 bloques formales: Indispensable / Deberías ahorrar / Podrías ahorrar o gastar en deseos -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 rounded-2xl bg-primary-container text-on-primary flex flex-col gap-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-secondary-fixed">1. Indispensable (No gastar)</span>
+                    <span class="text-2xl font-extrabold tabular-nums"
+                          th:text="'$ ' + ${#numbers.formatDecimal(nextAllocation.indispensableAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                    <p class="text-xs text-white/85 m-0">
+                        Reserva prioritaria para deudas, pagos fijos y necesidades esenciales del próximo mes.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-emerald-700/10 border border-emerald-700/30 flex flex-col gap-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">2. Deberías ahorrar</span>
+                    <span class="text-2xl font-extrabold text-emerald-800 dark:text-emerald-300 tabular-nums"
+                          th:text="'$ ' + ${#numbers.formatDecimal(nextAllocation.recommendedSavingsAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                    <p class="text-xs text-on-surface-variant m-0">
+                        Meta de ahorro recomendada al inicio del periodo según tu regla de presupuesto.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-secondary-container/50 border border-secondary/25 flex flex-col gap-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-secondary">3. Disponible / Podrías ahorrar extra</span>
+                    <span class="text-2xl font-extrabold text-primary tabular-nums"
+                          th:text="'$ ' + ${#numbers.formatDecimal(nextAllocation.flexibleWantsAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                    <p class="text-xs text-on-surface-variant m-0 tabular-nums"
+                       th:text="${nextAllocation.potentialExtraSavings > 0} ? ('Tope para deseos. Recortando la mitad de tus gastos hormiga podrías ahorrar $ ' + ${#numbers.formatDecimal(nextAllocation.potentialExtraSavings, 1, 'POINT', 0, 'COMMA')} + ' COP extra.') : 'Tope máximo recomendado para gustos y compras discrecionales.'">
+                        Tope para deseos
+                    </p>
+                </div>
+            </div>
+
+            <!-- Narrativa redactada por Gemini (si se solicitó recomendación) o resumen guardado -->
+            <div th:if="${recommendationNarrative != null}"
+                 class="p-4 rounded-xl bg-surface-container-low/75 border border-outline-variant/25 flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-primary">Análisis personalizado</span>
+                    <span class="text-[11px] font-semibold text-on-surface-variant" th:text="${recommendationNarrative.providerLabel}">gemini-2.5-flash</span>
+                </div>
+                <div class="text-xs sm:text-sm text-on-surface cc-narrative-prose" th:text="${recommendationNarrative.text}"></div>
+            </div>
+
+            <div th:if="${recommendationNarrative == null and savedReport != null}"
+                 class="p-4 rounded-xl bg-surface-container-low/75 border border-outline-variant/25 flex flex-col gap-2">
+                <span class="text-xs font-extrabold text-primary">Último cierre guardado</span>
+                <p class="text-xs sm:text-sm text-on-surface m-0" th:text="${savedReport.verdictSummary}"></p>
+            </div>
+
+            <!-- Acciones RF-16: Aceptar / Editar / Ignorar plan sugerido -->
+            <div th:if="${suggestedBudget != null or (closureView != null and closureView.suggestedNextPlan != null)}"
+                 th:with="planObj=${closureView != null ? closureView.suggestedNextPlan : suggestedBudget}"
+                 class="pt-4 border-t border-outline-variant/25 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2">
+                    <form method="post" action="/recommendations/plan-decision" class="m-0">
+                        <input type="hidden" name="budgetId" th:value="${planObj.id}"/>
+                        <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                        <input type="hidden" name="status" value="ACCEPTED"/>
+                        <button type="submit"
+                                class="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold border-0 cursor-pointer flex items-center gap-1.5 transition-colors">
+                            <span class="material-symbols-outlined text-[17px]">check</span>
+                            <span>Aceptar plan</span>
+                        </button>
+                    </form>
+
+                    <form method="post" action="/recommendations/plan-decision" class="m-0">
+                        <input type="hidden" name="budgetId" th:value="${planObj.id}"/>
+                        <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                        <input type="hidden" name="status" value="IGNORED"/>
+                        <button type="submit"
+                                class="h-10 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant text-xs font-bold border border-outline-variant/40 cursor-pointer transition-colors">
+                            Ignorar
+                        </button>
+                    </form>
+                </div>
+
+                <form method="post" action="/recommendations/plan-decision" class="m-0 flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="budgetId" th:value="${planObj.id}"/>
+                    <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                    <input type="hidden" name="status" value="EDITED"/>
+                    <span class="text-[11px] font-bold text-on-surface-variant">Ajustar (% = 100):</span>
+                    <input type="number" name="needsPct" min="0" max="100" th:value="${planObj.needsPct}"
+                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary" aria-label="Necesidades %"/>
+                    <input type="number" name="wantsPct" min="0" max="100" th:value="${planObj.wantsPct}"
+                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary" aria-label="Deseos %"/>
+                    <input type="number" name="savingsPct" min="0" max="100" th:value="${planObj.savingsPct}"
+                           class="w-16 h-9 px-2 rounded-lg bg-surface-container-low border border-outline-variant/45 text-xs font-bold text-center text-primary" aria-label="Ahorro %"/>
+                    <button type="submit"
+                            class="h-9 px-3 rounded-xl bg-primary-container text-on-primary text-xs font-bold border-0 cursor-pointer hover:opacity-95">
+                        Guardar ajuste
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Estado inicial antes de generar recomendación -->
+        <section th:if="${summaryNarrative == null and nextAllocation == null}"
+                 class="bg-surface-container-lowest rounded-2xl p-6 border border-dashed border-outline-variant/60 text-center flex flex-col items-center gap-2">
+            <span class="material-symbols-outlined text-3xl text-secondary">insights</span>
+            <h2 class="text-sm font-extrabold text-primary m-0">Selecciona un mes y elige una acción</h2>
+            <p class="text-xs text-on-surface-variant max-w-lg m-0">
+                Pulsa <strong>Analizar mes</strong> para obtener el resumen organizado de tus gastos o <strong>Recomendar próximo mes</strong> para calcular cuánto debes reservar, ahorrar y cuánto puedes gastar.
+            </p>
+        </section>
+    </main>
+</div>
+
+<div th:replace="~{fragments/mobile-nav :: bottomNav('recommendations')}"></div>
+</body>
+</html>
