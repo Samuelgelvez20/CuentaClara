@@ -92,8 +92,11 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem 1rem;
+    gap: 0.65rem 0.85rem;
     padding: 0.875rem 1.25rem;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
     border-bottom: 1px solid color-mix(in srgb, var(--outline-variant) 45%, transparent);
 }
 
@@ -102,6 +105,7 @@
     align-items: center;
     gap: 0.5rem;
     position: relative;
+    min-width: 0;
 }
 
 .cc-cal-month-title {
@@ -111,6 +115,7 @@
     letter-spacing: -0.02em;
     margin: 0;
     line-height: 1.2;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Menú discreto para saltar a cualquier mes/año */
@@ -168,18 +173,21 @@
     border: 1px solid color-mix(in srgb, var(--outline-variant) 45%, transparent);
     border-radius: 0.85rem;
     gap: 2px;
+    max-width: 100%;
+    flex-shrink: 0;
 }
 
 .cc-segmented-btn {
-    min-height: 40px;
-    min-width: 72px;
-    padding: 0 0.9rem;
+    min-height: 36px;
+    min-width: 64px;
+    padding: 0 0.75rem;
     border: 0;
     border-radius: 0.65rem;
     background: transparent;
     color: var(--on-surface-variant);
     font-size: 0.78rem;
     font-weight: 700;
+    white-space: nowrap;
     cursor: pointer;
     transition: background-color 160ms ease, color 160ms ease, transform 120ms var(--ease-out);
 }
@@ -475,14 +483,32 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* El día actual se marca SOLO con un círculo en el número */
+/* El día actual se marca con círculo sólido en el número + pill discreto "Hoy" */
+.cc-day-cell.is-today {
+    background-color: color-mix(in srgb, var(--secondary-container) 28%, var(--surface-container-lowest));
+}
+
 .cc-day-cell.is-today .cc-day-num {
     background-color: var(--secondary);
     color: var(--on-secondary);
     font-weight: 800;
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--secondary) 35%, transparent);
 }
 
-/* Botón "+" discreto al pasar el cursor o enfocar la celda */
+.cc-today-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    background-color: var(--secondary);
+    color: var(--on-secondary);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+}
+
+/* Botón "+" discreto al pasar el cursor o enfocar cualquier celda */
 .cc-cell-add-btn {
     width: 26px;
     height: 26px;
@@ -500,8 +526,7 @@
 }
 
 .cc-day-cell:hover .cc-cell-add-btn,
-.cc-day-cell:focus-within .cc-cell-add-btn,
-.cc-day-cell.is-selected .cc-cell-add-btn {
+.cc-day-cell:focus-within .cc-cell-add-btn {
     opacity: 1;
     transform: scale(1);
 }
@@ -585,13 +610,13 @@ html.dark .cc-chip-expense {
 }
 
 .cc-cell-total {
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--primary);
+    font-size: 0.67rem;
+    font-weight: 600;
+    color: var(--on-surface-variant);
     text-align: right;
     font-variant-numeric: tabular-nums;
     padding-top: 2px;
-    border-top: 1px solid color-mix(in srgb, var(--outline-variant) 28%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--outline-variant) 25%, transparent);
 }
 
 /* Puntos de color solo visibles en móvil */

@@ -169,7 +169,7 @@
 </aside>
 
 <!-- RIGHT DESKTOP/MOBILE WORKSPACE -->
-<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full overflow-x-hidden transition-[padding] duration-200 ease-out">
+<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0 overflow-x-clip transition-[padding] duration-200 ease-out">
     <!-- Top Header Bar -->
     <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
         <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-space-xl flex items-center justify-between gap-2 sm:gap-space-md">
@@ -208,7 +208,7 @@
         </div>
     </header>
 
-    <main class="w-full pt-16 lg:pt-20 bg-surface flex-1">
+    <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
         <div class="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-4 flex flex-col gap-3 sm:gap-4 max-w-[1640px] mx-auto">
 
             <!-- Alertas Flash -->
@@ -314,7 +314,7 @@
                     </div>
 
                     <!-- Derecha: Anterior / Hoy / Siguiente + acceso rápido Subir factura -->
-                    <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-2 flex-wrap min-w-0 max-w-full">
                         <div class="cc-nav-group" role="group" aria-label="Navegar periodo">
                             <a id="cc-nav-prev" th:href="@{/dashboard(month=${prevMonth})}" class="cc-nav-btn" aria-label="Anterior" title="Anterior">
                                 <span class="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -324,15 +324,15 @@
                                 <span class="material-symbols-outlined text-[18px]">chevron_right</span>
                             </a>
                         </div>
-                        <a href="/upload" class="cc-nav-btn bg-primary-container text-on-primary border-0 hover:opacity-95" title="Subir factura o recibo">
+                        <a href="/upload" class="cc-nav-btn bg-primary-container text-on-primary border-0 hover:opacity-95 whitespace-nowrap flex-shrink-0" title="Subir factura o recibo">
                             <span class="material-symbols-outlined text-[18px] mr-1">upload_file</span>
-                            <span class="hidden sm:inline">Factura</span>
+                            <span class="hidden sm:inline">+ Factura</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- Barra de filtros rápidos con conteos + leyenda compacta de 4 estados -->
-                <div class="cc-legend-inline justify-between" aria-label="Filtros y leyenda del calendario">
+                <!-- Barra de filtros rápidos con conteos -->
+                <div class="cc-legend-inline" aria-label="Filtros del calendario">
                     <div class="cc-filter-pills" id="cc-filter-pills" role="group" aria-label="Filtrar movimientos del calendario">
                         <button type="button" class="cc-filter-pill is-active" data-cal-filter="all">
                             <span>Todos</span>
@@ -354,10 +354,6 @@
                             <span class="cc-pill-count" id="cc-count-expense">0</span>
                         </button>
                     </div>
-                    <span class="cc-legend-item">
-                        <span class="cc-dot cc-dot-today"></span>
-                        <span>Hoy</span>
-                    </span>
                 </div>
 
                 <!-- Área principal del calendario (izquierda: vista Mes/Semana/Día; derecha: panel de día en Paso 4) -->
@@ -398,7 +394,10 @@
                                          th:classappend="${cell.today} ? 'is-today' : ''">
 
                                         <div class="cc-day-top">
-                                            <span class="cc-day-num" th:text="${cell.dayNumber}">1</span>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="cc-day-num" th:text="${cell.dayNumber}">1</span>
+                                                <span th:if="${cell.today}" class="cc-today-pill">Hoy</span>
+                                            </div>
                                             <button type="button"
                                                     class="cc-cell-add-btn"
                                                     th:attr="data-quick-add-day=${cell.dayNumber}"
@@ -413,6 +412,7 @@
                                              th:with="obCount=${#lists.size(cell.obligations)}, txCount=${#lists.size(cell.transactions)}, totalItems=${obCount + txCount}">
                                             <div th:each="ob, obStat : ${cell.obligations}"
                                                  th:if="${obStat.index < 2}"
+                                                 th:title="${ob.name}"
                                                  class="cc-chip"
                                                  th:classappend="${ob.paidThisMonth} ? 'cc-chip-paid' : 'cc-chip-pending'">
                                                 <span class="cc-chip-title" th:text="${ob.name}">Arriendo</span>
@@ -421,6 +421,7 @@
 
                                             <div th:each="tx, txStat : ${cell.transactions}"
                                                  th:if="${(obCount + txStat.index) < 2}"
+                                                 th:title="${tx.merchantName}"
                                                  class="cc-chip cc-chip-expense">
                                                 <span class="cc-chip-title" th:text="${tx.merchantName}">Comercio</span>
                                                 <span class="cc-chip-amt" th:text="'$' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span>
@@ -440,10 +441,10 @@
                                             <span th:if="${!#lists.isEmpty(cell.transactions)}" class="cc-dot cc-dot-expense"></span>
                                         </div>
 
-                                        <!-- Total del día solo si hay gastos -->
-                                        <div th:if="${cell.dayTotal > 0}"
+                                        <!-- Total del día solo cuando hay múltiples movimientos (evita duplicar el monto de un solo ítem) -->
+                                        <div th:if="${cell.dayTotal > 0 and (#lists.size(cell.obligations) + #lists.size(cell.transactions)) > 1}"
                                              class="cc-cell-total"
-                                             th:text="'$ ' + ${#numbers.formatDecimal(cell.dayTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</div>
+                                             th:text="'Total: $ ' + ${#numbers.formatDecimal(cell.dayTotal, 1, 'POINT', 0, 'COMMA')}">Total: $ 0</div>
 
                                         <!-- Datos ocultos del día para panel lateral, popover, vista semanal y vista diaria -->
                                         <div th:id="'day-data-' + ${cell.dayNumber}" class="hidden"
@@ -599,7 +600,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 flex-shrink-0">
-                                    <span class="text-xs font-bold text-secondary"
+                                    <span class="text-xs font-bold text-secondary tabular-nums"
                                           th:text="'$ ' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}">$ 1.200.000</span>
                                 </div>
                             </div>
@@ -624,9 +625,10 @@
                     <section aria-label="Distribución de tu dinero" class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex flex-col">
-                                <h3 class="text-base text-primary font-bold m-0"
+                                <h3 class="text-base text-primary font-bold m-0 tabular-nums"
                                     th:text="${profile != null ? 'Presupuesto ' + profile.needsPct + ' / ' + profile.wantsPct + ' / ' + profile.savingsPct : 'Presupuesto 50 / 30 / 20'}">Presupuesto 50 / 30 / 20</h3>
-                                <p class="text-xs text-on-surface-variant m-0">Distribución mensual según tu ingreso</p>
+                                <p class="text-xs text-on-surface-variant m-0 tabular-nums"
+                                   th:text="${profile != null ? profile.needsPct + '% Necesidades · ' + profile.wantsPct + '% Deseos · ' + profile.savingsPct + '% Ahorro' : '50% Necesidades · 30% Deseos · 20% Ahorro'}">50% Necesidades · 30% Deseos · 20% Ahorro</p>
                             </div>
                             <a class="p-2 rounded-xl text-primary hover:bg-surface-container-high transition-colors no-underline" href="/profile" title="Editar presupuesto">
                                 <span class="material-symbols-outlined text-[20px]">tune</span>

@@ -22,19 +22,19 @@
     --tertiary-container: #00695f;
     --tertiary-fixed: #89f5e7;
     --tertiary-fixed-dim: #6bd8cb;
-    --surface: #fff8f8;
-    --background: #fff8f8;
+    --surface: #faf7f8;
+    --background: #faf7f8;
     --surface-bright: #ffffff;
     --surface-container-lowest: #ffffff;
-    --surface-container-low: #fff0f2;
-    --surface-container: #ffe8ec;
-    --surface-container-high: #ffdfe5;
-    --surface-container-highest: #ffd5dd;
+    --surface-container-low: #f4eff1;
+    --surface-container: #ede5e8;
+    --surface-container-high: #e5dae0;
+    --surface-container-highest: #dccdd4;
     --on-surface: #2d0012;
     --on-background: #2d0012;
     --on-surface-variant: #5c4048;
     --outline: #8a6e76;
-    --outline-variant: #dec0c8;
+    --outline-variant: #e2d5da;
     --error: #ba1a1a;
     --error-container: #ffdad6;
     --on-error-container: #93000a;
@@ -374,6 +374,21 @@ html {
     -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
     overscroll-behavior: none;
+    background-color: var(--surface);
+}
+
+body {
+    background-color: var(--surface);
+    min-height: 100dvh;
+}
+
+aside nav a,
+#cc-sidebar .cc-nav-link {
+    border-radius: 0.75rem !important;
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
 }
 
 button, a, [role="button"] {

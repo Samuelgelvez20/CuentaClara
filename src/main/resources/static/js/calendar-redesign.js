@@ -38,6 +38,21 @@
             .replace(/"/g, '&quot;');
     }
 
+    function cleanDisplayTitle(raw) {
+        const original = String(raw || '').trim();
+        if (!original) return '';
+        let cleaned = original
+            .replace(/\b(S\.?\s*A\.?\s*S\.?|S\.?\s*A\.?|LTDA\.?|CIA\.?|INC\.?|CORP\.?)\b/gi, '')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/[.,\-\s]+$/, '')
+            .trim();
+        if (!cleaned) cleaned = original;
+        if (cleaned === cleaned.toUpperCase() && cleaned.length > 3) {
+            cleaned = cleaned.toLowerCase().replace(/\b\p{L}/gu, c => c.toUpperCase());
+        }
+        return cleaned;
+    }
+
     // Leer todos los datos del mes renderizados por Thymeleaf en #day-data-N
     function readDayData(dayNum) {
         const dataEl = document.getElementById('day-data-' + dayNum);
@@ -845,7 +860,20 @@
         });
     });
 
+    function polishChipTitles() {
+        document.querySelectorAll('.cc-chip').forEach(chip => {
+            const titleEl = chip.querySelector('.cc-chip-title');
+            if (!titleEl) return;
+            const fullText = chip.getAttribute('title') || titleEl.textContent.trim();
+            if (fullText) {
+                chip.setAttribute('title', fullText);
+                titleEl.textContent = cleanDisplayTitle(fullText);
+            }
+        });
+    }
+
     populateOutsideMonthDays();
+    polishChipTitles();
     updateFilterCounts();
     applyCalendarFilter(activeCalFilter);
 
