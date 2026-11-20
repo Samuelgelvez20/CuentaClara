@@ -249,7 +249,7 @@
                 </div>
                 <div class="ml-auto">
                     <button type="button" onclick="confirmLanguageSelection()"
-                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary hover:bg-primary-container text-white text-xs font-semibold transition-all cursor-pointer border-0">
+                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-on-secondary hover:bg-primary-container hover:text-on-primary text-xs font-semibold transition-all cursor-pointer border-0">
                         <span>Aplicar idioma y moneda</span>
                     </button>
                 </div>
@@ -370,7 +370,7 @@
                     </form>
                     <div class="flex flex-col gap-0.5 flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded-full bg-primary-container text-white text-[11px] font-bold" th:text="'Día ' + ${ob.dueDay} + ' de cada mes'">Día 5</span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary text-[11px] font-bold" th:text="'Día ' + ${ob.dueDay} + ' de cada mes'">Día 5</span>
                             <span class="text-xs text-on-surface-variant font-medium truncate" th:text="${ob.category}">Vivienda</span>
                         </div>
                         <span class="text-sm font-bold text-on-surface mt-1 truncate" th:text="${ob.name}">Alquiler</span>
@@ -397,7 +397,7 @@
                            class="w-full h-10 px-3.5 rounded-xl border border-outline-variant bg-surface text-on-surface text-sm font-bold"/>
                 </div>
                 <div>
-                    <button type="submit" class="w-full h-10 px-4 rounded-xl bg-secondary text-white text-xs font-bold shadow-sm hover:opacity-95 transition-opacity flex items-center justify-center gap-1.5">
+                    <button type="submit" class="w-full h-10 px-4 rounded-xl bg-secondary text-on-secondary text-xs font-bold shadow-sm hover:opacity-95 transition-opacity flex items-center justify-center gap-1.5 cursor-pointer border-0">
                         <span class="material-symbols-outlined text-[18px]">add_circle</span>
                         <span>Agendar cada Mes</span>
                     </button>
@@ -462,7 +462,7 @@
 
     function updateActiveThemeUI(currentTheme) {
         document.querySelectorAll('.theme-card').forEach(card => {
-            card.classList.remove('border-primary', 'ring-2', 'ring-primary/30', 'bg-surface-container');
+            card.classList.remove('border-secondary', 'border-primary', 'ring-2', 'ring-secondary/30', 'ring-primary/30', 'bg-surface-container');
             card.classList.add('border-outline-variant/40', 'bg-surface-container-low');
             const icon = card.querySelector('.check-icon');
             if (icon) icon.classList.add('hidden');
@@ -471,7 +471,7 @@
         const activeCard = document.getElementById('theme-btn-' + currentTheme);
         if (activeCard) {
             activeCard.classList.remove('border-outline-variant/40', 'bg-surface-container-low');
-            activeCard.classList.add('border-primary', 'ring-2', 'ring-primary/30', 'bg-surface-container');
+            activeCard.classList.add('border-secondary', 'ring-2', 'ring-secondary/30', 'bg-surface-container');
             const icon = activeCard.querySelector('.check-icon');
             if (icon) icon.classList.remove('hidden');
         }
@@ -483,15 +483,15 @@
         const headerLabel = document.getElementById('header-mode-label');
 
         if (currentMode === 'dark') {
-            btnDark.classList.add('bg-primary-container', 'text-white', 'shadow-sm');
+            btnDark.classList.add('bg-primary-container', 'text-on-primary', 'shadow-sm');
             btnDark.classList.remove('text-on-surface');
-            btnLight.classList.remove('bg-primary-container', 'text-white', 'shadow-sm');
+            btnLight.classList.remove('bg-primary-container', 'text-on-primary', 'shadow-sm');
             btnLight.classList.add('text-on-surface');
             if (headerLabel) headerLabel.textContent = 'Modo Oscuro';
         } else {
-            btnLight.classList.add('bg-primary-container', 'text-white', 'shadow-sm');
+            btnLight.classList.add('bg-primary-container', 'text-on-primary', 'shadow-sm');
             btnLight.classList.remove('text-on-surface');
-            btnDark.classList.remove('bg-primary-container', 'text-white', 'shadow-sm');
+            btnDark.classList.remove('bg-primary-container', 'text-on-primary', 'shadow-sm');
             btnDark.classList.add('text-on-surface');
             if (headerLabel) headerLabel.textContent = 'Modo Claro';
         }

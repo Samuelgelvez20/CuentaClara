@@ -228,7 +228,7 @@
                             <div class="p-space-xs rounded-lg bg-surface-container-low flex flex-col gap-space-xxs">
                                 <div class="flex items-center justify-between">
                                     <span class="font-label-sm text-[11px] text-on-surface-variant font-medium">Deseos</span>
-                                    <span class="font-title-md text-body-sm font-bold text-amber-700" id="valWantsPct">30%</span>
+                                    <span class="font-title-md text-body-sm font-bold text-amber-700 dark:text-amber-300" id="valWantsPct">30%</span>
                                 </div>
                                 <span class="font-title-md text-body-sm font-semibold text-on-surface truncate" id="valWantsAmt">$ 1.440.000</span>
                                 <input class="w-full accent-amber-600 cursor-pointer" id="rangeWants" name="wantsPct" max="90" min="0" type="range"
@@ -256,7 +256,7 @@
                             <p class="text-xs text-on-surface-variant m-0">Compromisos que vencen el mismo día cada mes (1 al 31).</p>
                         </div>
                         <button type="button" onclick="addProfileObligationRow()"
-                                class="px-3.5 py-1.5 rounded-xl bg-secondary text-white text-xs font-semibold hover:opacity-95 transition-opacity flex items-center gap-1 border-0 cursor-pointer">
+                                class="px-3.5 py-1.5 rounded-xl bg-secondary text-on-secondary text-xs font-semibold hover:opacity-95 transition-opacity flex items-center gap-1 border-0 cursor-pointer">
                             <span>+ Agregar pago fijo</span>
                         </button>
                     </div>
@@ -408,7 +408,7 @@
                 <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-outline-variant/30 flex flex-col gap-space-md">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-space-sm">
-                            <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-lg bg-amber-500/15 text-amber-700 dark:text-amber-300 flex items-center justify-center">
                                 <span class="material-symbols-outlined text-[22px]">local_cafe</span>
                             </div>
                             <div class="flex flex-col">
@@ -416,14 +416,14 @@
                                 <h3 class="text-sm text-on-surface font-semibold m-0">Gustos y ocio</h3>
                             </div>
                         </div>
-                        <span class="text-base font-bold text-amber-700" id="cardWantsAmt">$ 1.440.000</span>
+                        <span class="text-base font-bold text-amber-700 dark:text-amber-300 tabular-nums" id="cardWantsAmt">$ 1.440.000</span>
                     </div>
                 </div>
 
                 <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-outline-variant/30 flex flex-col gap-space-md">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-space-sm">
-                            <div class="w-10 h-10 rounded-lg bg-teal-50 text-teal-800 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
                                 <span class="material-symbols-outlined text-[22px]">savings</span>
                             </div>
                             <div class="flex flex-col">
@@ -431,7 +431,7 @@
                                 <h3 class="text-sm text-on-surface font-semibold m-0">Reserva mensual</h3>
                             </div>
                         </div>
-                        <span class="text-base font-bold text-primary" id="cardSavingsAmt">$ 960.000</span>
+                        <span class="text-base font-bold text-emerald-700 dark:text-emerald-300 tabular-nums" id="cardSavingsAmt">$ 960.000</span>
                     </div>
                 </div>
             </div>

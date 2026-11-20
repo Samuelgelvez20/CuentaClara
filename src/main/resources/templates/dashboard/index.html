@@ -496,7 +496,7 @@
                                 <p class="text-xs text-on-surface-variant m-0">Se repiten en la fecha indicada de cada mes</p>
                             </div>
                             <button type="button" onclick="openObligationModal()"
-                                    class="px-3.5 py-2 rounded-xl bg-secondary text-white text-xs font-semibold hover:opacity-95 transition-opacity cursor-pointer border-0">
+                                    class="px-3.5 py-2 rounded-xl bg-secondary text-on-secondary text-xs font-semibold hover:opacity-95 transition-opacity cursor-pointer border-0">
                                 + Agregar pago fijo
                             </button>
                         </div>
@@ -515,7 +515,7 @@
                                             &minus;
                                         </button>
                                     </form>
-                                    <div class="w-10 h-10 rounded-xl bg-primary-container text-white flex flex-col items-center justify-center flex-shrink-0 leading-none">
+                                    <div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary flex flex-col items-center justify-center flex-shrink-0 leading-none">
                                         <span class="text-[9px] uppercase font-semibold opacity-80">Día</span>
                                         <span class="text-sm font-bold" th:text="${ob.dueDay}">5</span>
                                     </div>
@@ -535,7 +535,7 @@
                         <div class="pt-3 border-t border-outline-variant/20 flex items-center justify-between flex-wrap gap-2">
                             <span class="text-xs text-on-surface-variant">Consulta y filtra todos los movimientos del mes</span>
                             <a th:href="@{/history(month=${selectedMonth})}"
-                               class="px-3.5 py-1.5 rounded-xl bg-surface-container-high hover:bg-primary-container hover:text-white text-primary text-xs font-semibold no-underline transition-all flex items-center gap-1.5">
+                               class="px-3.5 py-1.5 rounded-xl bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-primary text-xs font-semibold no-underline transition-all flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-[16px]">receipt_long</span>
                                 <span>Ver historial del mes</span>
                             </a>

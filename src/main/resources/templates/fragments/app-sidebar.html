@@ -9,7 +9,7 @@
         <div class="cc-sidebar-brand p-6 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
                 <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[24px]" aria-hidden="true">calendar_month</span>
+                    <span class="material-symbols-outlined text-on-primary text-[24px]" aria-hidden="true">calendar_month</span>
                 </div>
                 <div class="flex flex-col cc-sidebar-text min-w-0">
                     <span class="text-lg text-primary leading-tight font-extrabold tracking-tight truncate">CuentaClara</span>
@@ -30,26 +30,26 @@
             <nav class="flex flex-col gap-1.5" aria-label="Navegación lateral">
                 <a title="Calendario" href="/dashboard"
                    class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
-                   th:classappend="${activePage == 'dashboard'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary'"
+                   th:classappend="${activePage == 'dashboard'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
                    th:attr="aria-current=${activePage == 'dashboard'} ? 'page' : null">
                     <span class="material-symbols-outlined text-[20px] flex-shrink-0"
-                          th:classappend="${activePage == 'dashboard'} ? ' text-secondary-fixed' : ''" aria-hidden="true">calendar_month</span>
+                          th:classappend="${activePage == 'dashboard'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">calendar_month</span>
                     <span class="cc-sidebar-text">Calendario</span>
                 </a>
                 <a title="Historial de gastos" href="/history"
                    class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
-                   th:classappend="${activePage == 'history'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary'"
+                   th:classappend="${activePage == 'history'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
                    th:attr="aria-current=${activePage == 'history'} ? 'page' : null">
                     <span class="material-symbols-outlined text-[20px] flex-shrink-0"
-                          th:classappend="${activePage == 'history'} ? ' text-secondary-fixed' : ''" aria-hidden="true">receipt_long</span>
+                          th:classappend="${activePage == 'history'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">receipt_long</span>
                     <span class="cc-sidebar-text">Historial de gastos</span>
                 </a>
                 <a title="Facturas y recibos" href="/upload"
                    class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
-                   th:classappend="${activePage == 'upload'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary'"
+                   th:classappend="${activePage == 'upload'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
                    th:attr="aria-current=${activePage == 'upload'} ? 'page' : null">
                     <span class="material-symbols-outlined text-[20px] flex-shrink-0"
-                          th:classappend="${activePage == 'upload'} ? ' text-secondary-fixed' : ''" aria-hidden="true">upload_file</span>
+                          th:classappend="${activePage == 'upload'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">upload_file</span>
                     <span class="cc-sidebar-text">Facturas y recibos</span>
                     <span th:if="${pendingConfirmations != null and !#lists.isEmpty(pendingConfirmations)}"
                           class="cc-sidebar-text ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold"
@@ -57,34 +57,34 @@
                 </a>
                 <a title="Presupuesto y deudas" href="/profile"
                    class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
-                   th:classappend="${activePage == 'profile'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary'"
+                   th:classappend="${activePage == 'profile'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
                    th:attr="aria-current=${activePage == 'profile'} ? 'page' : null">
                     <span class="material-symbols-outlined text-[20px] flex-shrink-0"
-                          th:classappend="${activePage == 'profile'} ? ' text-secondary-fixed' : ''" aria-hidden="true">savings</span>
+                          th:classappend="${activePage == 'profile'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">savings</span>
                     <span class="cc-sidebar-text">Presupuesto y deudas</span>
                 </a>
                 <a title="Recomendaciones" href="/recommendations"
                    class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
-                   th:classappend="${activePage == 'recommendations'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary'"
+                   th:classappend="${activePage == 'recommendations'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
                    th:attr="aria-current=${activePage == 'recommendations'} ? 'page' : null">
                     <span class="material-symbols-outlined text-[20px] flex-shrink-0"
-                          th:classappend="${activePage == 'recommendations'} ? ' text-secondary-fixed' : ''" aria-hidden="true">auto_awesome</span>
+                          th:classappend="${activePage == 'recommendations'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">auto_awesome</span>
                     <span class="cc-sidebar-text">Recomendaciones</span>
                 </a>
                 <a title="Consultas" href="/assistant"
                    class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
-                   th:classappend="${activePage == 'assistant'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary'"
+                   th:classappend="${activePage == 'assistant'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
                    th:attr="aria-current=${activePage == 'assistant'} ? 'page' : null">
                     <span class="material-symbols-outlined text-[20px] flex-shrink-0"
-                          th:classappend="${activePage == 'assistant'} ? ' text-secondary-fixed' : ''" aria-hidden="true">chat_bubble</span>
+                          th:classappend="${activePage == 'assistant'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">chat_bubble</span>
                     <span class="cc-sidebar-text">Consultas</span>
                 </a>
                 <a title="Configuración" href="/settings"
                    class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
-                   th:classappend="${activePage == 'settings'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary'"
+                   th:classappend="${activePage == 'settings'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
                    th:attr="aria-current=${activePage == 'settings'} ? 'page' : null">
                     <span class="material-symbols-outlined text-[20px] flex-shrink-0"
-                          th:classappend="${activePage == 'settings'} ? ' text-secondary-fixed' : ''" aria-hidden="true">tune</span>
+                          th:classappend="${activePage == 'settings'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">tune</span>
                     <span class="cc-sidebar-text">Configuración</span>
                 </a>
             </nav>
