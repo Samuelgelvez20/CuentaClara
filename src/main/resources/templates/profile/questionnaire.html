@@ -115,12 +115,12 @@
     <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
         <div class="flex flex-col w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 gap-5 max-w-[1600px] mx-auto">
 
-            <div th:if="${successMessage}" class="p-4 rounded-xl bg-secondary-container text-on-secondary-fixed font-body-md flex items-center gap-2">
-                <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            <div th:if="${successMessage}" role="status" class="px-4 py-3 rounded-xl bg-secondary-container text-on-secondary-container border border-secondary/25 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[20px] text-secondary" aria-hidden="true">check_circle</span>
                 <span th:text="${successMessage}"></span>
             </div>
-            <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container text-on-error-container font-body-md flex items-center gap-2">
-                <span class="material-symbols-outlined text-[20px]">error</span>
+            <div th:if="${errorMessage}" role="alert" class="px-4 py-3 rounded-xl bg-error-container text-on-error-container border border-error/25 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">error</span>
                 <span th:text="${errorMessage}"></span>
             </div>
 
@@ -508,7 +508,7 @@
                 sumBadge.textContent = isEn ? 'Sum: 100% Valid' : 'Suma: 100% Correcto';
                 if (sumBadge.firstChild) sumBadge.firstChild._ccOrigText = 'Suma: 100% Correcto';
             } else {
-                sumBadge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-error font-label-sm text-label-sm font-bold';
+                sumBadge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container border border-error/25 font-label-sm text-label-sm font-bold';
                 const origBadge = 'Suma: ' + sum + '% (Debe ser 100%)';
                 sumBadge.textContent = isEn ? ('Sum: ' + sum + '% (Must be 100%)') : origBadge;
                 if (sumBadge.firstChild) sumBadge.firstChild._ccOrigText = origBadge;

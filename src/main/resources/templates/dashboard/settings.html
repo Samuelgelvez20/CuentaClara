@@ -44,7 +44,10 @@
                         "on-surface": "var(--on-surface)",
                         "on-surface-variant": "var(--on-surface-variant)",
                         "outline": "var(--outline)",
-                        "outline-variant": "var(--outline-variant)"
+                        "outline-variant": "var(--outline-variant)",
+                        "error": "var(--error)",
+                        "error-container": "var(--error-container)",
+                        "on-error-container": "var(--on-error-container)"
                     },
                     borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
                     spacing: { "space-2xl": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "gutter-sm": "1rem", "margin-lg": "3rem", "margin-sm": "1rem", "gutter-lg": "2rem", "gutter": "1.5rem", "space-xxs": "0.25rem", "space-xs": "0.5rem", "margin": "2rem", "space-md": "1rem" },
@@ -79,14 +82,14 @@
     <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
         <!-- Alerts Notification -->
         <div class="px-3 sm:px-6 lg:px-8 pt-4" th:if="${successMessage}">
-            <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 flex items-center gap-3">
-                <span class="material-symbols-outlined text-emerald-600 text-[20px]" aria-hidden="true">check_circle</span>
+            <div role="status" class="p-3.5 rounded-xl bg-secondary-container border border-secondary/25 text-on-secondary-container flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary text-[20px]" aria-hidden="true">check_circle</span>
                 <span class="text-sm font-semibold" th:text="${successMessage}">Configuración guardada correctamente.</span>
             </div>
         </div>
         <div class="px-3 sm:px-6 lg:px-8 pt-4" th:if="${errorMessage}">
-            <div class="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-800 dark:text-red-300 flex items-center gap-3">
-                <span class="material-symbols-outlined text-red-600 text-[20px]" aria-hidden="true">error</span>
+            <div role="alert" class="p-3.5 rounded-xl bg-error-container border border-error/25 text-on-error-container flex items-center gap-3">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">error</span>
                 <span class="text-sm font-semibold" th:text="${errorMessage}">Error al guardar.</span>
             </div>
         </div>
@@ -243,8 +246,8 @@
 
             <!-- Botón de Confirmación de Idioma y Preferencias Regionales -->
             <div class="pt-space-sm border-t border-outline-variant/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div id="lang-confirm-toast" class="hidden items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-                    <span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+                <div id="lang-confirm-toast" role="status" class="hidden items-center gap-2 px-4 py-2 rounded-xl bg-secondary-container border border-secondary/25 text-on-secondary-container text-xs font-semibold">
+                    <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">check_circle</span>
                     <span id="lang-confirm-text">Idioma y moneda actualizados.</span>
                 </div>
                 <div class="ml-auto">

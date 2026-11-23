@@ -120,6 +120,14 @@
 
     <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
         <div class="flex flex-col w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 gap-5 max-w-[1600px] mx-auto">
+            <div th:if="${successMessage}" role="status" class="px-4 py-2.5 rounded-xl bg-secondary-container text-on-secondary-container border border-secondary/25 font-semibold text-xs flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">check_circle</span>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div th:if="${errorMessage}" role="alert" class="px-4 py-2.5 rounded-xl bg-error-container text-on-error-container border border-error/25 font-semibold text-xs flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
             <!-- DOM order: Chat primero (mejor Tab order y prioridad en móvil); lg:flex-row-reverse lo sitúa a la derecha en escritorio -->
             <div class="flex flex-col lg:flex-row-reverse gap-5 w-full items-start">
 

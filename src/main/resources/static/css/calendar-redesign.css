@@ -71,6 +71,7 @@
 
 .cc-metric-action:hover {
     background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
 }
 
 .cc-metric-action:active {
@@ -934,6 +935,7 @@ html.dark .cc-chip-expense {
 
 .cc-quick-pill:hover {
     background-color: var(--secondary-container);
+    color: var(--on-secondary-container);
 }
 
 .cc-quick-pill:active {
