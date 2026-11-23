@@ -35,10 +35,12 @@
 }
 
 .cc-metric-label {
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--on-surface-variant);
-    line-height: 1.2;
+    line-height: 1.25;
     white-space: nowrap;
 }
 
@@ -780,7 +782,8 @@ html.dark .cc-chip-expense {
     justify-content: center;
     gap: 0.4rem;
     cursor: pointer;
-    transition: opacity 150ms ease, transform 120ms var(--ease-out);
+    box-shadow: 0 2px 0 color-mix(in srgb, var(--primary) 35%, rgba(0, 0, 0, 0.22));
+    transition: opacity 150ms ease, transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out);
 }
 
 .cc-primary-btn:hover {
@@ -788,7 +791,8 @@ html.dark .cc-chip-expense {
 }
 
 .cc-primary-btn:active {
-    transform: scale(0.98);
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--primary) 25%, rgba(0, 0, 0, 0.16));
 }
 
 .cc-sheet-backdrop {
@@ -1269,6 +1273,13 @@ html.dark .cc-chip-expense {
     height: 100%;
     border-radius: 9999px;
     background-size: 10px 10px;
+    transition: width 320ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cc-capacity-fill {
+        transition: none;
+    }
 }
 
 .cc-fill-needs {
