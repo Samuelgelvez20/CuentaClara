@@ -230,7 +230,7 @@
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color 150ms ease, border-color 150ms ease, transform 120ms var(--ease-out);
+    transition: background-color 150ms ease, border-color 150ms ease, opacity 150ms ease, transform 120ms var(--ease-out);
 }
 
 .cc-nav-btn:hover {
@@ -251,6 +251,19 @@
 .cc-nav-btn-today:hover {
     background-color: var(--secondary);
     color: var(--on-secondary);
+}
+
+.cc-nav-btn-primary {
+    background-color: var(--primary-container);
+    border-color: transparent;
+    color: var(--on-primary);
+}
+
+.cc-nav-btn-primary:hover {
+    background-color: var(--primary-container);
+    border-color: transparent;
+    color: var(--on-primary);
+    opacity: 0.86;
 }
 
 /* Leyenda compacta en una línea alineada a la derecha */

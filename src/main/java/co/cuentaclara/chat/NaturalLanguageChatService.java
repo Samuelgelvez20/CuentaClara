@@ -93,7 +93,7 @@ public class NaturalLanguageChatService {
         boolean hasSpecificEntityFilter = detectedMerchantOrCode != null || detectedCategory != null || isSpecificTopicQuery(lower);
         List<HybridSearchAndChatToolsService.HybridChunkEvidence> verifiedChunks = filterRelevantChunks(lower, docChunks);
 
-        // 3. Caso: Pregunta sobre presupuesto / distribución 50/30/20
+        // 3. Caso: Pregunta sobre presupuesto / distribución de presupuesto
         if (lower.contains("presupuesto") || lower.contains("50/30/20") || lower.contains("distribución") || lower.contains("distribucion")) {
             Optional<FinancialProfileService.ProfileWithInitialBudget> profileOpt = profileService.getCurrentProfileAndBudget(userId);
             if (profileOpt.isPresent()) {
@@ -102,8 +102,11 @@ public class NaturalLanguageChatService {
                         toolsService.consultarTransacciones(userId, new HybridSearchAndChatToolsService.TransactionQueryFilters(detectedMonth, null, null, null, null, null));
                 List<String> citations = collectCitations(allTx.rows(), verifiedChunks);
                 String answer = String.format(
-                        "¡Hola! Tu ingreso base mensual registrado es de $%,.2f COP. Según tu distribución 50/30/20, tienes asignado un %d%% a Necesidades ($%,.2f COP), un %d%% a Deseos ($%,.2f COP) y un %d%% a Ahorro ($%,.2f COP). Hasta el momento llevas un gasto acumulado confirmado de $%,.2f COP en %d movimiento(s).",
+                        "¡Hola! Tu ingreso base mensual registrado es de $%,.2f COP. Según tu distribución %d/%d/%d, tienes asignado un %d%% a Necesidades ($%,.2f COP), un %d%% a Deseos ($%,.2f COP) y un %d%% a Ahorro ($%,.2f COP). Hasta el momento llevas un gasto acumulado confirmado de $%,.2f COP en %d movimiento(s).",
                         p.profile().getNetIncome(),
+                        p.profile().getNeedsPct(),
+                        p.profile().getWantsPct(),
+                        p.profile().getSavingsPct(),
                         p.profile().getNeedsPct(), p.initialBudget().getNeedsLimit(),
                         p.profile().getWantsPct(), p.initialBudget().getWantsLimit(),
                         p.profile().getSavingsPct(), p.initialBudget().getSavingsTarget(),

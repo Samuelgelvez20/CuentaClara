@@ -131,6 +131,29 @@ public class DocumentIngestionService {
         }
     }
 
+    /**
+     * Descarta un comprobante pendiente sin registrar gasto y libera sus claves de duplicado.
+     */
+    @Transactional
+    public void cancelPendingDocument(UUID userId, UUID documentId) {
+        DocumentEntity doc = documentRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado: " + documentId));
+        if (!doc.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("No tienes permiso para descartar este comprobante.");
+        }
+        if (doc.getStatus() == DocumentStatus.INDEXED) {
+            throw new IllegalStateException("Este comprobante ya fue confirmado y guardado como gasto.");
+        }
+        if (doc.getTempFilePath() != null && !doc.getTempFilePath().isBlank()) {
+            deleteTempQuietly(Path.of(doc.getTempFilePath()));
+        }
+        extractionRepository.findByDocumentId(documentId).ifPresent(ext -> {
+            extractionRepository.delete(ext);
+            extractionRepository.flush();
+        });
+        documentRepository.delete(doc);
+    }
+
     private void deleteTempQuietly(Path path) {
         try {
             if (path != null) {

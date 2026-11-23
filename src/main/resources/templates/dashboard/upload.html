@@ -291,8 +291,16 @@
                                 <strong class="text-primary">CUFE:</strong> <span th:text="${item.document.cufe}"></span>
                             </div>
 
-                            <button type="submit" data-loading-text="Guardando comprobante..." class="cc-cta-tactile w-full h-10 px-space-xl rounded-full bg-primary-container hover:opacity-95 text-on-primary text-xs font-bold flex items-center justify-center gap-2 cursor-pointer border-0">
+                            <button type="submit" data-loading-text="Guardando comprobante..." class="cc-cta-tactile w-full min-h-[44px] px-space-xl rounded-full bg-primary-container hover:opacity-95 text-on-primary text-xs font-bold flex items-center justify-center gap-2 cursor-pointer border-0">
                                 <span>Confirmar y guardar</span>
+                            </button>
+                        </form>
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/cancel'}" data-loading-submit class="-mt-3 m-0">
+                            <input type="hidden" name="returnTo" value="/upload"/>
+                            <button type="submit" data-loading-text="Descartando comprobante..."
+                                    class="w-full min-h-[44px] px-space-xl rounded-full bg-surface-container-low hover:bg-error-container text-on-surface-variant hover:text-on-error-container border border-outline-variant/40 hover:border-error/30 transition-colors text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                                <span>Cancelar y no guardar</span>
                             </button>
                         </form>
                     </div>

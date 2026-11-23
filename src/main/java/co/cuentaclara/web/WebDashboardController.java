@@ -492,6 +492,26 @@ public class WebDashboardController {
         }
     }
 
+    @PostMapping("/dashboard/documents/{documentId}/cancel")
+    public String cancelDocumentFromWeb(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @PathVariable UUID documentId,
+            @RequestParam(defaultValue = "/upload") String returnTo,
+            RedirectAttributes redirectAttributes
+    ) {
+        String safeReturn = (returnTo != null && returnTo.startsWith("/") && !returnTo.startsWith("//"))
+                ? returnTo
+                : "/upload";
+        try {
+            ingestionService.cancelPendingDocument(principal.userId(), documentId);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Comprobante descartado. No se guardó ningún gasto.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:" + safeReturn;
+    }
+
     @PostMapping("/dashboard/manual-expense")
     public String registerManualExpenseFromWeb(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,

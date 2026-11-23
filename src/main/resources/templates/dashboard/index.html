@@ -242,7 +242,7 @@
                                 <span class="material-symbols-outlined text-[18px]">chevron_right</span>
                             </a>
                         </div>
-                        <a href="/upload" class="cc-nav-btn bg-primary-container text-on-primary border-0 hover:opacity-95 whitespace-nowrap flex-shrink-0" title="Subir factura o recibo">
+                        <a href="/upload" class="cc-nav-btn cc-nav-btn-primary whitespace-nowrap flex-shrink-0" title="Subir factura o recibo">
                             <span class="material-symbols-outlined text-[18px] mr-1">upload_file</span>
                             <span class="hidden sm:inline">+ Factura</span>
                         </a>
@@ -481,9 +481,17 @@
                                            th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
                                 </div>
                             </div>
-                            <button type="submit" class="cc-cta-tactile w-full h-10 px-6 rounded-full bg-secondary hover:bg-primary-container hover:text-on-primary text-on-secondary transition-all text-sm flex items-center justify-center gap-2 font-bold border-0 cursor-pointer">
+                            <button type="submit" class="cc-cta-tactile w-full min-h-[44px] px-6 rounded-full bg-secondary hover:bg-primary-container hover:text-on-primary text-on-secondary transition-all text-sm flex items-center justify-center gap-2 font-bold border-0 cursor-pointer">
                                 <span class="material-symbols-outlined text-[18px]">check</span>
                                 <span>Confirmar y guardar</span>
+                            </button>
+                        </form>
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/cancel'}" data-loading-submit class="px-6 pb-6 -mt-3 m-0">
+                            <input type="hidden" name="returnTo" th:value="'/dashboard?month=' + ${selectedMonth}"/>
+                            <button type="submit" data-loading-text="Descartando..."
+                                    class="w-full min-h-[44px] px-6 rounded-full bg-surface-container-low hover:bg-error-container text-on-surface-variant hover:text-on-error-container border border-outline-variant/40 hover:border-error/30 transition-colors text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                                <span>Cancelar y no guardar</span>
                             </button>
                         </form>
                     </article>
