@@ -88,10 +88,10 @@
         </div>
 
         <!-- Cabecera + Selector de mes + Dos botones principales -->
-        <section class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/35 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <section class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-secondary">Evaluación y planificación mensual</span>
-                <h1 class="text-xl sm:text-2xl font-extrabold text-primary m-0 tracking-tight"
+                <span class="cc-eyebrow text-secondary">Evaluación y planificación mensual</span>
+                <h1 class="text-xl sm:text-2xl font-extrabold text-primary m-0"
                     th:text="'Análisis de ' + ${selectedMonthLabel}">Análisis de Octubre 2026</h1>
                 <p class="text-xs text-on-surface-variant m-0">
                     Las cifras se calculan en SQL sobre tus movimientos confirmados; Gemini redacta el análisis y el plan para <strong class="text-primary" th:text="${nextMonthLabel}">Noviembre 2026</strong>.
@@ -113,7 +113,7 @@
                 <form method="post" action="/recommendations/analyze" data-loading-submit class="m-0">
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
                     <button type="submit" data-loading-text="Analizando mes..."
-                            class="w-full sm:w-auto h-10 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary border border-outline-variant/45 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                            class="w-full sm:w-auto h-10 px-4 rounded-full bg-surface-container hover:bg-surface-container-high text-primary border border-outline-variant/50 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
                         <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">summarize</span>
                         <span>Analizar mes</span>
                     </button>
@@ -122,7 +122,7 @@
                 <form method="post" action="/recommendations/recommend" data-loading-submit class="m-0">
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
                     <button type="submit" data-loading-text="Consultando Gemini..."
-                            class="w-full sm:w-auto h-10 px-4 rounded-xl bg-primary-container hover:opacity-95 text-on-primary border-0 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all">
+                            class="cc-cta-tactile w-full sm:w-auto h-10 px-5 rounded-full bg-primary-container hover:opacity-95 text-on-primary border-0 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
                         <span class="material-symbols-outlined text-[18px] text-secondary-fixed" aria-hidden="true">auto_awesome</span>
                         <span>Recomendar próximo mes</span>
                     </button>
@@ -132,16 +132,16 @@
 
         <!-- 4 tarjetas numéricas exactas (SQL) del mes seleccionado -->
         <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
-            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
-                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Ingreso base del mes</span>
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/45 flex flex-col gap-1">
+                <span class="cc-eyebrow">Ingreso base del mes</span>
                 <span class="text-xl font-extrabold text-primary tabular-nums"
                       th:text="'$ ' + ${#numbers.formatDecimal(snapshot.actualIncome, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
                 <span class="text-[11px] text-on-surface-variant tabular-nums"
                       th:text="${snapshot.totalTransactionsCount} + ' movimientos confirmados'">0 movimientos</span>
             </div>
 
-            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
-                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Obligatorios y deudas</span>
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/45 flex flex-col gap-1">
+                <span class="cc-eyebrow">Obligatorios y deudas</span>
                 <span class="text-xl font-extrabold text-primary tabular-nums"
                       th:text="'$ ' + ${#numbers.formatDecimal(snapshot.needsSpent, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
                 <span class="text-[11px] tabular-nums"
@@ -149,16 +149,16 @@
                       th:text="'Meta ' + ${snapshot.needsPct} + '%: $ ' + ${#numbers.formatDecimal(snapshot.needsTarget, 1, 'POINT', 0, 'COMMA')}">Meta 50%</span>
             </div>
 
-            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
-                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Deseos y gastos hormiga</span>
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/45 flex flex-col gap-1">
+                <span class="cc-eyebrow">Deseos y gastos hormiga</span>
                 <span class="text-xl font-extrabold text-secondary tabular-nums"
                       th:text="'$ ' + ${#numbers.formatDecimal(snapshot.wantsSpent, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
                 <span class="text-[11px] text-on-surface-variant tabular-nums"
                       th:text="${snapshot.smallExpensesCount} + ' gastos hormiga: $ ' + ${#numbers.formatDecimal(snapshot.smallExpensesTotal, 1, 'POINT', 0, 'COMMA')}">0 gastos hormiga</span>
             </div>
 
-            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/35 flex flex-col gap-1">
-                <span class="text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">Ahorro logrado</span>
+            <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/45 flex flex-col gap-1">
+                <span class="cc-eyebrow">Ahorro logrado</span>
                 <span class="text-xl font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums"
                       th:text="'$ ' + ${#numbers.formatDecimal(snapshot.savingsAchieved, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
                 <span class="text-[11px] text-on-surface-variant tabular-nums"
@@ -168,7 +168,7 @@
 
         <!-- Bloque 1: Resumen organizado del mes (al pulsar "Analizar mes") -->
         <section th:if="${summaryNarrative != null}"
-                 class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/35 shadow-xs flex flex-col gap-3">
+                 class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-3">
             <div class="flex items-center justify-between flex-wrap gap-2">
                 <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-xl bg-secondary-container text-secondary flex items-center justify-center">
@@ -180,16 +180,16 @@
                     </div>
                 </div>
             </div>
-            <div class="p-4 rounded-xl bg-surface-container-low/70 border border-outline-variant/25 text-xs sm:text-sm text-on-surface cc-narrative-prose"
+            <div class="p-4 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 text-xs sm:text-sm text-on-surface cc-narrative-prose"
                  th:text="${summaryNarrative.text}"></div>
         </section>
 
-        <!-- Bloque 2: Recomendación para el mes siguiente (3 buckets formales + narrativa + decisión RF-16) -->
+        <!-- Bloque 2: Recomendación para el mes siguiente (Shopify 1-featured-card + hairline siblings + RF-16) -->
         <section th:if="${nextAllocation != null}"
-                 class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/35 shadow-xs flex flex-col gap-5">
+                 class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-5">
             <div class="flex items-center justify-between flex-wrap gap-2">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-9 h-9 rounded-xl bg-primary-container text-secondary-fixed flex items-center justify-center">
+                    <span class="w-9 h-9 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
                         <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
                     </span>
                     <div>
@@ -204,28 +204,28 @@
                       th:text="'Estado del plan: ' + ${suggestedBudget.status}">SUGGESTED</span>
             </div>
 
-            <!-- 3 bloques formales: Indispensable / Deberías ahorrar / Podrías ahorrar o gastar en deseos -->
+            <!-- 3 bloques formales: 1 tarjeta destacada suave (Shopify featured card) + 2 tarjetas limpias hairline (Apple) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="p-4 rounded-2xl bg-primary-container text-on-primary flex flex-col gap-1.5">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-secondary-fixed">1. Indispensable (No gastar)</span>
-                    <span class="text-2xl font-extrabold tabular-nums"
+                <div class="cc-card-featured p-4 rounded-2xl flex flex-col gap-1.5">
+                    <span class="cc-eyebrow text-secondary">1. Indispensable (No gastar)</span>
+                    <span class="text-2xl font-extrabold text-primary tabular-nums"
                           th:text="'$ ' + ${#numbers.formatDecimal(nextAllocation.indispensableAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
-                    <p class="text-xs text-white/85 m-0">
+                    <p class="text-xs text-on-surface-variant m-0">
                         Reserva prioritaria para deudas, pagos fijos y necesidades esenciales del próximo mes.
                     </p>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-emerald-700/10 border border-emerald-700/30 flex flex-col gap-1.5">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">2. Deberías ahorrar</span>
-                    <span class="text-2xl font-extrabold text-emerald-800 dark:text-emerald-300 tabular-nums"
+                <div class="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/45 flex flex-col gap-1.5">
+                    <span class="cc-eyebrow text-emerald-700 dark:text-emerald-400">2. Deberías ahorrar</span>
+                    <span class="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums"
                           th:text="'$ ' + ${#numbers.formatDecimal(nextAllocation.recommendedSavingsAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
                     <p class="text-xs text-on-surface-variant m-0">
                         Meta de ahorro recomendada al inicio del periodo según tu regla de presupuesto.
                     </p>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-secondary-container/50 border border-secondary/25 flex flex-col gap-1.5">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-secondary">3. Disponible / Podrías ahorrar extra</span>
+                <div class="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/45 flex flex-col gap-1.5">
+                    <span class="cc-eyebrow">3. Disponible / Podrías ahorrar extra</span>
                     <span class="text-2xl font-extrabold text-primary tabular-nums"
                           th:text="'$ ' + ${#numbers.formatDecimal(nextAllocation.flexibleWantsAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
                     <p class="text-xs text-on-surface-variant m-0 tabular-nums"
@@ -261,7 +261,7 @@
                         <input type="hidden" name="month" th:value="${selectedMonth}"/>
                         <input type="hidden" name="status" value="ACCEPTED"/>
                         <button type="submit"
-                                class="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold border-0 cursor-pointer flex items-center gap-1.5 transition-colors">
+                                class="cc-cta-tactile h-10 px-5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold border-0 cursor-pointer flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-[17px]">check</span>
                             <span>Aceptar plan</span>
                         </button>

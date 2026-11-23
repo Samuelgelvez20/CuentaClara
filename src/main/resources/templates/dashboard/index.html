@@ -489,14 +489,15 @@
                     </article>
 
                     <!-- b) Mis Pagos y Deudas Fijas de Cada Mes -->
-                    <section class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 flex flex-col gap-4">
+                    <section class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-4">
                         <div class="flex items-center justify-between flex-wrap gap-2">
-                            <div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="cc-eyebrow">Compromisos recurrentes</span>
                                 <h3 class="text-base text-primary font-bold m-0">Pagos fijos mensuales</h3>
                                 <p class="text-xs text-on-surface-variant m-0">Se repiten en la fecha indicada de cada mes</p>
                             </div>
                             <button type="button" onclick="openObligationModal()"
-                                    class="px-3.5 py-2 rounded-xl bg-secondary text-on-secondary text-xs font-semibold hover:opacity-95 transition-opacity cursor-pointer border-0">
+                                    class="cc-cta-tactile px-3.5 py-2 rounded-full bg-secondary text-on-secondary text-xs font-bold hover:opacity-95 cursor-pointer border-0">
                                 + Agregar pago fijo
                             </button>
                         </div>
@@ -547,9 +548,10 @@
                 <div class="lg:col-span-5 flex flex-col gap-space-xl">
 
                     <!-- a) Distribución 50/30/20 -->
-                    <section aria-label="Distribución de tu dinero" class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 flex flex-col gap-4">
+                    <section aria-label="Distribución de tu dinero" class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
-                            <div class="flex flex-col">
+                            <div class="flex flex-col gap-0.5">
+                                <span class="cc-eyebrow">Meta de reparto</span>
                                 <h3 class="text-base text-primary font-bold m-0 tabular-nums"
                                     th:text="${profile != null ? 'Presupuesto ' + profile.needsPct + ' / ' + profile.wantsPct + ' / ' + profile.savingsPct : 'Presupuesto 50 / 30 / 20'}">Presupuesto 50 / 30 / 20</h3>
                                 <p class="text-xs text-on-surface-variant m-0 tabular-nums"
@@ -620,16 +622,17 @@
                     </section>
 
                     <!-- b) Consultas rápidas -->
-                    <section aria-label="Consultas" class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 flex flex-col gap-4">
+                    <section aria-label="Consultas" class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2.5">
                                 <span class="material-symbols-outlined text-[20px] text-primary">chat_bubble</span>
                                 <div class="flex flex-col">
+                                    <span class="cc-eyebrow">Asistente SQL</span>
                                     <h3 class="text-base text-primary font-bold m-0">Consultas rápidas</h3>
                                     <span class="text-[11px] text-on-surface-variant">Pregunta sobre tus gastos registrados</span>
                                 </div>
                             </div>
-                            <a href="/assistant" class="px-3 py-1 rounded-lg bg-surface-container-high text-primary text-xs font-semibold no-underline">Abrir &rarr;</a>
+                            <a href="/assistant" class="px-3 py-1 rounded-full bg-surface-container-high text-primary text-xs font-semibold no-underline">Abrir &rarr;</a>
                         </div>
 
                         <div class="flex flex-wrap gap-2">
