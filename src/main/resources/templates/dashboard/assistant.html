@@ -220,7 +220,7 @@
                                 <input id="assistant-input" name="question" required autocomplete="off" enterkeyhint="send"
                                        class="flex-1 h-10 px-3 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none"
                                        placeholder="Escribe tu consulta sobre gastos o facturas..." type="text"/>
-                                <button type="submit" data-loading-text="Consultando..." class="h-9 px-4 bg-primary-container hover:bg-primary text-on-primary rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all flex-shrink-0 cursor-pointer">
+                                <button type="submit" data-loading-text="Consultando..." class="cc-cta-tactile h-9 px-4 bg-primary-container hover:opacity-95 text-on-primary rounded-full text-xs font-bold flex items-center gap-1.5 flex-shrink-0 cursor-pointer border-0">
                                     <span>Consultar</span>
                                 </button>
                             </div>
@@ -230,10 +230,11 @@
 
                 <!-- PANEL DE APOYO: Comprobantes registrados (en escritorio a la izquierda, en móvil debajo del chat) -->
                 <aside class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4">
-                    <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/30 flex flex-col gap-2.5">
+                    <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/45 flex flex-col gap-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-primary font-bold">Resumen de movimientos</span>
+                            <span class="cc-eyebrow">Base verificada</span>
                         </div>
+                        <span class="text-sm text-primary font-bold">Resumen de movimientos</span>
                         <div class="bg-surface-container-low rounded-xl p-3 flex flex-col gap-1">
                             <span class="text-xs text-on-surface font-semibold tabular-nums"
                                   th:text="${#lists.size(history.transactions)} + ' movimientos confirmados'">0 movimientos</span>
