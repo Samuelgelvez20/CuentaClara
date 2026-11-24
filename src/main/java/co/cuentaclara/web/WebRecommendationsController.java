@@ -6,14 +6,14 @@ import co.cuentaclara.profile.Budget;
 import co.cuentaclara.profile.FinancialProfileService;
 import co.cuentaclara.report.GeminiFinancialAdvisorService;
 import co.cuentaclara.report.MonthlyAnalysisAndReportService;
-import co.cuentaclara.report.MonthlyReportEntity;
+import co.cuentaclara.report.PeriodWindow;
 import co.cuentaclara.security.jwt.AuthenticatedUserPrincipal;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -51,15 +51,19 @@ public class WebRecommendationsController {
     public String recommendationsPage(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam(value = "month", required = false) String month,
+            @RequestParam(value = "period", defaultValue = "MONTHLY") String period,
             Model model
     ) {
-        YearMonth selectedYm = parseOrDefaultPreviousMonth(month);
-        String selectedMonth = selectedYm.toString();
+        PeriodWindow pw = PeriodWindow.resolve(month, period);
+        String selectedMonth = pw.yearMonth().toString();
 
         model.addAttribute("user", principal);
         model.addAttribute("selectedMonth", selectedMonth);
-        model.addAttribute("selectedMonthLabel", formatMonthLabel(selectedYm));
-        model.addAttribute("nextMonthLabel", formatMonthLabel(selectedYm.plusMonths(1)));
+        model.addAttribute("selectedPeriod", pw.scopeCode());
+        model.addAttribute("selectedPeriodLabel", pw.label());
+        model.addAttribute("selectedMonthLabel", pw.spanishTitle());
+        model.addAttribute("nextMonthLabel", pw.nextSpanishTitle());
+        model.addAttribute("todayIso", LocalDate.now().toString());
         model.addAttribute("monthOptions", buildMonthOptions());
         model.addAttribute("geminiConfigured", geminiAdvisor.isGeminiConfigured());
         model.addAttribute("geminiModel", geminiAdvisor.getActiveModelName());
@@ -74,20 +78,8 @@ public class WebRecommendationsController {
                 .ifPresent(pb -> model.addAttribute("profile", pb.profile()));
 
         GeminiFinancialAdvisorService.MonthAnalysisSnapshot snapshot =
-                reportService.buildMonthSnapshot(principal.userId(), selectedMonth);
+                reportService.buildMonthSnapshot(principal.userId(), pw.label());
         model.addAttribute("snapshot", snapshot);
-
-        Optional<MonthlyReportEntity> existingReport =
-                reportService.findLatestReportForPeriod(principal.userId(), selectedMonth);
-        existingReport.ifPresent(report -> {
-            model.addAttribute("savedReport", report);
-            reportService.findSuggestedBudgetById(report.getSuggestedBudgetId()).ifPresent(budget -> {
-                model.addAttribute("suggestedBudget", budget);
-                if (!model.containsAttribute("nextAllocation")) {
-                    model.addAttribute("nextAllocation", reportService.computeNextMonthAllocation(snapshot, budget));
-                }
-            });
-        });
 
         return "dashboard/recommendations";
     }
@@ -96,19 +88,20 @@ public class WebRecommendationsController {
     public String analyzeSelectedMonth(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam("month") String month,
+            @RequestParam(value = "period", defaultValue = "MONTHLY") String period,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            YearMonth ym = parseOrDefaultPreviousMonth(month);
+            PeriodWindow pw = PeriodWindow.resolve(month, period);
             GeminiFinancialAdvisorService.MonthAnalysisSnapshot snapshot =
-                    reportService.buildMonthSnapshot(principal.userId(), ym.toString());
+                    reportService.buildMonthSnapshot(principal.userId(), pw.label());
             GeminiFinancialAdvisorService.NarrativeOutput summary =
                     geminiAdvisor.generateMonthSummary(snapshot);
 
             redirectAttributes.addFlashAttribute("summaryNarrative", summary);
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Resumen organizado de " + formatMonthLabel(ym) + " generado correctamente.");
-            return "redirect:/recommendations?month=" + ym;
+                    "Resumen organizado de " + pw.spanishTitle() + " generado correctamente.");
+            return "redirect:/recommendations?month=" + pw.yearMonth() + "&period=" + pw.scopeCode();
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
             return "redirect:/recommendations";
@@ -119,14 +112,15 @@ public class WebRecommendationsController {
     public String recommendNextMonth(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam("month") String month,
+            @RequestParam(value = "period", defaultValue = "MONTHLY") String period,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            YearMonth ym = parseOrDefaultPreviousMonth(month);
+            PeriodWindow pw = PeriodWindow.resolve(month, period);
             MonthlyAnalysisAndReportService.PeriodClosureReportView closure =
-                    reportService.generatePeriodReportAndNextPlan(principal.userId(), ym.toString());
+                    reportService.generatePeriodReportAndNextPlan(principal.userId(), pw.label());
             GeminiFinancialAdvisorService.MonthAnalysisSnapshot snapshot =
-                    reportService.buildMonthSnapshot(principal.userId(), ym.toString());
+                    reportService.buildMonthSnapshot(principal.userId(), pw.label());
             GeminiFinancialAdvisorService.NextMonthAllocation allocation =
                     reportService.computeNextMonthAllocation(snapshot, closure.suggestedNextPlan());
             GeminiFinancialAdvisorService.NarrativeOutput recommendation =
@@ -135,9 +129,12 @@ public class WebRecommendationsController {
             redirectAttributes.addFlashAttribute("recommendationNarrative", recommendation);
             redirectAttributes.addFlashAttribute("nextAllocation", allocation);
             redirectAttributes.addFlashAttribute("closureView", closure);
+            redirectAttributes.addFlashAttribute("calculatedPlan", closure.calculatedPlan());
+            redirectAttributes.addFlashAttribute("suggestedBudget", closure.suggestedNextPlan());
+            redirectAttributes.addFlashAttribute("savedReport", closure.report());
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Recomendación y plan sugerido para " + formatMonthLabel(ym.plusMonths(1)) + " listos.");
-            return "redirect:/recommendations?month=" + ym;
+                    "Recomendación y plan sugerido para " + pw.nextSpanishTitle() + " listos.");
+            return "redirect:/recommendations?month=" + pw.yearMonth() + "&period=" + pw.scopeCode();
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
             return "redirect:/recommendations";
@@ -149,12 +146,14 @@ public class WebRecommendationsController {
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam("budgetId") UUID budgetId,
             @RequestParam("month") String month,
+            @RequestParam(value = "period", defaultValue = "MONTHLY") String period,
             @RequestParam("status") String status,
             @RequestParam(value = "needsPct", required = false) Integer needsPct,
             @RequestParam(value = "wantsPct", required = false) Integer wantsPct,
             @RequestParam(value = "savingsPct", required = false) Integer savingsPct,
             RedirectAttributes redirectAttributes
     ) {
+        PeriodWindow pw = PeriodWindow.resolve(month, period);
         try {
             Budget updated = reportService.updateSuggestedPlanDecision(
                     principal.userId(),
@@ -164,7 +163,7 @@ public class WebRecommendationsController {
                     )
             );
             String label = switch (updated.getStatus()) {
-                case "ACCEPTED" -> "Plan aceptado para el próximo mes.";
+                case "ACCEPTED" -> "Plan aceptado para el próximo periodo.";
                 case "EDITED" -> "Porcentajes del plan actualizados y guardados.";
                 case "IGNORED" -> "Plan marcado como ignorado; tus datos históricos se mantienen intactos.";
                 default -> "Decisión registrada.";
@@ -173,7 +172,7 @@ public class WebRecommendationsController {
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/recommendations?month=" + parseOrDefaultPreviousMonth(month);
+        return "redirect:/recommendations?month=" + pw.yearMonth() + "&period=" + pw.scopeCode();
     }
 
     private YearMonth parseOrDefaultPreviousMonth(String month) {

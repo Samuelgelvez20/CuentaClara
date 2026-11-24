@@ -64,9 +64,11 @@ public class DocumentIngestionService {
         DocumentEntity doc = createPendingDocumentRecord(userId, validated, savedTempFile);
 
         // 5. Encolar en Redis y procesar en el Worker
-        ingestionWorker.enqueueJob(userId, doc.getId());
         if (asyncExecution) {
-            ingestionWorker.processDocumentAsync(userId, doc.getId());
+            boolean enqueuedInRedis = ingestionWorker.enqueueJob(userId, doc.getId());
+            if (!enqueuedInRedis && ingestionWorker.isInlineAsyncFallbackEnabled()) {
+                ingestionWorker.processDocumentAsync(userId, doc.getId());
+            }
         } else {
             try {
                 ingestionWorker.processDocumentDeterministically(userId, doc.getId());

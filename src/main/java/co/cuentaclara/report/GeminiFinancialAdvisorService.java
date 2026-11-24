@@ -34,14 +34,14 @@ public class GeminiFinancialAdvisorService {
     public GeminiFinancialAdvisorService(
             ObjectMapper objectMapper,
             @Value("${cuentaclara.ai.gemini-api-key:}") String geminiApiKey,
-            @Value("${cuentaclara.ai.gemini-model:gemini-2.5-flash}") String geminiModel
+            @Value("${cuentaclara.ai.gemini-model:gemini-3.8-flash}") String geminiModel
     ) {
         this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         this.geminiApiKey = geminiApiKey != null ? geminiApiKey.trim() : "";
-        this.geminiModel = (geminiModel != null && !geminiModel.isBlank()) ? geminiModel.trim() : "gemini-2.5-flash";
+        this.geminiModel = (geminiModel != null && !geminiModel.isBlank()) ? geminiModel.trim() : "gemini-3.8-flash";
     }
 
     public boolean isGeminiConfigured() {
@@ -123,8 +123,32 @@ public class GeminiFinancialAdvisorService {
         return new NarrativeOutput(deterministicFallback, false, "Motor determinista");
     }
 
+    public String generateGroundedResponse(String systemInstruction, String userText) throws Exception {
+        return callGemini(systemInstruction, userText, 0.15, false);
+    }
+
+    public String generateJsonCompletion(String systemInstruction, String userText) throws Exception {
+        return callGemini(systemInstruction, userText, 0.05, true);
+    }
+
     private String callGemini(String systemInstruction, String userText) throws Exception {
+        return callGemini(systemInstruction, userText, 0.25, false);
+    }
+
+    protected String callGemini(
+            String systemInstruction,
+            String userText,
+            double temperature,
+            boolean jsonMode
+    ) throws Exception {
         String url = GEMINI_BASE_URL + geminiModel + ":generateContent?key=" + geminiApiKey;
+
+        Map<String, Object> generationConfig = new java.util.LinkedHashMap<>();
+        generationConfig.put("temperature", temperature);
+        generationConfig.put("maxOutputTokens", 900);
+        if (jsonMode) {
+            generationConfig.put("responseMimeType", "application/json");
+        }
 
         Map<String, Object> body = Map.of(
                 "systemInstruction", Map.of(
@@ -136,10 +160,7 @@ public class GeminiFinancialAdvisorService {
                                 "parts", List.of(Map.of("text", userText))
                         )
                 ),
-                "generationConfig", Map.of(
-                        "temperature", 0.25,
-                        "maxOutputTokens", 700
-                )
+                "generationConfig", generationConfig
         );
 
         HttpRequest request = HttpRequest.newBuilder()

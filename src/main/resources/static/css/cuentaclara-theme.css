@@ -386,6 +386,27 @@ body {
     background-color: var(--surface);
     min-height: 100dvh;
     overflow-wrap: break-word;
+    font-size-adjust: from-font;
+}
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    flex-shrink: 0;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
 }
 
 aside nav a,
@@ -600,6 +621,170 @@ html.dark .cc-mobile-bottom-nav {
 @media (min-width: 1024px) {
     .cc-mobile-bottom-nav {
         display: none !important;
+    }
+}
+
+/* Native accessible modal dialogs (scroll containment + backdrop polish) */
+dialog:modal {
+    overscroll-behavior: contain;
+    border: 0 !important;
+}
+
+dialog::backdrop {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+}
+
+/* ==========================================================================
+   SISTEMA SIN BORDES BLANCOS — Superficies Tonales Limpias (Modo Oscuro y Claro)
+   Corrige además las utilidades Tailwind con /alpha sobre variables CSS hex
+   que hacían fallback a currentColor (blanco en modo oscuro).
+   ========================================================================== */
+
+[class*="border-outline-variant"],
+[class*="border-secondary/"],
+[class*="border-primary/"] {
+    border-color: transparent !important;
+}
+
+[class*="border-error/"] {
+    border-color: color-mix(in srgb, var(--error) 22%, transparent) !important;
+}
+
+[class*="bg-surface-container-low/"] {
+    background-color: color-mix(in srgb, var(--surface-container-low) 78%, transparent) !important;
+}
+
+[class*="bg-error-container/"] {
+    background-color: color-mix(in srgb, var(--error-container) 55%, transparent) !important;
+}
+
+html:not(.dark) main section.bg-surface-container-lowest {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.045);
+}
+
+#cc-top-header {
+    background-color: color-mix(in srgb, var(--surface) 88%, transparent) !important;
+    border-bottom-color: transparent !important;
+}
+
+#cc-sidebar {
+    border-right-color: transparent !important;
+}
+
+.cc-theme-active {
+    background-color: var(--surface-container) !important;
+    box-shadow: inset 0 0 0 2px var(--secondary);
+}
+
+/* Dropzone de facturas: línea discontinua sutil sin blanco chillón */
+#cc-upload-form {
+    border: 1.5px dashed color-mix(in srgb, var(--on-surface-variant) 24%, transparent) !important;
+}
+
+#cc-upload-form:hover,
+#cc-upload-form.cc-drop-active {
+    border-color: var(--secondary) !important;
+}
+
+/* Entradas de formulario sin bordes duros, con contraste tonal limpio */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+    border-color: transparent !important;
+    transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+
+html.dark section input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark section select,
+html.dark section textarea,
+html.dark dialog input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark form select,
+html.dark form textarea {
+    background-color: var(--surface-container) !important;
+}
+
+html:not(.dark) section input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html:not(.dark) section select,
+html:not(.dark) section textarea,
+html:not(.dark) form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html:not(.dark) form select,
+html:not(.dark) form textarea {
+    background-color: var(--surface-container-low);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary) 45%, transparent);
+}
+
+/* Autocompletado del navegador integrado con el tema sin parches blancos ni amarillos */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill) {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 45%, transparent),
+        inset 0 0 0 100vmax var(--surface-container-low);
+    -webkit-text-fill-color: var(--on-surface);
+    caret-color: var(--on-surface);
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill) {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 50%, transparent),
+        inset 0 0 0 100vmax var(--surface-container);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill):focus {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 60%, transparent),
+        inset 0 0 0 100vmax var(--surface-container-low),
+        0 0 0 3px color-mix(in srgb, var(--secondary) 35%, transparent);
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill):focus {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 65%, transparent),
+        inset 0 0 0 100vmax var(--surface-container),
+        0 0 0 3px color-mix(in srgb, var(--secondary) 40%, transparent);
+}
+
+/* Calendario, tarjetas y Date Picker sin bordes duros en modo oscuro */
+html.dark .cc-metric-chip,
+html.dark .cc-calendar-shell,
+html.dark .cc-nav-btn:not(.cc-nav-btn-today):not(.cc-nav-btn-primary),
+html.dark .cc-dp-trigger,
+html.dark .cc-dp-popover,
+html.dark .cc-panel-tx-card,
+html.dark .cc-mobile-bottom-nav {
+    border-color: transparent !important;
+}
+
+html.dark .cc-cal-header,
+html.dark .cc-legend-inline,
+html.dark .cc-day-panel,
+html.dark .cc-day-panel-header,
+html.dark .cc-panel-tx-details,
+html.dark .cc-cell-total {
+    border-color: color-mix(in srgb, var(--on-surface) 6%, transparent) !important;
+}
+
+html.dark .cc-day-cell {
+    border-color: color-mix(in srgb, var(--on-surface) 5%, transparent) !important;
+}
+
+@media (forced-colors: active) {
+    [class*="border-outline-variant"],
+    section,
+    input,
+    select,
+    textarea,
+    .cc-metric-chip,
+    .cc-calendar-shell {
+        border: 1px solid ButtonBorder !important;
     }
 }
 

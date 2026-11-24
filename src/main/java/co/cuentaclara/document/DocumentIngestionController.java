@@ -42,7 +42,11 @@ public class DocumentIngestionController {
                     statement,
                     async
             );
-            return ResponseEntity.status(HttpStatus.CREATED).body(view);
+            HttpStatus responseStatus = async && (view.document().getStatus() == DocumentStatus.PENDING
+                    || view.document().getStatus() == DocumentStatus.PROCESSING)
+                    ? HttpStatus.ACCEPTED
+                    : HttpStatus.CREATED;
+            return ResponseEntity.status(responseStatus).body(view);
         } catch (DocumentIngestionWorker.DuplicateInvoiceException dupEx) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", dupEx.getMessage()));
         } catch (IllegalArgumentException ex) {

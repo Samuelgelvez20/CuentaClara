@@ -4,95 +4,20 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
     <meta name="color-scheme" content="light dark"/>
+    <meta name="description" content="Sube tus facturas electrónicas XML, PDF o fotos y registra gastos manualmente en CuentaClara."/>
     <title>CuentaClara — Cargar y Confirmar Factura (PC)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-    <link rel="stylesheet" href="/css/cuentaclara-theme.css"/>
-    <script src="/js/cuentaclara-theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;icon_names=account_balance_wallet,add,add_circle,alternate_email,auto_awesome,bolt,calendar_month,chat_bubble,check,check_circle,chevron_left,chevron_right,close,dark_mode,delete_forever,dock_to_left,dock_to_right,error,event_repeat,expand_more,fact_check,forum,home,hourglass_top,insights,keyboard_arrow_down,keyboard_arrow_up,light_mode,local_cafe,lock,logout,pause_circle,person,person_remove,pie_chart,play_circle,progress_activity,receipt,receipt_long,save,savings,search,send,summarize,tune,upload_file,verified_user,visibility,visibility_off,warning&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/cuentaclara-tailwind.css"/>
+    <link rel="stylesheet" href="/css/cuentaclara-theme.min.css"/>
+    <script src="/js/cuentaclara-theme.min.js"></script>
     <style>
-        @layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } }
+        html, body { margin: 0; padding: 0; }
+        body { overscroll-behavior: none; }
         ::-webkit-scrollbar { display: none; }
     </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "var(--primary)",
-                        "primary-container": "var(--primary-container)",
-                        "on-primary": "var(--on-primary)",
-                        "on-primary-container": "var(--on-primary-container)",
-                        "primary-fixed": "var(--primary-fixed)",
-                        "primary-fixed-dim": "var(--primary-fixed-dim)",
-                        "on-primary-fixed": "var(--on-primary-fixed)",
-                        "secondary": "var(--secondary)",
-                        "secondary-container": "var(--secondary-container)",
-                        "on-secondary": "var(--on-secondary)",
-                        "on-secondary-container": "var(--on-secondary-container)",
-                        "secondary-fixed": "var(--secondary-fixed)",
-                        "secondary-fixed-dim": "var(--secondary-fixed-dim)",
-                        "on-secondary-fixed": "var(--on-secondary-fixed)",
-                        "tertiary": "var(--tertiary)",
-                        "tertiary-container": "var(--tertiary-container)",
-                        "tertiary-fixed": "var(--tertiary-fixed)",
-                        "tertiary-fixed-dim": "var(--tertiary-fixed-dim)",
-                        "surface": "var(--surface)",
-                        "background": "var(--background)",
-                        "surface-bright": "var(--surface-bright)",
-                        "surface-container-lowest": "var(--surface-container-lowest)",
-                        "surface-container-low": "var(--surface-container-low)",
-                        "surface-container": "var(--surface-container)",
-                        "surface-container-high": "var(--surface-container-high)",
-                        "surface-container-highest": "var(--surface-container-highest)",
-                        "on-surface": "var(--on-surface)",
-                        "on-background": "var(--on-background)",
-                        "on-surface-variant": "var(--on-surface-variant)",
-                        "outline": "var(--outline)",
-                        "outline-variant": "var(--outline-variant)",
-                        "error": "var(--error)",
-                        "error-container": "var(--error-container)",
-                        "on-error-container": "var(--on-error-container)"
-                    },
-                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                    spacing: { "space-2xl": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "gutter-sm": "1rem", "margin-lg": "3rem", "margin-sm": "1rem", "gutter-lg": "2rem", "gutter": "1.5rem", "space-xxs": "0.25rem", "space-xs": "0.5rem", "margin": "2rem", "space-md": "1rem" },
-                    fontFamily: {
-                        "body-lg": ["Plus Jakarta Sans"],
-                        "data-mono": ["Plus Jakarta Sans"],
-                        "headline-sm": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "title-lg": ["Plus Jakarta Sans"],
-                        "body-sm": ["Plus Jakarta Sans"],
-                        "title-md": ["Plus Jakarta Sans"],
-                        "display-lg-mobile": ["Plus Jakarta Sans"],
-                        "label-md": ["Plus Jakarta Sans"],
-                        "label-sm": ["Plus Jakarta Sans"],
-                        "body-md": ["Plus Jakarta Sans"],
-                        "headline-lg-mobile": ["Plus Jakarta Sans"],
-                        "display-lg": ["Plus Jakarta Sans"]
-                    },
-                    fontSize: {
-                        "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
-                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
-                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
-                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
-                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
-                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
-                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
-                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
-                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
-                        "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
-                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-                        "display-lg": ["48px", { "lineHeight": "56px", "fontWeight": "700" }]
-                    }
-                }
-            }
-        };
-    </script>
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 
@@ -118,6 +43,10 @@
             <div th:if="${successMessage}" role="status" class="px-4 py-3 rounded-xl bg-secondary-container text-on-secondary-container border border-secondary/25 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
                 <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">check_circle</span>
                 <span th:text="${successMessage}"></span>
+            </div>
+            <div th:if="${infoMessage}" role="status" class="px-4 py-3 rounded-xl bg-surface-container text-on-surface border border-outline-variant/40 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">hourglass_top</span>
+                <span th:text="${infoMessage}"></span>
             </div>
             <div th:if="${errorMessage}" role="alert" class="px-4 py-3 rounded-xl bg-error-container text-on-error-container border border-error/25 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
                 <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
@@ -145,9 +74,9 @@
                         <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary mb-3">
                             <span class="material-symbols-outlined text-[26px] text-secondary" aria-hidden="true">upload_file</span>
                         </div>
-                        <h3 class="text-base font-bold text-on-surface mb-1 m-0">
+                        <h2 class="text-base font-bold text-on-surface mb-1 m-0">
                             Subir archivo de factura o recibo
-                        </h3>
+                        </h2>
                         <p class="text-xs text-on-surface-variant max-w-md mb-4">
                             Arrastra un archivo aquí o selecciónalo: XML, PDF, JPG o PNG (máx. 10 MB).
                         </p>
@@ -168,7 +97,7 @@
                     <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data" data-loading-submit
                           class="rounded-2xl p-5 sm:p-6 bg-surface-container-lowest flex flex-col gap-space-md border border-outline-variant/30 m-0">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-base text-primary font-bold m-0">Registrar gasto manual</h3>
+                            <h2 class="text-base text-primary font-bold m-0">Registrar gasto manual</h2>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
@@ -214,9 +143,50 @@
 
                 <!-- RIGHT COLUMN: Confirmación de Comprobante -->
                 <div class="lg:col-span-6 flex flex-col gap-space-md">
-                    <div th:if="${#lists.isEmpty(pendingConfirmations)}" class="rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-space-xl text-center flex flex-col items-center gap-2">
-                        <span class="material-symbols-outlined text-[28px] text-on-surface-variant">receipt_long</span>
-                        <h3 class="text-sm text-primary font-bold m-0">Sin comprobantes pendientes</h3>
+                    <!-- Tracking en vivo de cola asíncrona Redis / Worker -->
+                    <section id="cc-async-tracker"
+                             th:if="${trackingDoc != null and (trackingDoc.document.status.name() == 'PENDING' or trackingDoc.document.status.name() == 'PROCESSING')}"
+                             role="status" aria-live="polite"
+                             class="rounded-2xl bg-surface-container-lowest border border-secondary/50 p-5 flex flex-col gap-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="material-symbols-outlined text-[20px] text-secondary animate-spin" aria-hidden="true">progress_activity</span>
+                                <div class="min-w-0">
+                                    <p id="cc-async-status-title" class="text-sm font-bold text-primary m-0 truncate"
+                                       th:text="'Procesando: ' + ${trackingDoc.document.originalFilename}">Procesando archivo...</p>
+                                    <p id="cc-async-status-subtitle" class="text-xs text-on-surface-variant m-0"
+                                       th:text="${trackingDoc.document.status.name() == 'PROCESSING' ? 'Extrayendo texto e identificando campos...' : 'En cola de lectura segura...'}">En cola de lectura segura...</p>
+                                </div>
+                            </div>
+                            <span id="cc-async-badge" class="px-2.5 py-1 rounded-md bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold flex-shrink-0"
+                                  th:text="${trackingDoc.document.status.name()}">PENDING</span>
+                        </div>
+                        <label for="cc-async-progress" class="sr-only">Progreso de análisis del comprobante</label>
+                        <progress id="cc-async-progress" max="100" class="w-full h-2 accent-secondary"></progress>
+                    </section>
+
+                    <!-- Documentos fallidos recuperables o rechazados -->
+                    <div th:each="errDoc : ${failedDocuments}"
+                         class="rounded-2xl bg-error-container/40 border border-error/30 p-4 flex items-start justify-between gap-3">
+                        <div class="flex items-start gap-2.5 min-w-0">
+                            <span class="material-symbols-outlined text-[20px] text-error mt-0.5" aria-hidden="true">error</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-on-surface m-0 truncate" th:text="${errDoc.document.originalFilename}">archivo</p>
+                                <p class="text-[11px] text-on-error-container m-0 mt-0.5"
+                                   th:text="${errDoc.document.errorMessage != null ? errDoc.document.errorMessage : 'No fue posible leer este archivo.'}"></p>
+                            </div>
+                        </div>
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${errDoc.document.id} + '/cancel'}" class="m-0 flex-shrink-0">
+                            <input type="hidden" name="returnTo" value="/upload"/>
+                            <button type="submit" class="h-8 px-3 rounded-lg bg-surface-container-lowest hover:bg-error hover:text-white text-on-surface text-[11px] font-bold border border-outline-variant/40 cursor-pointer">
+                                Descartar
+                            </button>
+                        </form>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(pendingConfirmations) and (trackingDoc == null or (trackingDoc.document.status.name() != 'PENDING' and trackingDoc.document.status.name() != 'PROCESSING')) and #lists.isEmpty(failedDocuments)}" class="rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-space-xl text-center flex flex-col items-center gap-2">
+                        <span class="material-symbols-outlined text-[28px] text-on-surface-variant" aria-hidden="true">receipt_long</span>
+                        <h2 class="text-sm text-primary font-bold m-0">Sin comprobantes pendientes</h2>
                         <p class="text-xs text-on-surface-variant max-w-sm m-0">
                             Al subir un archivo en el panel izquierdo podrás revisar y confirmar sus datos aquí antes de guardarlo.
                         </p>
@@ -235,26 +205,26 @@
                         <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" data-loading-submit class="flex flex-col gap-space-md m-0">
                             <div class="p-space-md rounded-xl bg-surface-container-low grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">Comercio / Emisor</label>
-                                    <input type="text" name="merchantName" required
+                                    <label th:for="'up-merchant-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">Comercio / Emisor</label>
+                                    <input th:id="'up-merchant-' + ${item.document.id}" type="text" name="merchantName" required
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest text-sm text-primary font-bold border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">NIT</label>
-                                    <input type="text" name="merchantNit"
+                                    <label th:for="'up-nit-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">NIT</label>
+                                    <input th:id="'up-nit-' + ${item.document.id}" type="text" name="merchantNit"
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-data-mono text-sm font-semibold border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.merchantNit : '0'}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">Número de factura</label>
-                                    <input type="text" name="invoiceNumber"
+                                    <label th:for="'up-inv-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">Número de factura</label>
+                                    <input th:id="'up-inv-' + ${item.document.id}" type="text" name="invoiceNumber"
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-data-mono text-sm border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.invoiceNumber : 'SIN-NUMERO'}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">Fecha</label>
-                                    <input type="date" name="transactionDate"
+                                    <label th:for="'up-date-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">Fecha</label>
+                                    <input th:id="'up-date-' + ${item.document.id}" type="date" name="transactionDate"
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-data-mono text-sm border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.issueDate : ''}"/>
                                 </div>
@@ -262,8 +232,8 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-xs text-on-surface font-semibold block mb-1">Categoría</label>
-                                    <input type="text" name="category" list="cc-upload-categories" required
+                                    <label th:for="'up-cat-' + ${item.document.id}" class="text-xs text-on-surface font-semibold block mb-1">Categoría</label>
+                                    <input th:id="'up-cat-' + ${item.document.id}" type="text" name="category" list="cc-upload-categories" required
                                            class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-primary text-xs font-bold border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.suggestedCategory : 'Alimentación'}"/>
                                     <datalist id="cc-upload-categories">
@@ -271,8 +241,8 @@
                                     </datalist>
                                 </div>
                                 <div>
-                                    <label class="text-xs text-on-surface font-semibold block mb-1">Bloque</label>
-                                    <select name="budgetBlock" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold border border-outline-variant/30">
+                                    <label th:for="'up-blk-' + ${item.document.id}" class="text-xs text-on-surface font-semibold block mb-1">Bloque</label>
+                                    <select th:id="'up-blk-' + ${item.document.id}" name="budgetBlock" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold border border-outline-variant/30">
                                         <option th:each="blk : ${budgetBlocks}" th:value="${blk}" th:text="${blk.label}"
                                                 th:selected="${item.extraction != null and item.extraction.suggestedBudgetBlock == blk}"></option>
                                     </select>
@@ -289,8 +259,8 @@
                                     <span class="font-data-mono tabular-nums" th:text="'$ ' + ${item.extraction != null ? item.extraction.taxAmount : 0} + ' COP'"></span>
                                 </div>
                                 <div class="pt-space-xs mt-space-xxs flex items-center justify-between text-primary">
-                                    <span class="text-xs font-bold text-on-surface-variant">Total ($ COP)</span>
-                                    <input type="number" inputmode="decimal" step="0.01" name="totalAmount" required
+                                    <label th:for="'up-total-' + ${item.document.id}" class="text-xs font-bold text-on-surface-variant">Total ($ COP)</label>
+                                    <input th:id="'up-total-' + ${item.document.id}" type="number" inputmode="decimal" step="0.01" name="totalAmount" required
                                            class="w-44 p-2 rounded-lg bg-surface-container-lowest text-base text-primary font-bold text-right border border-outline-variant/30 tabular-nums"
                                            th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
                                 </div>
@@ -343,13 +313,13 @@
         ['dragenter', 'dragover'].forEach(evt => {
             form.addEventListener(evt, (e) => {
                 e.preventDefault();
-                form.classList.add('border-secondary', 'bg-secondary-container/20');
+                form.classList.add('cc-drop-active');
             });
         });
         ['dragleave', 'drop'].forEach(evt => {
             form.addEventListener(evt, (e) => {
                 e.preventDefault();
-                form.classList.remove('border-secondary', 'bg-secondary-container/20');
+                form.classList.remove('cc-drop-active');
             });
         });
         form.addEventListener('drop', (e) => {
@@ -358,6 +328,52 @@
                 showSelectedFile(e.dataTransfer.files[0]);
             }
         });
+    })();
+</script>
+<script th:if="${trackingDocId != null}" th:inline="javascript">
+    (function () {
+        const trackingDocId = /*[[${trackingDocId}]]*/ null;
+        if (!trackingDocId) return;
+        const subtitle = document.getElementById('cc-async-status-subtitle');
+        const badge = document.getElementById('cc-async-badge');
+        const progressEl = document.getElementById('cc-async-progress');
+        let attempts = 0;
+        const maxAttempts = 60;
+
+        async function pollStatus() {
+            attempts++;
+            try {
+                const resp = await fetch('/api/documents/' + encodeURIComponent(trackingDocId), {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (!resp.ok) {
+                    if (attempts < maxAttempts) setTimeout(pollStatus, 900);
+                    return;
+                }
+                const data = await resp.json();
+                const status = data && data.document ? data.document.status : null;
+                if (badge && status) badge.textContent = status;
+                if (status === 'PROCESSING' && subtitle) {
+                    subtitle.textContent = 'Extrayendo datos e identificando comercio y totales...';
+                }
+                if (status === 'AWAITING_CONFIRMATION' || status === 'INDEXED' || status === 'ERROR') {
+                    if (progressEl) progressEl.value = 100;
+                    window.location.replace('/upload');
+                    return;
+                }
+            } catch (ignored) {
+                // Reintentar en la siguiente iteración sin interrumpir al usuario
+            }
+            if (attempts < maxAttempts) {
+                setTimeout(pollStatus, 700);
+            }
+        }
+
+        const tracker = document.getElementById('cc-async-tracker');
+        if (tracker) {
+            setTimeout(pollStatus, 500);
+        }
     })();
 </script>
 </body>

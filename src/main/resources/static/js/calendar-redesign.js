@@ -896,4 +896,12 @@
             applyCalendarFilter(activeCalFilter);
         }
     } catch (_) {}
+
+    // Si llega ?day=DD en la URL (desde el selector visual de fecha), abrir ese día
+    try {
+        const urlDay = parseInt(new URLSearchParams(window.location.search).get('day'), 10);
+        if (urlDay >= 1 && urlDay <= daysInCurrentMonth) {
+            openDayPanel(urlDay);
+        }
+    } catch (_) {}
 })();

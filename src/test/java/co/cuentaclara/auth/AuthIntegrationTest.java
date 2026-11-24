@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -57,6 +58,15 @@ class AuthIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Value("${cuentaclara.security.google-client-id:}")
+    private String configuredGoogleClientId;
+
+    @Value("${cuentaclara.security.firebase.project-id:}")
+    private String configuredFirebaseProjectId;
+
+    @Value("${cuentaclara.security.firebase.api-key:}")
+    private String configuredFirebaseApiKey;
 
     @Test
     @DisplayName("RF-01, RNF-02, RNF-04, RF-14: Registro exige consentimiento Ley 1581, autentica con JWT y permite eliminar cuenta y datos")
@@ -134,5 +144,27 @@ class AuthIntegrationTest {
                 Integer.class
         );
         assertThat(remainingUsers).isZero();
+    }
+
+    @Test
+    @DisplayName("UI Login A1 + Móvil C y Google Client ID configurado desde entorno")
+    void shouldRenderRedesignedLoginPageWithConfiguredGoogleClient() throws Exception {
+        MvcResult loginRes = mockMvc.perform(get("/auth/login"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String loginHtml = loginRes.getResponse().getContentAsString();
+        assertThat(loginHtml).contains("cc-aurora-orb-1", "authTabTrack", "loginModeToggleBtn", "Calendario diario");
+        if (!configuredFirebaseProjectId.isBlank() && !configuredFirebaseApiKey.isBlank()) {
+            assertThat(loginHtml).contains("id=\"firebaseGoogleBtn\"", "action=\"/auth/firebase\"", configuredFirebaseProjectId);
+        } else if (!configuredGoogleClientId.isBlank()) {
+            assertThat(loginHtml).contains("data-client-id=\"" + configuredGoogleClientId + "\"", "https://accounts.google.com/gsi/client");
+        } else {
+            assertThat(loginHtml).contains("GOOGLE_CLIENT_ID");
+        }
+
+        MvcResult regRes = mockMvc.perform(get("/auth/register"))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertThat(regRes.getResponse().getContentAsString()).contains("const initialMode = \"register\";");
     }
 }

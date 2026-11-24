@@ -4,46 +4,16 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
     <meta name="color-scheme" content="light dark"/>
+    <meta name="description" content="Análisis financiero mensual y recomendaciones personalizadas con regla 50/30/20 en CuentaClara."/>
     <title>CuentaClara — Recomendaciones y Plan Mensual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-    <link rel="stylesheet" href="/css/cuentaclara-theme.css"/>
-    <script src="/js/cuentaclara-theme.js"></script>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "var(--primary)",
-                        "primary-container": "var(--primary-container)",
-                        "on-primary": "var(--on-primary)",
-                        "on-primary-container": "var(--on-primary-container)",
-                        "secondary": "var(--secondary)",
-                        "secondary-container": "var(--secondary-container)",
-                        "on-secondary-container": "var(--on-secondary-container)",
-                        "secondary-fixed": "var(--secondary-fixed)",
-                        "on-secondary": "var(--on-secondary)",
-                        "surface": "var(--surface)",
-                        "surface-container-lowest": "var(--surface-container-lowest)",
-                        "surface-container-low": "var(--surface-container-low)",
-                        "surface-container": "var(--surface-container)",
-                        "surface-container-high": "var(--surface-container-high)",
-                        "on-surface": "var(--on-surface)",
-                        "on-surface-variant": "var(--on-surface-variant)",
-                        "outline-variant": "var(--outline-variant)",
-                        "error": "var(--error)",
-                        "error-container": "var(--error-container)",
-                        "on-error-container": "var(--on-error-container)"
-                    },
-                    fontFamily: {
-                        "sans": ["Plus Jakarta Sans", "Inter", "sans-serif"]
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;icon_names=account_balance_wallet,add,add_circle,alternate_email,auto_awesome,bolt,calendar_month,chat_bubble,check,check_circle,chevron_left,chevron_right,close,dark_mode,delete_forever,dock_to_left,dock_to_right,error,event_repeat,expand_more,fact_check,forum,home,hourglass_top,insights,keyboard_arrow_down,keyboard_arrow_up,light_mode,local_cafe,lock,logout,pause_circle,person,person_remove,pie_chart,play_circle,progress_activity,receipt,receipt_long,save,savings,search,send,summarize,tune,upload_file,verified_user,visibility,visibility_off,warning&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/cuentaclara-tailwind.css"/>
+    <link rel="stylesheet" href="/css/cuentaclara-theme.min.css"/>
+    <link rel="stylesheet" href="/css/calendar-redesign.min.css"/>
+    <script src="/js/cuentaclara-theme.min.js"></script>
     <style>
         .cc-narrative-prose strong {
             color: var(--primary);
@@ -101,33 +71,38 @@
                 </p>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-shrink-0">
-                <form method="get" action="/recommendations" class="m-0 flex items-center gap-2">
-                    <label for="rec-month-select" class="sr-only">Seleccionar mes</label>
-                    <select id="rec-month-select" name="month" onchange="this.form.submit()"
-                            class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-xs font-bold text-primary focus:outline-none focus:ring-2 focus:ring-secondary">
-                        <option th:each="opt : ${monthOptions}"
-                                th:value="${opt.value}"
-                                th:text="${opt.label}"
-                                th:selected="${opt.value == selectedMonth}">Octubre 2026</option>
-                    </select>
-                </form>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-shrink-0 flex-wrap">
+                <div th:replace="~{fragments/date-picker :: datePicker('cc-rec-datepicker', 'month', '/recommendations', ${selectedMonthLabel}, ${selectedMonth}, '', '', '', '', false)}"></div>
+
+                <label for="cc-rec-period-select" class="sr-only">Periodicidad del corte</label>
+                <select id="cc-rec-period-select" onchange="changeRecPeriod(this.value)"
+                        class="h-10 px-3 rounded-xl bg-surface-container-low text-on-surface text-xs font-bold border border-outline-variant/45 cursor-pointer">
+                    <option value="MONTHLY" th:selected="${selectedPeriod == 'MONTHLY'}">Mes completo</option>
+                    <option value="Q1" th:selected="${selectedPeriod == 'Q1'}">1ª Quincena (1-15)</option>
+                    <option value="Q2" th:selected="${selectedPeriod == 'Q2'}">2ª Quincena (16-fin)</option>
+                    <option value="W1" th:selected="${selectedPeriod == 'W1'}">Semana 1 (1-7)</option>
+                    <option value="W2" th:selected="${selectedPeriod == 'W2'}">Semana 2 (8-14)</option>
+                    <option value="W3" th:selected="${selectedPeriod == 'W3'}">Semana 3 (15-21)</option>
+                    <option value="W4" th:selected="${selectedPeriod == 'W4'}">Semana 4 (22-28)</option>
+                </select>
 
                 <form method="post" action="/recommendations/analyze" data-loading-submit class="m-0">
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
-                    <button type="submit" data-loading-text="Analizando mes..."
+                    <input type="hidden" name="period" th:value="${selectedPeriod}"/>
+                    <button type="submit" data-loading-text="Analizando periodo..."
                             class="w-full sm:w-auto h-10 px-4 rounded-full bg-surface-container hover:bg-surface-container-high text-primary border border-outline-variant/50 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
                         <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">summarize</span>
-                        <span>Analizar mes</span>
+                        <span>Analizar periodo</span>
                     </button>
                 </form>
 
                 <form method="post" action="/recommendations/recommend" data-loading-submit class="m-0">
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                    <input type="hidden" name="period" th:value="${selectedPeriod}"/>
                     <button type="submit" data-loading-text="Consultando Gemini..."
                             class="cc-cta-tactile w-full sm:w-auto h-10 px-5 rounded-full bg-primary-container hover:opacity-95 text-on-primary border-0 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
                         <span class="material-symbols-outlined text-[18px] text-secondary-fixed" aria-hidden="true">auto_awesome</span>
-                        <span>Recomendar próximo mes</span>
+                        <span>Recomendar próximo</span>
                     </button>
                 </form>
             </div>
@@ -254,6 +229,39 @@
                 <p class="text-xs sm:text-sm text-on-surface m-0" th:text="${savedReport.verdictSummary}"></p>
             </div>
 
+            <!-- Desglose por categoría y topes semanales calculados por PlanCalculator (V2) -->
+            <div th:if="${calculatedPlan != null}" class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-2">
+                <div class="lg:col-span-6 p-4 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-extrabold text-primary">Topes por categoría</span>
+                        <span th:if="${calculatedPlan.structuralGap > 0}"
+                              class="px-2 py-0.5 rounded-md bg-error-container text-on-error-container text-[10px] font-bold tabular-nums"
+                              th:text="'Brecha fija: $ ' + ${#numbers.formatDecimal(calculatedPlan.structuralGap, 1, 'POINT', 0, 'COMMA')}">Brecha</span>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <div th:each="line : ${calculatedPlan.lines}"
+                             class="flex items-center justify-between text-xs py-1 border-b border-outline-variant/20 last:border-b-0">
+                            <span class="font-semibold text-on-surface truncate pr-2" th:text="${line.categoryName} + ' (' + ${line.block} + ')'">Categoría</span>
+                            <span class="font-bold text-primary tabular-nums flex-shrink-0"
+                                  th:text="'$ ' + ${#numbers.formatDecimal(line.limitAmount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 p-4 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-2.5">
+                    <span class="text-xs font-extrabold text-primary">Topes semanales recomendados</span>
+                    <div class="flex flex-col gap-1.5">
+                        <div th:each="wk : ${calculatedPlan.weeks}"
+                             class="flex items-center justify-between text-xs py-1 border-b border-outline-variant/20 last:border-b-0 tabular-nums">
+                            <span class="font-semibold text-on-surface"
+                                  th:text="'Sem. ' + ${wk.weekIndex} + ' (' + ${wk.startDate} + ' → ' + ${wk.endDate} + ')'">Sem. 1</span>
+                            <span class="font-bold text-secondary flex-shrink-0"
+                                  th:text="'Deseos: $ ' + ${#numbers.formatDecimal(wk.wantsLimit, 1, 'POINT', 0, 'COMMA')} + ' · Neces. var: $ ' + ${#numbers.formatDecimal(wk.variableNeedsLimit, 1, 'POINT', 0, 'COMMA')}">$ 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Acciones RF-16: Aceptar / Editar / Ignorar plan sugerido -->
             <div th:if="${suggestedBudget != null or (closureView != null and closureView.suggestedNextPlan != null)}"
                  th:with="planObj=${closureView != null ? closureView.suggestedNextPlan : suggestedBudget}"
@@ -262,6 +270,7 @@
                     <form method="post" action="/recommendations/plan-decision" class="m-0">
                         <input type="hidden" name="budgetId" th:value="${planObj.id}"/>
                         <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                        <input type="hidden" name="period" th:value="${selectedPeriod}"/>
                         <input type="hidden" name="status" value="ACCEPTED"/>
                         <button type="submit"
                                 class="cc-cta-tactile h-10 px-5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold border-0 cursor-pointer flex items-center gap-1.5">
@@ -273,6 +282,7 @@
                     <form method="post" action="/recommendations/plan-decision" class="m-0">
                         <input type="hidden" name="budgetId" th:value="${planObj.id}"/>
                         <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                        <input type="hidden" name="period" th:value="${selectedPeriod}"/>
                         <input type="hidden" name="status" value="IGNORED"/>
                         <button type="submit"
                                 class="h-10 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant text-xs font-bold border border-outline-variant/40 cursor-pointer transition-colors">
@@ -284,6 +294,7 @@
                 <form id="cc-plan-edit-form" method="post" action="/recommendations/plan-decision" class="m-0 flex flex-wrap items-center gap-2">
                     <input type="hidden" name="budgetId" th:value="${planObj.id}"/>
                     <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                    <input type="hidden" name="period" th:value="${selectedPeriod}"/>
                     <input type="hidden" name="status" value="EDITED"/>
                     <span class="text-[11px] font-bold text-on-surface-variant">Ajustar (% = 100):</span>
                     <input type="number" inputmode="numeric" name="needsPct" min="0" max="100" th:value="${planObj.needsPct}"
@@ -315,6 +326,13 @@
 
 <div th:replace="~{fragments/mobile-nav :: bottomNav('recommendations')}"></div>
 
+<script src="/js/cc-date-picker.min.js"></script>
+<script th:inline="javascript">
+    function changeRecPeriod(periodValue) {
+        const monthVal = /*[[${selectedMonth}]]*/ '2026-11';
+        window.location.href = '/recommendations?month=' + encodeURIComponent(monthVal) + '&period=' + encodeURIComponent(periodValue);
+    }
+</script>
 <script>
     (function () {
         // Renderizado limpio y seguro del markdown ligero devuelto por Gemini (**negritas** y listas)

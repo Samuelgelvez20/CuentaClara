@@ -1,5 +1,7 @@
 package co.cuentaclara.web;
 
+import co.cuentaclara.auth.AuthController;
+import co.cuentaclara.auth.AuthService;
 import co.cuentaclara.chat.NaturalLanguageChatService;
 import co.cuentaclara.document.DocumentIngestionService;
 import co.cuentaclara.document.DocumentStatus;
@@ -23,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,6 +62,7 @@ public class WebDashboardController {
             "Otros"
     );
 
+    private final AuthService authService;
     private final FinancialProfileService profileService;
     private final DocumentIngestionService ingestionService;
     private final TransactionService transactionService;
@@ -66,12 +70,14 @@ public class WebDashboardController {
     private final MonthlyAnalysisAndReportService reportService;
 
     public WebDashboardController(
+            AuthService authService,
             FinancialProfileService profileService,
             DocumentIngestionService ingestionService,
             TransactionService transactionService,
             NaturalLanguageChatService chatService,
             MonthlyAnalysisAndReportService reportService
     ) {
+        this.authService = authService;
         this.profileService = profileService;
         this.ingestionService = ingestionService;
         this.transactionService = transactionService;
@@ -98,9 +104,28 @@ public class WebDashboardController {
     public String uploadAndConfirmPage(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam(value = "month", required = false) String month,
+            @RequestParam(value = "trackingDoc", required = false) UUID trackingDocId,
             Model model
     ) {
         populateCommonDashboardModel(principal, month, null, null, model);
+        @SuppressWarnings("unchecked")
+        List<DocumentIngestionService.DocumentStatusView> allDocs =
+                (List<DocumentIngestionService.DocumentStatusView>) model.getAttribute("documents");
+        List<DocumentIngestionService.DocumentStatusView> activeDocs = allDocs == null ? List.of() : allDocs.stream()
+                .filter(d -> d.document().getStatus() == DocumentStatus.PENDING
+                        || d.document().getStatus() == DocumentStatus.PROCESSING)
+                .toList();
+        UUID effectiveTrackingId = trackingDocId;
+        if (effectiveTrackingId == null && !activeDocs.isEmpty()) {
+            effectiveTrackingId = activeDocs.get(0).document().getId();
+        }
+        model.addAttribute("trackingDocId", effectiveTrackingId);
+        if (effectiveTrackingId != null) {
+            UUID targetId = effectiveTrackingId;
+            ingestionService.getDocumentStatus(targetId)
+                    .filter(d -> d.document().getUserId().equals(principal.userId()))
+                    .ifPresent(d -> model.addAttribute("trackingDoc", d));
+        }
         return "dashboard/upload";
     }
 
@@ -158,6 +183,26 @@ public class WebDashboardController {
         return "redirect:/settings";
     }
 
+    @PostMapping("/settings/delete-account")
+    public String deleteAccountFromWeb(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam(value = "confirmationText", required = false) String confirmationText,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        String normalized = confirmationText != null ? confirmationText.trim() : "";
+        if (!"ELIMINAR".equalsIgnoreCase(normalized)) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Para eliminar tu cuenta escribe exactamente ELIMINAR en el diálogo de confirmación.");
+            return "redirect:/settings";
+        }
+        authService.deleteAccount(principal.userId());
+        AuthController.attachAuthCookie(response, "", 0);
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Tu cuenta, tus movimientos, tus análisis y tus archivos temporales fueron eliminados de forma permanente.");
+        return "redirect:/auth/login?deleted=true";
+    }
+
     @PostMapping("/dashboard/obligations")
     public String addRecurringObligationFromWeb(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
@@ -202,13 +247,74 @@ public class WebDashboardController {
             @RequestParam(value = "month", required = false) String month,
             @RequestParam(value = "year", required = false) Integer year,
             @RequestParam(value = "monthNum", required = false) Integer monthNum,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "merchant", required = false) String merchant,
             Model model
     ) {
-        String effectiveMonth = resolveEffectiveMonthParam(month, year, monthNum);
+        boolean allHistoryRequested = "ALL".equalsIgnoreCase(month != null ? month.trim() : "")
+                && startDate == null && endDate == null;
+        String effectiveMonth = allHistoryRequested
+                ? null
+                : resolveEffectiveMonthParam(month, year, monthNum);
+        if ((effectiveMonth == null || effectiveMonth.isBlank()) && startDate != null) {
+            effectiveMonth = YearMonth.from(startDate).toString();
+        }
+
         populateCommonDashboardModel(principal, effectiveMonth, category, merchant, model);
+
+        LocalDate sDate = startDate;
+        LocalDate eDate = endDate;
+        if (sDate != null && eDate != null && sDate.isAfter(eDate)) {
+            LocalDate tmp = sDate;
+            sDate = eDate;
+            eDate = tmp;
+        }
+
+        if (sDate != null || eDate != null) {
+            TransactionService.ExpenseHistorySummary rangeHistory = transactionService.getExpenseHistory(
+                    principal.userId(), null, sDate, eDate, category, merchant
+            );
+            model.addAttribute("history", rangeHistory);
+            model.addAttribute("startDate", sDate != null ? sDate.toString() : "");
+            model.addAttribute("endDate", eDate != null ? eDate.toString() : "");
+            model.addAttribute("isAllHistory", false);
+            model.addAttribute("historyRangeLabel", formatDateRangeLabel(sDate, eDate));
+        } else if (allHistoryRequested) {
+            TransactionService.ExpenseHistorySummary allHistory = transactionService.getExpenseHistory(
+                    principal.userId(), "ALL", null, null, category, merchant
+            );
+            model.addAttribute("history", allHistory);
+            model.addAttribute("startDate", "");
+            model.addAttribute("endDate", "");
+            model.addAttribute("isAllHistory", true);
+            model.addAttribute("historyRangeLabel", "Todo el historial");
+        }
         return "dashboard/history";
+    }
+
+    private String formatDateRangeLabel(LocalDate start, LocalDate end) {
+        if (start != null && end != null) {
+            if (start.equals(end)) {
+                return formatShortDate(start);
+            }
+            if (start.getDayOfMonth() == 1 && end.equals(YearMonth.from(start).atEndOfMonth())
+                    && YearMonth.from(start).equals(YearMonth.from(end))) {
+                return formatMonthLabel(YearMonth.from(start));
+            }
+            return formatShortDate(start) + " – " + formatShortDate(end);
+        }
+        LocalDate single = start != null ? start : end;
+        return single != null ? formatShortDate(single) : "";
+    }
+
+    private String formatShortDate(LocalDate d) {
+        String monthShort = SPANISH_MONTH_NAMES[d.getMonthValue()];
+        if (monthShort.length() > 3) {
+            monthShort = monthShort.substring(0, 3);
+        }
+        return d.getDayOfMonth() + " " + monthShort + " " + d.getYear();
     }
 
     private String resolveEffectiveMonthParam(String month, Integer year, Integer monthNum) {
@@ -237,6 +343,10 @@ public class WebDashboardController {
         model.addAttribute("user", principal);
         model.addAttribute("budgetBlocks", BudgetBlock.values());
         model.addAttribute("selectedMonth", resolvedMonthStr);
+        model.addAttribute("startDate", "");
+        model.addAttribute("endDate", "");
+        model.addAttribute("isAllHistory", false);
+        model.addAttribute("historyRangeLabel", formatMonthLabel(resolvedYm));
         model.addAttribute("selectedCategory", category != null ? category : "");
         model.addAttribute("selectedMerchant", merchant != null ? merchant : "");
         model.addAttribute("prevMonth", resolvedYm.minusMonths(1).toString());
@@ -267,8 +377,18 @@ public class WebDashboardController {
         List<DocumentIngestionService.DocumentStatusView> pendingConfirmations = allDocs.stream()
                 .filter(d -> d.document().getStatus() == DocumentStatus.AWAITING_CONFIRMATION)
                 .toList();
+        List<DocumentIngestionService.DocumentStatusView> activeProcessingDocs = allDocs.stream()
+                .filter(d -> d.document().getStatus() == DocumentStatus.PENDING
+                        || d.document().getStatus() == DocumentStatus.PROCESSING)
+                .toList();
+        List<DocumentIngestionService.DocumentStatusView> failedDocuments = allDocs.stream()
+                .filter(d -> d.document().getStatus() == DocumentStatus.ERROR)
+                .limit(5)
+                .toList();
         model.addAttribute("documents", allDocs);
         model.addAttribute("pendingConfirmations", pendingConfirmations);
+        model.addAttribute("activeProcessingDocs", activeProcessingDocs);
+        model.addAttribute("failedDocuments", failedDocuments);
 
         // Historial filtrado para la tabla de movimientos
         TransactionService.ExpenseHistorySummary history = transactionService.getExpenseHistory(
@@ -441,16 +561,30 @@ public class WebDashboardController {
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "statement", defaultValue = "false") boolean statement,
+            @RequestParam(value = "async", defaultValue = "true") boolean async,
             RedirectAttributes redirectAttributes
     ) throws IOException {
         try {
-            ingestionService.uploadAndProcessDocument(
+            DocumentIngestionService.DocumentStatusView statusView = ingestionService.uploadAndProcessDocument(
                     principal.userId(),
                     file.getOriginalFilename(),
                     file.getBytes(),
                     statement,
-                    false
+                    async
             );
+            DocumentStatus status = statusView.document().getStatus();
+            if (status == DocumentStatus.PENDING || status == DocumentStatus.PROCESSING) {
+                redirectAttributes.addFlashAttribute("infoMessage",
+                        "Archivo recibido y en cola de extracción segura. Verás el resultado aquí en unos segundos.");
+                return "redirect:/upload?trackingDoc=" + statusView.document().getId();
+            }
+            if (status == DocumentStatus.ERROR) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        statusView.document().getErrorMessage() != null
+                                ? statusView.document().getErrorMessage()
+                                : "No fue posible extraer los datos de este archivo.");
+                return "redirect:/upload";
+            }
             redirectAttributes.addFlashAttribute("successMessage",
                     "¡Tu recibo o factura fue leído! Revisa y confirma los datos antes de guardarlo.");
         } catch (Exception ex) {

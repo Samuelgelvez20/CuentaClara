@@ -25,10 +25,15 @@
    ```bash
    cp .env.example .env
    ```
-2. Levantar PostgreSQL 16 + `pgvector` y Redis 7:
+2. Levantar PostgreSQL 16 + `pgvector` y Redis 7 para desarrollo local:
    ```bash
    docker compose up -d
    ```
+   O levantar toda la pila productiva con separación `app` / `worker` Redis, antivirus **ClamAV** y proxy inverso **HTTPS/TLS** (`https://localhost:8443`):
+   ```bash
+   docker compose --profile full up -d --build
+   ```
+   > Para cambiar el proveedor de embeddings entre OpenAI y Ollama local sin tocar el dominio, configura `AI_PROVIDER=ollama`, `OLLAMA_BASE_URL` y `OLLAMA_EMBEDDING_MODEL` (`RNF-08`).
 3. Ejecutar la aplicación Spring Boot:
    ```bash
    mvn spring-boot:run

@@ -32,7 +32,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(properties = "cuentaclara.chat.gemini-enabled=false")
 @Testcontainers
 class ThirtyQuestionsRagEvaluationTest {
 

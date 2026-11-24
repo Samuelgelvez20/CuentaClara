@@ -4,7 +4,7 @@
 <!-- SIDEBAR LATERAL COMPARTIDO EN ESCRITORIO (>= lg, colapsable en localStorage) -->
 <aside th:fragment="sidebar(activePage)"
        id="cc-sidebar"
-       class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex-col justify-between border-r border-outline-variant/25 shadow-sm transition-all duration-200 ease-out">
+       class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex-col justify-between shadow-sm transition-all duration-200 ease-out">
     <div class="flex flex-col flex-1 overflow-y-auto">
         <div class="cc-sidebar-brand p-6 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
@@ -92,7 +92,7 @@
     </div>
 
     <div class="p-4 flex flex-col gap-2 bg-surface-container-high/35">
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest shadow-xs border border-outline-variant/20 cc-sidebar-user">
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest cc-sidebar-user">
             <div class="flex items-center gap-2.5 overflow-hidden">
                 <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-secondary-fixed text-[18px]" aria-hidden="true">person</span>

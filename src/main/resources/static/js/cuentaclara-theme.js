@@ -50,6 +50,20 @@
         "Acepto la política de tratamiento de datos (Ley 1581 de 2012).": "I accept the data privacy policy (Law 1581 of 2012).",
         "Continuar con Google": "Continue with Google",
         "Probar con cuenta demo": "Try demo account",
+        "Bienvenido de nuevo": "Welcome back",
+        "Ingresa para continuar gestionando tu mes.": "Sign in to continue managing your month.",
+        "Configura tu mes en 1 minuto": "Set up your month in 1 minute",
+        "Crea tu cuenta y agrega tus pagos fijos si lo deseas.": "Create your account and add your fixed payments if you wish.",
+        "Calendario diario": "Daily calendar",
+        "Pagos fijos": "Fixed payments",
+        "Oscuro": "Dark",
+        "Claro": "Light",
+        "Ingresa un correo electrónico válido (ej. nombre@correo.com).": "Enter a valid email address (e.g. name@email.com).",
+        "La contraseña debe tener al menos 8 caracteres.": "Password must be at least 8 characters.",
+        "Tu cuenta y tus datos fueron eliminados permanentemente.": "Your account and all your data have been permanently deleted.",
+        "Debes aceptar la política de tratamiento de datos (Ley 1581 de 2012) antes de continuar con Google.": "You must accept the data privacy policy (Law 1581 of 2012) before continuing with Google.",
+        "Conectando con Google...": "Connecting to Google...",
+        "Este dominio aún no está autorizado en Firebase Auth. Agrega localhost en Firebase Console → Authentication → Settings → Authorized domains.": "This domain is not yet authorized in Firebase Auth. Add localhost under Firebase Console → Authentication → Settings → Authorized domains.",
 
         // Dashboard & Calendario (/dashboard)
         "Resumen mensual y registro diario de gastos": "Monthly overview and daily expense log",
@@ -373,6 +387,16 @@
         return localStorage.getItem(CURRENCY_STORAGE_KEY) || 'COP';
     }
 
+    function syncThemeMeta() {
+        const metaTheme = document.getElementById('cc-theme-color-meta');
+        if (metaTheme) {
+            const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+            if (surface) {
+                metaTheme.setAttribute('content', surface);
+            }
+        }
+    }
+
     function applyTheme(themeName) {
         const root = document.documentElement;
         if (!themeName || themeName === 'vinotinto') {
@@ -381,6 +405,7 @@
             root.setAttribute('data-theme', themeName);
         }
         localStorage.setItem(THEME_STORAGE_KEY, themeName || 'vinotinto');
+        syncThemeMeta();
         window.dispatchEvent(new CustomEvent('cuentaclara:theme-changed', { detail: { theme: themeName || 'vinotinto' } }));
     }
 
@@ -393,6 +418,7 @@
             root.classList.remove('dark');
         }
         localStorage.setItem(MODE_STORAGE_KEY, resolved);
+        syncThemeMeta();
         window.dispatchEvent(new CustomEvent('cuentaclara:mode-changed', { detail: { mode: resolved } }));
     }
 

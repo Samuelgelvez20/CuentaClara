@@ -284,4 +284,116 @@ class ConfirmationAndManualExpenseIntegrationTest {
                 .andExpect(jsonPath("$.answer", containsString("Según tu distribución 50/41/9")))
                 .andExpect(jsonPath("$.answer", not(containsString("50/30/20"))));
     }
+
+    @Test
+    @DisplayName("Permite navegar y filtrar fechas antiguas y futuras en Calendario, Historial (rangos y Todo) y Recomendaciones")
+    void shouldSupportArbitraryDatesAndRangesAcrossDashboardHistoryAndRecommendations() throws Exception {
+        MvcResult reg = mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "fullName": "Mateo Ríos",
+                                  "email": "mateo.fechas@cuentaclara.co",
+                                  "password": "PasswordSegura123",
+                                  "aiConsentAccepted": true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String token = objectMapper.readTree(reg.getResponse().getContentAsString()).get("token").asText();
+
+        mockMvc.perform(post("/api/profile")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "netIncome": 4000000.00,
+                                  "paymentFrequency": "MONTHLY",
+                                  "paymentDays": "30",
+                                  "needsPct": 50,
+                                  "wantsPct": 30,
+                                  "savingsPct": 20,
+                                  "financialGoals": "Ahorro",
+                                  "totalDebts": 0,
+                                  "obligations": []
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        // Registrar un gasto antiguo en 2018-04-12 y uno futuro en 2029-05-05
+        mockMvc.perform(post("/api/transactions/manual")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "merchantName": "Librería 2018",
+                                  "transactionDate": "2018-04-12",
+                                  "totalAmount": 85000.00,
+                                  "category": "Educación",
+                                  "budgetBlock": "NEEDS",
+                                  "description": "Compra histórica"
+                                }
+                                """))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/transactions/manual")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "merchantName": "Viaje Futuro 2029",
+                                  "transactionDate": "2029-05-05",
+                                  "totalAmount": 250000.00,
+                                  "category": "Entretenimiento",
+                                  "budgetBlock": "WANTS",
+                                  "description": "Reserva futura"
+                                }
+                                """))
+                .andExpect(status().isCreated());
+
+        // 1. Calendario permite fecha antigua (2018-04) y futura (2029-05) renderizando el Date Picker visual
+        mockMvc.perform(get("/dashboard")
+                        .param("month", "2018-04")
+                        .param("day", "12")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("cc-cal-datepicker")))
+                .andExpect(content().string(containsString("Abril 2018")))
+                .andExpect(content().string(containsString("Librería 2018")));
+
+        // 2. Historial soporta rango exacto y 'month=ALL' (con tarjetas por categoría activas)
+        mockMvc.perform(get("/history")
+                        .param("startDate", "2018-04-01")
+                        .param("endDate", "2018-04-20")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("cc-history-datepicker")))
+                .andExpect(content().string(containsString("1 movimiento(s)")))
+                .andExpect(content().string(containsString("Compra histórica")))
+                .andExpect(content().string(not(containsString("Reserva futura"))));
+
+        mockMvc.perform(get("/history")
+                        .param("month", "ALL")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Todo el historial")))
+                .andExpect(content().string(containsString("2 movimiento(s)")))
+                .andExpect(content().string(containsString("Compra histórica")))
+                .andExpect(content().string(containsString("Reserva futura")));
+
+        // 3. Recomendaciones soporta meses antiguos más allá de 18 meses y meses futuros
+        mockMvc.perform(get("/recommendations")
+                        .param("month", "2018-04")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("cc-rec-datepicker")))
+                .andExpect(content().string(containsString("Abril 2018")));
+
+        mockMvc.perform(get("/recommendations")
+                        .param("month", "2029-05")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Mayo 2029")));
+    }
 }

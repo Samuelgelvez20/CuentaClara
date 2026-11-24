@@ -1,5 +1,6 @@
 package co.cuentaclara.report;
 
+import co.cuentaclara.plan.BudgetPlanCalculationAndPersistenceService;
 import co.cuentaclara.profile.Budget;
 import co.cuentaclara.profile.BudgetBlock;
 import co.cuentaclara.profile.BudgetRepository;
@@ -37,6 +38,7 @@ public class MonthlyAnalysisAndReportService {
     private final MonthlyReportRepository reportRepository;
     private final TransactionService transactionService;
     private final ObjectMapper objectMapper;
+    private final BudgetPlanCalculationAndPersistenceService planPersistenceService;
 
     public MonthlyAnalysisAndReportService(
             JdbcTemplate jdbcTemplate,
@@ -46,30 +48,46 @@ public class MonthlyAnalysisAndReportService {
             TransactionService transactionService,
             ObjectMapper objectMapper
     ) {
+        this(jdbcTemplate, profileRepository, budgetRepository, reportRepository, transactionService, objectMapper, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public MonthlyAnalysisAndReportService(
+            JdbcTemplate jdbcTemplate,
+            FinancialProfileRepository profileRepository,
+            BudgetRepository budgetRepository,
+            MonthlyReportRepository reportRepository,
+            TransactionService transactionService,
+            ObjectMapper objectMapper,
+            @org.springframework.beans.factory.annotation.Autowired(required = false)
+            BudgetPlanCalculationAndPersistenceService planPersistenceService
+    ) {
         this.jdbcTemplate = jdbcTemplate;
         this.profileRepository = profileRepository;
         this.budgetRepository = budgetRepository;
         this.reportRepository = reportRepository;
         this.transactionService = transactionService;
         this.objectMapper = objectMapper;
+        this.planPersistenceService = planPersistenceService;
     }
 
     /**
-     * Evalúa en SQL el cierre de un mes (ej. "2026-10"), compara el perfil declarado vs. los movimientos
-     * confirmados, genera el informe con citas y construye el plan sugerido (no vinculante) del siguiente periodo (RF-13, RF-16).
+     * Evalúa en SQL el cierre de un periodo (mensual "2026-10", quincenal "2026-10-Q1" o semanal "2026-10-W1"),
+     * compara el perfil declarado vs. los movimientos confirmados, genera el informe con citas,
+     * construye el plan sugerido y persiste el detalle por categoría y semana vía PlanCalculator (RF-13, RF-16).
      */
     @Transactional
-    public PeriodClosureReportView generatePeriodReportAndNextPlan(UUID userId, String yearMonthStr) {
-        YearMonth ym = (yearMonthStr != null && !yearMonthStr.isBlank())
-                ? YearMonth.parse(yearMonthStr.trim())
-                : YearMonth.now();
-        LocalDate start = ym.atDay(1);
-        LocalDate end = ym.atEndOfMonth();
+    public PeriodClosureReportView generatePeriodReportAndNextPlan(UUID userId, String periodSpec) {
+        PeriodWindow pw = PeriodWindow.parse(periodSpec);
+        LocalDate start = pw.start();
+        LocalDate end = pw.end();
 
         FinancialProfile profile = profileRepository.findByUserId(userId)
                 .orElseGet(() -> createDefaultProfileIfMissing(userId));
 
-        // 1. Consultar ingresos registrados en SQL en ese periodo; si no hay registros explícitos, usar el ingreso declarado
+        BigDecimal proratedDeclaredIncome = pw.prorateMonthlyAmount(profile.getNetIncome());
+
+        // 1. Consultar ingresos registrados en SQL en ese periodo; si no hay registros explícitos, usar el ingreso declarado prorrateado
         BigDecimal recordedIncome = jdbcTemplate.queryForObject(
                 "SELECT COALESCE(SUM(amount), 0) FROM incomes WHERE user_id = ? AND received_date >= ? AND received_date <= ?",
                 BigDecimal.class,
@@ -77,7 +95,7 @@ public class MonthlyAnalysisAndReportService {
         );
         BigDecimal actualIncome = (recordedIncome != null && recordedIncome.compareTo(BigDecimal.ZERO) > 0)
                 ? recordedIncome
-                : profile.getNetIncome();
+                : proratedDeclaredIncome;
 
         // 2. Calcular en SQL los gastos confirmados por bloque presupuestario (NEEDS, WANTS, SAVINGS) (RNF-06)
         BigDecimal needsSpent = sumConfirmedByBlock(userId, start, end, BudgetBlock.NEEDS);
@@ -112,8 +130,8 @@ public class MonthlyAnalysisAndReportService {
         );
 
         String verdict = buildVerdictSummary(
-                ym.toString(),
-                profile.getNetIncome(),
+                pw.label(),
+                proratedDeclaredIncome,
                 actualIncome,
                 profile.getNeedsPct(),
                 profile.getWantsPct(),
@@ -127,11 +145,11 @@ public class MonthlyAnalysisAndReportService {
                 essentialExceeded
         );
 
-        // 5. Generar Plan Sugerido (OBSERVED_PLAN) para el siguiente mes/quincena basado en comportamiento observado (RF-16)
-        YearMonth nextYm = ym.plusMonths(1);
+        // 5. Generar Plan Sugerido (OBSERVED_PLAN) para el siguiente periodo basado en comportamiento observado (RF-16)
+        PeriodWindow nextPw = PeriodWindow.parse(pw.nextLabel());
         Budget nextPlan = buildNextPeriodSuggestedPlan(
                 userId,
-                nextYm,
+                nextPw,
                 profile,
                 actualIncome,
                 needsSpent,
@@ -141,10 +159,10 @@ public class MonthlyAnalysisAndReportService {
 
         MonthlyReportEntity report = new MonthlyReportEntity();
         report.setUserId(userId);
-        report.setPeriodLabel(ym.toString());
+        report.setPeriodLabel(pw.label());
         report.setPeriodStart(start);
         report.setPeriodEnd(end);
-        report.setDeclaredIncome(profile.getNetIncome());
+        report.setDeclaredIncome(proratedDeclaredIncome);
         report.setActualIncome(actualIncome);
         report.setNeedsPct(profile.getNeedsPct());
         report.setWantsPct(profile.getWantsPct());
@@ -159,10 +177,23 @@ public class MonthlyAnalysisAndReportService {
 
         MonthlyReportEntity savedReport = reportRepository.save(report);
 
+        BudgetPlanCalculationAndPersistenceService.PersistedPlanView calculatedPlan = null;
+        if (planPersistenceService != null) {
+            calculatedPlan = planPersistenceService.calculateAndPersistPlan(
+                    userId,
+                    pw.targetBudgetMonth(),
+                    start,
+                    end,
+                    nextPlan,
+                    recommendations
+            );
+        }
+
         return new PeriodClosureReportView(
                 savedReport,
                 recommendations,
-                nextPlan
+                nextPlan,
+                calculatedPlan
         );
     }
 
@@ -195,7 +226,11 @@ public class MonthlyAnalysisAndReportService {
             budget.setSavingsTarget(percentageOf(refIncome, request.savingsPct()));
         }
 
-        return budgetRepository.save(budget);
+        Budget savedBudget = budgetRepository.save(budget);
+        if (planPersistenceService != null) {
+            planPersistenceService.syncPlanDecision(userId, savedBudget);
+        }
+        return savedBudget;
     }
 
     /**
@@ -326,15 +361,17 @@ public class MonthlyAnalysisAndReportService {
     }
 
     @Transactional(readOnly = true)
-    public GeminiFinancialAdvisorService.MonthAnalysisSnapshot buildMonthSnapshot(UUID userId, String yearMonthStr) {
-        YearMonth ym = (yearMonthStr != null && !yearMonthStr.isBlank())
-                ? YearMonth.parse(yearMonthStr.trim())
-                : YearMonth.now().minusMonths(1);
-        LocalDate start = ym.atDay(1);
-        LocalDate end = ym.atEndOfMonth();
+    public GeminiFinancialAdvisorService.MonthAnalysisSnapshot buildMonthSnapshot(UUID userId, String periodSpec) {
+        PeriodWindow pw = PeriodWindow.parse(periodSpec != null && !periodSpec.isBlank()
+                ? periodSpec
+                : YearMonth.now().minusMonths(1).toString());
+        LocalDate start = pw.start();
+        LocalDate end = pw.end();
 
         FinancialProfile profile = profileRepository.findByUserId(userId)
                 .orElseGet(() -> createDefaultProfileIfMissing(userId));
+
+        BigDecimal proratedDeclaredIncome = pw.prorateMonthlyAmount(profile.getNetIncome());
 
         BigDecimal recordedIncome = jdbcTemplate.queryForObject(
                 "SELECT COALESCE(SUM(amount), 0) FROM incomes WHERE user_id = ? AND received_date >= ? AND received_date <= ?",
@@ -343,16 +380,17 @@ public class MonthlyAnalysisAndReportService {
         );
         BigDecimal actualIncome = (recordedIncome != null && recordedIncome.compareTo(BigDecimal.ZERO) > 0)
                 ? recordedIncome
-                : profile.getNetIncome();
+                : proratedDeclaredIncome;
 
-        BigDecimal fixedObligationsTotal = jdbcTemplate.queryForObject(
+        BigDecimal fixedObligationsMonthly = jdbcTemplate.queryForObject(
                 "SELECT COALESCE(SUM(estimated_amount), 0) FROM recurring_obligations WHERE user_id = ?",
                 BigDecimal.class,
                 userId
         );
-        if (fixedObligationsTotal == null) {
-            fixedObligationsTotal = BigDecimal.ZERO;
+        if (fixedObligationsMonthly == null) {
+            fixedObligationsMonthly = BigDecimal.ZERO;
         }
+        BigDecimal fixedObligationsTotal = pw.prorateMonthlyAmount(fixedObligationsMonthly);
 
         BigDecimal needsSpent = sumConfirmedByBlock(userId, start, end, BudgetBlock.NEEDS);
         BigDecimal wantsSpent = sumConfirmedByBlock(userId, start, end, BudgetBlock.WANTS);
@@ -393,7 +431,7 @@ public class MonthlyAnalysisAndReportService {
         List<String> topWants = findTopCitationsForBlock(userId, start, end, BudgetBlock.WANTS, 5);
 
         return new GeminiFinancialAdvisorService.MonthAnalysisSnapshot(
-                ym.toString(),
+                pw.label(),
                 actualIncome,
                 fixedObligationsTotal,
                 needsSpent,
@@ -418,7 +456,7 @@ public class MonthlyAnalysisAndReportService {
             GeminiFinancialAdvisorService.MonthAnalysisSnapshot snapshot,
             Budget nextPlan
     ) {
-        YearMonth nextYm = YearMonth.parse(snapshot.periodLabel()).plusMonths(1);
+        PeriodWindow currentPw = PeriodWindow.parse(snapshot.periodLabel());
         BigDecimal indispensable = nextPlan.getNeedsLimit().max(snapshot.fixedObligationsTotal());
         BigDecimal recommendedSavings = nextPlan.getSavingsTarget();
         BigDecimal flexibleWants = nextPlan.getWantsLimit();
@@ -426,7 +464,7 @@ public class MonthlyAnalysisAndReportService {
                 .divide(BigDecimal.valueOf(2), 0, RoundingMode.HALF_UP);
 
         return new GeminiFinancialAdvisorService.NextMonthAllocation(
-                nextYm.toString(),
+                currentPw.nextLabel(),
                 nextPlan.getNeedsPct(),
                 nextPlan.getWantsPct(),
                 nextPlan.getSavingsPct(),
@@ -570,7 +608,7 @@ public class MonthlyAnalysisAndReportService {
 
     private Budget buildNextPeriodSuggestedPlan(
             UUID userId,
-            YearMonth nextYm,
+            PeriodWindow nextPw,
             FinancialProfile profile,
             BigDecimal actualIncome,
             BigDecimal needsSpent,
@@ -598,9 +636,9 @@ public class MonthlyAnalysisAndReportService {
 
         Budget plan = new Budget();
         plan.setUserId(userId);
-        plan.setPeriodLabel("Plan Sugerido (" + nextYm + ")");
-        plan.setPeriodStart(nextYm.atDay(1));
-        plan.setPeriodEnd(nextYm.atEndOfMonth());
+        plan.setPeriodLabel("Plan Sugerido (" + nextPw.label() + ")");
+        plan.setPeriodStart(nextPw.start());
+        plan.setPeriodEnd(nextPw.end());
         plan.setBudgetStage("OBSERVED_PLAN");
         plan.setStatus("SUGGESTED");
         plan.setReferenceIncome(actualIncome);
@@ -677,8 +715,16 @@ public class MonthlyAnalysisAndReportService {
     public record PeriodClosureReportView(
             MonthlyReportEntity report,
             List<BackedRecommendation> recommendations,
-            Budget suggestedNextPlan
+            Budget suggestedNextPlan,
+            BudgetPlanCalculationAndPersistenceService.PersistedPlanView calculatedPlan
     ) {
+        public PeriodClosureReportView(
+                MonthlyReportEntity report,
+                List<BackedRecommendation> recommendations,
+                Budget suggestedNextPlan
+        ) {
+            this(report, recommendations, suggestedNextPlan, null);
+        }
     }
 
     public record PlanDecisionRequest(

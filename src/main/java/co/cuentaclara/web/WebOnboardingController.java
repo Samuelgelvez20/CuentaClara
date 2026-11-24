@@ -2,6 +2,8 @@ package co.cuentaclara.web;
 
 import co.cuentaclara.auth.AuthController;
 import co.cuentaclara.auth.AuthService;
+import co.cuentaclara.auth.FirebaseIdTokenVerifierService;
+import co.cuentaclara.auth.GoogleIdTokenVerifierService;
 import co.cuentaclara.profile.BudgetBlock;
 import co.cuentaclara.profile.FinancialProfileService;
 import co.cuentaclara.profile.PaymentFrequency;
@@ -9,13 +11,9 @@ import co.cuentaclara.report.MonthlyAnalysisAndReportService;
 import co.cuentaclara.security.jwt.AuthenticatedUserPrincipal;
 import co.cuentaclara.security.jwt.JwtTokenService;
 import co.cuentaclara.security.rls.RlsDataSourceConfig;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,23 +31,50 @@ public class WebOnboardingController {
     private final JwtTokenService jwtTokenService;
     private final FinancialProfileService profileService;
     private final MonthlyAnalysisAndReportService reportService;
-    private final ObjectMapper objectMapper;
+    private final GoogleIdTokenVerifierService googleIdTokenVerifier;
+    private final FirebaseIdTokenVerifierService firebaseTokenVerifier;
     private final String googleClientId;
+    private final String firebaseProjectId;
+    private final String firebaseApiKey;
+    private final String firebaseAuthDomain;
+    private final String firebaseAppId;
 
     public WebOnboardingController(
             AuthService authService,
             JwtTokenService jwtTokenService,
             FinancialProfileService profileService,
             MonthlyAnalysisAndReportService reportService,
-            ObjectMapper objectMapper,
-            @Value("${cuentaclara.security.google-client-id:}") String googleClientId
+            GoogleIdTokenVerifierService googleIdTokenVerifier,
+            FirebaseIdTokenVerifierService firebaseTokenVerifier,
+            @Value("${cuentaclara.security.google-client-id:}") String googleClientId,
+            @Value("${cuentaclara.security.firebase.project-id:}") String firebaseProjectId,
+            @Value("${cuentaclara.security.firebase.api-key:}") String firebaseApiKey,
+            @Value("${cuentaclara.security.firebase.auth-domain:}") String firebaseAuthDomain,
+            @Value("${cuentaclara.security.firebase.app-id:}") String firebaseAppId
     ) {
         this.authService = authService;
         this.jwtTokenService = jwtTokenService;
         this.profileService = profileService;
         this.reportService = reportService;
-        this.objectMapper = objectMapper;
-        this.googleClientId = googleClientId;
+        this.googleIdTokenVerifier = googleIdTokenVerifier;
+        this.firebaseTokenVerifier = firebaseTokenVerifier;
+        this.googleClientId = googleClientId != null ? googleClientId.trim() : "";
+        this.firebaseProjectId = firebaseProjectId != null ? firebaseProjectId.trim() : "";
+        this.firebaseApiKey = firebaseApiKey != null ? firebaseApiKey.trim() : "";
+        this.firebaseAuthDomain = (firebaseAuthDomain != null && !firebaseAuthDomain.isBlank())
+                ? firebaseAuthDomain.trim()
+                : (!this.firebaseProjectId.isEmpty() ? this.firebaseProjectId + ".firebaseapp.com" : "");
+        this.firebaseAppId = firebaseAppId != null ? firebaseAppId.trim() : "";
+    }
+
+    private void populateExternalAuthAttributes(Model model) {
+        boolean firebaseEnabled = !firebaseProjectId.isEmpty() && !firebaseApiKey.isEmpty();
+        model.addAttribute("firebaseEnabled", firebaseEnabled);
+        model.addAttribute("firebaseProjectId", firebaseProjectId);
+        model.addAttribute("firebaseApiKey", firebaseApiKey);
+        model.addAttribute("firebaseAuthDomain", firebaseAuthDomain);
+        model.addAttribute("firebaseAppId", firebaseAppId);
+        model.addAttribute("googleClientId", googleClientId);
     }
 
     @GetMapping("/")
@@ -70,7 +95,7 @@ public class WebOnboardingController {
             return "redirect:/dashboard";
         }
         model.addAttribute("registerMode", "register".equalsIgnoreCase(mode));
-        model.addAttribute("googleClientId", googleClientId);
+        populateExternalAuthAttributes(model);
         return "auth/login";
     }
 
@@ -83,38 +108,64 @@ public class WebOnboardingController {
             return "redirect:/dashboard";
         }
         model.addAttribute("registerMode", true);
-        model.addAttribute("googleClientId", googleClientId);
+        populateExternalAuthAttributes(model);
         return "auth/login";
+    }
+
+    @PostMapping("/auth/firebase")
+    public String handleFirebaseSignIn(
+            @RequestParam(value = "idToken", required = false) String firebaseIdToken,
+            @RequestParam(value = "aiConsentAccepted", defaultValue = "false") boolean aiConsentAccepted,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            FirebaseIdTokenVerifierService.VerifiedFirebaseUser verifiedUser =
+                    firebaseTokenVerifier.verifyIdToken(firebaseIdToken);
+
+            AuthService.GoogleAuthResult result = authService.loginOrRegisterWithGoogle(
+                    verifiedUser.email(),
+                    verifiedUser.fullName(),
+                    aiConsentAccepted
+            );
+            AuthService.AuthResponse auth = result.authResponse();
+            AuthController.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+
+            if (result.newUser()) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "¡Conectado con Firebase Auth (" + auth.email() + ")! Configura aquí tu ingreso y tus deudas o pagos de cada mes para tu calendario."
+                );
+                return "redirect:/profile";
+            }
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "¡Bienvenido(a) de nuevo, " + auth.fullName() + "! Iniciaste sesión con Google vía Firebase."
+            );
+            return "redirect:/dashboard";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "No se pudo autenticar con Firebase: " + ex.getMessage());
+            return "redirect:/auth/login";
+        }
     }
 
     @PostMapping("/auth/google")
     public String handleGoogleSignIn(
             @RequestParam(value = "credential", required = false) String googleIdTokenCredential,
-            @RequestParam(value = "googleEmail", required = false) String googleEmail,
-            @RequestParam(value = "googleName", required = false) String googleName,
+            @RequestParam(value = "aiConsentAccepted", defaultValue = "false") boolean aiConsentAccepted,
             HttpServletResponse response,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            String resolvedEmail = googleEmail;
-            String resolvedName = googleName;
+            GoogleIdTokenVerifierService.VerifiedGoogleUser verifiedUser =
+                    googleIdTokenVerifier.verifyIdToken(googleIdTokenCredential);
 
-            // Si viene un ID Token oficial de Google Identity Services (JWT de 3 partes), extraer email y name verificados
-            if (googleIdTokenCredential != null && !googleIdTokenCredential.isBlank()) {
-                String[] parts = googleIdTokenCredential.split("\\.");
-                if (parts.length >= 2) {
-                    String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-                    JsonNode node = objectMapper.readTree(payloadJson);
-                    if (node.hasNonNull("email")) {
-                        resolvedEmail = node.get("email").asText();
-                    }
-                    if (node.hasNonNull("name")) {
-                        resolvedName = node.get("name").asText();
-                    }
-                }
-            }
-
-            AuthService.GoogleAuthResult result = authService.loginOrRegisterWithGoogle(resolvedEmail, resolvedName);
+            AuthService.GoogleAuthResult result = authService.loginOrRegisterWithGoogle(
+                    verifiedUser.email(),
+                    verifiedUser.fullName(),
+                    aiConsentAccepted
+            );
             AuthService.AuthResponse auth = result.authResponse();
             AuthController.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
 
