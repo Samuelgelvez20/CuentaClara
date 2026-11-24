@@ -2,194 +2,56 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
+    <meta name="description" content="Sube tus facturas electrónicas XML, PDF o fotos y registra gastos manualmente en CuentaClara."/>
     <title>CuentaClara — Cargar y Confirmar Factura (PC)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-    <link rel="stylesheet" href="/css/cuentaclara-theme.css"/>
-    <script src="/js/cuentaclara-theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;icon_names=account_balance_wallet,add,add_circle,alternate_email,auto_awesome,bolt,calendar_month,chat_bubble,check,check_circle,chevron_left,chevron_right,close,dark_mode,delete_forever,dock_to_left,dock_to_right,error,event_repeat,expand_more,fact_check,forum,home,hourglass_top,insights,keyboard_arrow_down,keyboard_arrow_up,light_mode,local_cafe,lock,logout,pause_circle,person,person_remove,pie_chart,play_circle,progress_activity,receipt,receipt_long,save,savings,search,send,summarize,tune,upload_file,verified_user,visibility,visibility_off,warning&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/cuentaclara-tailwind.css"/>
+    <link rel="stylesheet" href="/css/cuentaclara-theme.min.css"/>
+    <script src="/js/cuentaclara-theme.min.js"></script>
     <style>
-        @layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } }
+        html, body { margin: 0; padding: 0; }
+        body { overscroll-behavior: none; }
         ::-webkit-scrollbar { display: none; }
     </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "var(--primary)",
-                        "primary-container": "var(--primary-container)",
-                        "on-primary": "var(--on-primary)",
-                        "on-primary-container": "var(--on-primary-container)",
-                        "primary-fixed": "var(--primary-fixed)",
-                        "primary-fixed-dim": "var(--primary-fixed-dim)",
-                        "on-primary-fixed": "var(--on-primary-fixed)",
-                        "secondary": "var(--secondary)",
-                        "secondary-container": "var(--secondary-container)",
-                        "on-secondary": "var(--on-secondary)",
-                        "on-secondary-container": "var(--on-secondary-container)",
-                        "secondary-fixed": "var(--secondary-fixed)",
-                        "secondary-fixed-dim": "var(--secondary-fixed-dim)",
-                        "on-secondary-fixed": "var(--on-secondary-fixed)",
-                        "tertiary": "var(--tertiary)",
-                        "tertiary-container": "var(--tertiary-container)",
-                        "tertiary-fixed": "var(--tertiary-fixed)",
-                        "tertiary-fixed-dim": "var(--tertiary-fixed-dim)",
-                        "surface": "var(--surface)",
-                        "background": "var(--background)",
-                        "surface-bright": "var(--surface-bright)",
-                        "surface-container-lowest": "var(--surface-container-lowest)",
-                        "surface-container-low": "var(--surface-container-low)",
-                        "surface-container": "var(--surface-container)",
-                        "surface-container-high": "var(--surface-container-high)",
-                        "surface-container-highest": "var(--surface-container-highest)",
-                        "on-surface": "var(--on-surface)",
-                        "on-background": "var(--on-background)",
-                        "on-surface-variant": "var(--on-surface-variant)",
-                        "outline": "var(--outline)",
-                        "outline-variant": "var(--outline-variant)",
-                        "error": "var(--error)",
-                        "error-container": "var(--error-container)",
-                        "on-error-container": "var(--on-error-container)"
-                    },
-                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                    spacing: { "space-2xl": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "gutter-sm": "1rem", "margin-lg": "3rem", "margin-sm": "1rem", "gutter-lg": "2rem", "gutter": "1.5rem", "space-xxs": "0.25rem", "space-xs": "0.5rem", "margin": "2rem", "space-md": "1rem" },
-                    fontFamily: {
-                        "body-lg": ["Plus Jakarta Sans"],
-                        "data-mono": ["Plus Jakarta Sans"],
-                        "headline-sm": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "title-lg": ["Plus Jakarta Sans"],
-                        "body-sm": ["Plus Jakarta Sans"],
-                        "title-md": ["Plus Jakarta Sans"],
-                        "display-lg-mobile": ["Plus Jakarta Sans"],
-                        "label-md": ["Plus Jakarta Sans"],
-                        "label-sm": ["Plus Jakarta Sans"],
-                        "body-md": ["Plus Jakarta Sans"],
-                        "headline-lg-mobile": ["Plus Jakarta Sans"],
-                        "display-lg": ["Plus Jakarta Sans"]
-                    },
-                    fontSize: {
-                        "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
-                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
-                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
-                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
-                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
-                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
-                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
-                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
-                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
-                        "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
-                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-                        "display-lg": ["48px", { "lineHeight": "56px", "fontWeight": "700" }]
-                    }
-                }
-            }
-        };
-    </script>
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 
-<!-- LEFT FIXED SIDEBAR (PC) -->
-<aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,53,39,0.06)]">
-    <div class="flex flex-col flex-1 overflow-y-auto">
-        <div class="p-space-lg flex items-center gap-space-sm">
-            <div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shadow-sm">
-                <span class="material-symbols-outlined text-secondary-fixed text-[22px]">account_balance</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-title-md text-title-md text-primary leading-tight tracking-tight font-bold">CuentaClara</span>
-                <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
-            </div>
-        </div>
-        <div class="px-space-md py-space-xs">
-            <div class="px-space-sm pb-2">
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">Menú</span>
-            </div>
-            <nav class="flex flex-col gap-1.5">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Historial de gastos</span>
-                </a>
-                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">upload_file</span>
-                    <span>Facturas y recibos</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px]">savings</span>
-                    <span>Presupuesto y deudas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-                    <span>Consultas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px]">tune</span>
-                    <span>Configuración</span>
-                </a>
-            </nav>
-        </div>
-    </div>
-    <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/40">
-        <div class="flex items-center justify-between p-space-xs rounded-lg bg-surface-container-lowest shadow-sm">
-            <div class="flex items-center gap-space-xs overflow-hidden">
-                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
-                </div>
-                <div class="flex flex-col truncate">
-                    <span class="font-title-md text-body-sm text-on-surface truncate font-semibold" th:text="${user.fullName}">Usuario</span>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
-                </div>
-            </div>
-            <form method="post" action="/auth/logout" class="m-0">
-                <button class="p-1.5 rounded text-on-surface-variant hover:text-error transition-colors" title="Cerrar sesión" type="submit">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</aside>
+<!-- LEFT SIDEBAR COMPARTIDO (>= lg, colapsable) -->
+<div th:replace="~{fragments/app-sidebar :: sidebar('upload')}"></div>
 
 <!-- RIGHT DESKTOP WORKSPACE -->
-<div class="pl-72 flex flex-col min-h-screen">
-    <header class="fixed top-0 left-72 right-0 h-20 bg-surface/85 backdrop-blur-xl z-40 border-b border-outline-variant/20">
-        <div class="h-20 w-full px-space-xl flex items-center justify-between gap-space-md">
-            <div class="flex items-center gap-space-xxs text-on-surface-variant font-label-md text-label-md">
-                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary">Inicio</a>
-                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span class="text-primary font-semibold">Facturas y recibos</span>
+<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0 transition-[padding] duration-200 ease-out">
+    <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-40 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
+        <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+            <div class="flex items-center gap-2 text-xs text-on-surface-variant min-w-0">
+                <a href="/dashboard" class="text-on-surface-variant no-underline hover:text-primary font-semibold">Inicio</a>
+                <span class="material-symbols-outlined text-[14px]" aria-hidden="true">chevron_right</span>
+                <span class="text-primary font-semibold truncate">Facturas y recibos</span>
             </div>
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
-                        title="Alternar tema claro / oscuro"
-                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
-                    <span>Tema</span>
-                </button>
-                <a href="/settings" title="Configuración"
-                   class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
-                    <span>Ajustes</span>
-                </a>
-                <a href="/dashboard" class="h-9 px-4 rounded-xl bg-primary-container text-on-primary text-xs font-semibold flex items-center gap-1.5 no-underline hover:opacity-95">
-                    <span class="material-symbols-outlined text-[18px] text-secondary-fixed">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-            </div>
+            <div th:replace="~{fragments/mobile-nav :: headerUtilityActions('upload')}"></div>
         </div>
     </header>
 
-    <main class="w-full pt-20 bg-surface flex-1">
-        <div class="px-space-xl py-space-lg flex flex-col gap-space-lg max-w-[1600px] mx-auto w-full">
+    <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
+        <div class="px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-5 max-w-[1600px] mx-auto w-full">
+
+            <div th:if="${successMessage}" role="status" class="px-4 py-3 rounded-xl bg-secondary-container text-on-secondary-container border border-secondary/25 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">check_circle</span>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div th:if="${infoMessage}" role="status" class="px-4 py-3 rounded-xl bg-surface-container text-on-surface border border-outline-variant/40 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">hourglass_top</span>
+                <span th:text="${infoMessage}"></span>
+            </div>
+            <div th:if="${errorMessage}" role="alert" class="px-4 py-3 rounded-xl bg-error-container text-on-error-container border border-error/25 font-semibold text-xs sm:text-sm flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
 
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
@@ -207,53 +69,55 @@
                 <!-- LEFT COLUMN: Dropzone de Factura + Formulario Gasto Manual -->
                 <div class="lg:col-span-6 flex flex-col gap-space-lg">
                     <!-- 1. Subir Comprobante XML / PDF / Foto -->
-                    <form method="post" action="/dashboard/upload" enctype="multipart/form-data"
-                          class="rounded-2xl p-space-xl bg-surface-container-lowest flex flex-col items-center justify-center text-center border border-dashed border-outline-variant m-0">
+                    <form id="cc-upload-form" method="post" action="/dashboard/upload" enctype="multipart/form-data" data-loading-submit
+                          class="rounded-2xl p-5 sm:p-7 bg-surface-container-lowest flex flex-col items-center justify-center text-center border-2 border-dashed border-outline-variant/70 hover:border-secondary transition-colors m-0">
                         <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary mb-3">
-                            <span class="material-symbols-outlined text-[26px] text-secondary">upload_file</span>
+                            <span class="material-symbols-outlined text-[26px] text-secondary" aria-hidden="true">upload_file</span>
                         </div>
-                        <h3 class="text-base font-bold text-on-surface mb-1 m-0">
+                        <h2 class="text-base font-bold text-on-surface mb-1 m-0">
                             Subir archivo de factura o recibo
-                        </h3>
+                        </h2>
                         <p class="text-xs text-on-surface-variant max-w-md mb-4">
-                            Formatos admitidos: XML, PDF, JPG o PNG (máx. 10 MB).
+                            Arrastra un archivo aquí o selecciónalo: XML, PDF, JPG o PNG (máx. 10 MB).
                         </p>
-                        <input type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required
+                        <input id="cc-upload-file-input" type="file" name="file" accept=".xml,.pdf,image/jpeg,image/png" required
+                               aria-label="Seleccionar archivo de factura o recibo"
                                class="w-full max-w-md p-2 rounded-xl bg-surface-container-low font-data-mono text-xs border border-outline-variant/30"/>
-                        <label class="mt-3 flex items-center gap-2 text-xs text-on-surface-variant cursor-pointer">
+                        <div id="cc-upload-file-preview" class="hidden mt-2.5 px-3 py-1.5 rounded-lg bg-secondary-container text-on-secondary-container border border-secondary/25 text-xs font-semibold max-w-md truncate tabular-nums"></div>
+                        <label class="mt-3 flex items-center gap-2 text-xs text-on-surface-variant cursor-pointer min-h-[44px]">
                             <input type="checkbox" name="statement" value="true" class="w-4 h-4 accent-secondary rounded"/>
                             <span>Es un extracto PDF con varios movimientos</span>
                         </label>
-                        <button type="submit" class="mt-4 w-full max-w-md h-10 px-space-lg rounded-xl bg-primary-container hover:bg-primary text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+                        <button type="submit" data-loading-text="Procesando archivo..." class="cc-cta-tactile mt-3 w-full max-w-md h-10 px-space-lg rounded-full bg-primary-container hover:opacity-95 text-on-primary text-xs font-bold flex items-center justify-center gap-2 cursor-pointer border-0">
                             <span>Procesar archivo</span>
                         </button>
                     </form>
 
                     <!-- 2. Gasto Manual -->
-                    <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data"
-                          class="rounded-2xl p-space-lg bg-surface-container-lowest flex flex-col gap-space-md border border-outline-variant/30 m-0">
+                    <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data" data-loading-submit
+                          class="rounded-2xl p-5 sm:p-6 bg-surface-container-lowest flex flex-col gap-space-md border border-outline-variant/30 m-0">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-base text-primary font-bold m-0">Registrar gasto manual</h3>
+                            <h2 class="text-base text-primary font-bold m-0">Registrar gasto manual</h2>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Concepto o comercio *</label>
-                                <input type="text" name="merchantName" required placeholder="Supermercado, almuerzo..."
+                                <label for="cc-manual-merchant" class="text-xs font-semibold text-on-surface-variant">Concepto o comercio *</label>
+                                <input id="cc-manual-merchant" type="text" name="merchantName" required placeholder="Supermercado, almuerzo..."
                                        class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs border border-outline-variant/30"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Valor ($ COP) *</label>
-                                <input type="number" step="0.01" name="totalAmount" required placeholder="28000"
-                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs font-bold text-primary border border-outline-variant/30"/>
+                                <label for="cc-manual-amount" class="text-xs font-semibold text-on-surface-variant">Valor ($ COP) *</label>
+                                <input id="cc-manual-amount" type="number" inputmode="decimal" step="0.01" min="0" name="totalAmount" required placeholder="28000"
+                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs font-bold text-primary border border-outline-variant/30 tabular-nums"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Fecha</label>
-                                <input type="date" name="transactionDate"
-                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs border border-outline-variant/30"/>
+                                <label for="cc-manual-date" class="text-xs font-semibold text-on-surface-variant">Fecha</label>
+                                <input id="cc-manual-date" type="date" name="transactionDate"
+                                       class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low font-data-mono text-xs border border-outline-variant/30 tabular-nums"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Categoría</label>
-                                <select name="category" class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs font-semibold border border-outline-variant/30">
+                                <label for="cc-manual-category" class="text-xs font-semibold text-on-surface-variant">Categoría</label>
+                                <select id="cc-manual-category" name="category" class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs font-semibold border border-outline-variant/30">
                                     <option value="">Asignar automáticamente</option>
                                     <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}"></option>
                                 </select>
@@ -261,17 +125,17 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Descripción</label>
-                                <input type="text" name="description" placeholder="Detalle opcional del gasto"
+                                <label for="cc-manual-desc" class="text-xs font-semibold text-on-surface-variant">Descripción</label>
+                                <input id="cc-manual-desc" type="text" name="description" placeholder="Detalle opcional del gasto"
                                        class="mt-1 w-full h-10 px-3 rounded-xl bg-surface-container-low text-xs border border-outline-variant/30"/>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-on-surface-variant">Comprobante (opcional)</label>
-                                <input type="file" name="attachment" accept=".xml,.pdf,image/jpeg,image/png"
+                                <label for="cc-manual-attachment" class="text-xs font-semibold text-on-surface-variant">Comprobante (opcional)</label>
+                                <input id="cc-manual-attachment" type="file" name="attachment" accept=".xml,.pdf,image/jpeg,image/png"
                                        class="mt-1 w-full p-1.5 rounded-xl bg-surface-container-low font-data-mono text-[12px] border border-outline-variant/30"/>
                             </div>
                         </div>
-                        <button type="submit" class="w-full h-10 px-space-lg rounded-xl bg-secondary hover:bg-primary-container text-on-secondary text-xs font-semibold flex items-center justify-center gap-2">
+                        <button type="submit" data-loading-text="Guardando gasto..." class="cc-cta-tactile w-full h-10 px-space-lg rounded-full bg-secondary hover:bg-primary-container hover:text-on-primary text-on-secondary text-xs font-bold flex items-center justify-center gap-2 cursor-pointer border-0">
                             <span>Guardar gasto</span>
                         </button>
                     </form>
@@ -279,9 +143,50 @@
 
                 <!-- RIGHT COLUMN: Confirmación de Comprobante -->
                 <div class="lg:col-span-6 flex flex-col gap-space-md">
-                    <div th:if="${#lists.isEmpty(pendingConfirmations)}" class="rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-space-xl text-center flex flex-col items-center gap-2">
-                        <span class="material-symbols-outlined text-[28px] text-on-surface-variant">receipt_long</span>
-                        <h3 class="text-sm text-primary font-bold m-0">Sin comprobantes pendientes</h3>
+                    <!-- Tracking en vivo de cola asíncrona Redis / Worker -->
+                    <section id="cc-async-tracker"
+                             th:if="${trackingDoc != null and (trackingDoc.document.status.name() == 'PENDING' or trackingDoc.document.status.name() == 'PROCESSING')}"
+                             role="status" aria-live="polite"
+                             class="rounded-2xl bg-surface-container-lowest border border-secondary/50 p-5 flex flex-col gap-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="material-symbols-outlined text-[20px] text-secondary animate-spin" aria-hidden="true">progress_activity</span>
+                                <div class="min-w-0">
+                                    <p id="cc-async-status-title" class="text-sm font-bold text-primary m-0 truncate"
+                                       th:text="'Procesando: ' + ${trackingDoc.document.originalFilename}">Procesando archivo...</p>
+                                    <p id="cc-async-status-subtitle" class="text-xs text-on-surface-variant m-0"
+                                       th:text="${trackingDoc.document.status.name() == 'PROCESSING' ? 'Extrayendo texto e identificando campos...' : 'En cola de lectura segura...'}">En cola de lectura segura...</p>
+                                </div>
+                            </div>
+                            <span id="cc-async-badge" class="px-2.5 py-1 rounded-md bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold flex-shrink-0"
+                                  th:text="${trackingDoc.document.status.name()}">PENDING</span>
+                        </div>
+                        <label for="cc-async-progress" class="sr-only">Progreso de análisis del comprobante</label>
+                        <progress id="cc-async-progress" max="100" class="w-full h-2 accent-secondary"></progress>
+                    </section>
+
+                    <!-- Documentos fallidos recuperables o rechazados -->
+                    <div th:each="errDoc : ${failedDocuments}"
+                         class="rounded-2xl bg-error-container/40 border border-error/30 p-4 flex items-start justify-between gap-3">
+                        <div class="flex items-start gap-2.5 min-w-0">
+                            <span class="material-symbols-outlined text-[20px] text-error mt-0.5" aria-hidden="true">error</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-on-surface m-0 truncate" th:text="${errDoc.document.originalFilename}">archivo</p>
+                                <p class="text-[11px] text-on-error-container m-0 mt-0.5"
+                                   th:text="${errDoc.document.errorMessage != null ? errDoc.document.errorMessage : 'No fue posible leer este archivo.'}"></p>
+                            </div>
+                        </div>
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${errDoc.document.id} + '/cancel'}" class="m-0 flex-shrink-0">
+                            <input type="hidden" name="returnTo" value="/upload"/>
+                            <button type="submit" class="h-8 px-3 rounded-lg bg-surface-container-lowest hover:bg-error hover:text-white text-on-surface text-[11px] font-bold border border-outline-variant/40 cursor-pointer">
+                                Descartar
+                            </button>
+                        </form>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(pendingConfirmations) and (trackingDoc == null or (trackingDoc.document.status.name() != 'PENDING' and trackingDoc.document.status.name() != 'PROCESSING')) and #lists.isEmpty(failedDocuments)}" class="rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-space-xl text-center flex flex-col items-center gap-2">
+                        <span class="material-symbols-outlined text-[28px] text-on-surface-variant" aria-hidden="true">receipt_long</span>
+                        <h2 class="text-sm text-primary font-bold m-0">Sin comprobantes pendientes</h2>
                         <p class="text-xs text-on-surface-variant max-w-sm m-0">
                             Al subir un archivo en el panel izquierdo podrás revisar y confirmar sus datos aquí antes de guardarlo.
                         </p>
@@ -297,29 +202,29 @@
                                   th:text="${item.extraction != null ? item.extraction.extractionMethod : item.document.sourceType}">XML</span>
                         </div>
 
-                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" class="flex flex-col gap-space-md m-0">
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" data-loading-submit class="flex flex-col gap-space-md m-0">
                             <div class="p-space-md rounded-xl bg-surface-container-low grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">Comercio / Emisor</label>
-                                    <input type="text" name="merchantName" required
+                                    <label th:for="'up-merchant-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">Comercio / Emisor</label>
+                                    <input th:id="'up-merchant-' + ${item.document.id}" type="text" name="merchantName" required
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest text-sm text-primary font-bold border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">NIT</label>
-                                    <input type="text" name="merchantNit"
+                                    <label th:for="'up-nit-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">NIT</label>
+                                    <input th:id="'up-nit-' + ${item.document.id}" type="text" name="merchantNit"
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-data-mono text-sm font-semibold border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.merchantNit : '0'}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">Número de factura</label>
-                                    <input type="text" name="invoiceNumber"
+                                    <label th:for="'up-inv-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">Número de factura</label>
+                                    <input th:id="'up-inv-' + ${item.document.id}" type="text" name="invoiceNumber"
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-data-mono text-sm border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.invoiceNumber : 'SIN-NUMERO'}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs font-semibold text-on-surface-variant">Fecha</label>
-                                    <input type="date" name="transactionDate"
+                                    <label th:for="'up-date-' + ${item.document.id}" class="text-xs font-semibold text-on-surface-variant">Fecha</label>
+                                    <input th:id="'up-date-' + ${item.document.id}" type="date" name="transactionDate"
                                            class="mt-1 w-full p-2 rounded-lg bg-surface-container-lowest font-data-mono text-sm border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.issueDate : ''}"/>
                                 </div>
@@ -327,14 +232,17 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-xs text-on-surface font-semibold block mb-1">Categoría</label>
-                                    <input type="text" name="category" required
+                                    <label th:for="'up-cat-' + ${item.document.id}" class="text-xs text-on-surface font-semibold block mb-1">Categoría</label>
+                                    <input th:id="'up-cat-' + ${item.document.id}" type="text" name="category" list="cc-upload-categories" required
                                            class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-primary text-xs font-bold border border-outline-variant/30"
                                            th:value="${item.extraction != null ? item.extraction.suggestedCategory : 'Alimentación'}"/>
+                                    <datalist id="cc-upload-categories">
+                                        <option th:each="cat : ${availableCategories}" th:value="${cat}"></option>
+                                    </datalist>
                                 </div>
                                 <div>
-                                    <label class="text-xs text-on-surface font-semibold block mb-1">Bloque</label>
-                                    <select name="budgetBlock" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold border border-outline-variant/30">
+                                    <label th:for="'up-blk-' + ${item.document.id}" class="text-xs text-on-surface font-semibold block mb-1">Bloque</label>
+                                    <select th:id="'up-blk-' + ${item.document.id}" name="budgetBlock" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold border border-outline-variant/30">
                                         <option th:each="blk : ${budgetBlocks}" th:value="${blk}" th:text="${blk.label}"
                                                 th:selected="${item.extraction != null and item.extraction.suggestedBudgetBlock == blk}"></option>
                                     </select>
@@ -344,16 +252,16 @@
                             <div class="p-space-md rounded-xl bg-surface-container flex flex-col gap-space-xs">
                                 <div class="flex items-center justify-between text-xs text-on-surface-variant">
                                     <span>Subtotal</span>
-                                    <span class="font-data-mono" th:text="'$ ' + ${item.extraction != null ? item.extraction.subtotalAmount : 0} + ' COP'"></span>
+                                    <span class="font-data-mono tabular-nums" th:text="'$ ' + ${item.extraction != null ? item.extraction.subtotalAmount : 0} + ' COP'"></span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs text-on-surface-variant">
                                     <span>Impuestos</span>
-                                    <span class="font-data-mono" th:text="'$ ' + ${item.extraction != null ? item.extraction.taxAmount : 0} + ' COP'"></span>
+                                    <span class="font-data-mono tabular-nums" th:text="'$ ' + ${item.extraction != null ? item.extraction.taxAmount : 0} + ' COP'"></span>
                                 </div>
                                 <div class="pt-space-xs mt-space-xxs flex items-center justify-between text-primary">
-                                    <span class="text-xs font-bold text-on-surface-variant">Total ($ COP)</span>
-                                    <input type="number" step="0.01" name="totalAmount" required
-                                           class="w-44 p-2 rounded-lg bg-surface-container-lowest text-base text-primary font-bold text-right border border-outline-variant/30"
+                                    <label th:for="'up-total-' + ${item.document.id}" class="text-xs font-bold text-on-surface-variant">Total ($ COP)</label>
+                                    <input th:id="'up-total-' + ${item.document.id}" type="number" inputmode="decimal" step="0.01" name="totalAmount" required
+                                           class="w-44 p-2 rounded-lg bg-surface-container-lowest text-base text-primary font-bold text-right border border-outline-variant/30 tabular-nums"
                                            th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
                                 </div>
                             </div>
@@ -362,8 +270,16 @@
                                 <strong class="text-primary">CUFE:</strong> <span th:text="${item.document.cufe}"></span>
                             </div>
 
-                            <button type="submit" class="w-full h-10 px-space-xl rounded-xl bg-primary-container hover:bg-primary text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+                            <button type="submit" data-loading-text="Guardando comprobante..." class="cc-cta-tactile w-full min-h-[44px] px-space-xl rounded-full bg-primary-container hover:opacity-95 text-on-primary text-xs font-bold flex items-center justify-center gap-2 cursor-pointer border-0">
                                 <span>Confirmar y guardar</span>
+                            </button>
+                        </form>
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/cancel'}" data-loading-submit class="-mt-3 m-0">
+                            <input type="hidden" name="returnTo" value="/upload"/>
+                            <button type="submit" data-loading-text="Descartando comprobante..."
+                                    class="w-full min-h-[44px] px-space-xl rounded-full bg-surface-container-low hover:bg-error-container text-on-surface-variant hover:text-on-error-container border border-outline-variant/40 hover:border-error/30 transition-colors text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                                <span>Cancelar y no guardar</span>
                             </button>
                         </form>
                     </div>
@@ -372,5 +288,93 @@
         </div>
     </main>
 </div>
+<div th:replace="~{fragments/mobile-nav :: bottomNav('upload')}"></div>
+
+<script>
+    (function () {
+        const form = document.getElementById('cc-upload-form');
+        const input = document.getElementById('cc-upload-file-input');
+        const preview = document.getElementById('cc-upload-file-preview');
+        if (!form || !input || !preview) return;
+
+        function showSelectedFile(file) {
+            if (!file) {
+                preview.classList.add('hidden');
+                preview.textContent = '';
+                return;
+            }
+            const kb = Math.max(1, Math.round(file.size / 1024));
+            preview.textContent = `Archivo listo: ${file.name} (${kb} KB)`;
+            preview.classList.remove('hidden');
+        }
+
+        input.addEventListener('change', () => showSelectedFile(input.files && input.files[0]));
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            form.addEventListener(evt, (e) => {
+                e.preventDefault();
+                form.classList.add('cc-drop-active');
+            });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            form.addEventListener(evt, (e) => {
+                e.preventDefault();
+                form.classList.remove('cc-drop-active');
+            });
+        });
+        form.addEventListener('drop', (e) => {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                input.files = e.dataTransfer.files;
+                showSelectedFile(e.dataTransfer.files[0]);
+            }
+        });
+    })();
+</script>
+<script th:if="${trackingDocId != null}" th:inline="javascript">
+    (function () {
+        const trackingDocId = /*[[${trackingDocId}]]*/ null;
+        if (!trackingDocId) return;
+        const subtitle = document.getElementById('cc-async-status-subtitle');
+        const badge = document.getElementById('cc-async-badge');
+        const progressEl = document.getElementById('cc-async-progress');
+        let attempts = 0;
+        const maxAttempts = 60;
+
+        async function pollStatus() {
+            attempts++;
+            try {
+                const resp = await fetch('/api/documents/' + encodeURIComponent(trackingDocId), {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (!resp.ok) {
+                    if (attempts < maxAttempts) setTimeout(pollStatus, 900);
+                    return;
+                }
+                const data = await resp.json();
+                const status = data && data.document ? data.document.status : null;
+                if (badge && status) badge.textContent = status;
+                if (status === 'PROCESSING' && subtitle) {
+                    subtitle.textContent = 'Extrayendo datos e identificando comercio y totales...';
+                }
+                if (status === 'AWAITING_CONFIRMATION' || status === 'INDEXED' || status === 'ERROR') {
+                    if (progressEl) progressEl.value = 100;
+                    window.location.replace('/upload');
+                    return;
+                }
+            } catch (ignored) {
+                // Reintentar en la siguiente iteración sin interrumpir al usuario
+            }
+            if (attempts < maxAttempts) {
+                setTimeout(pollStatus, 700);
+            }
+        }
+
+        const tracker = document.getElementById('cc-async-tracker');
+        if (tracker) {
+            setTimeout(pollStatus, 500);
+        }
+    })();
+</script>
 </body>
 </html>

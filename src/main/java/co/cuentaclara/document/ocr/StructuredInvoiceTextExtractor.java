@@ -2,7 +2,9 @@ package co.cuentaclara.document.ocr;
 
 import co.cuentaclara.document.xml.DianUblXmlParser;
 import co.cuentaclara.profile.BudgetBlock;
+import co.cuentaclara.report.GeminiFinancialAdvisorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,6 +14,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,15 +57,29 @@ public class StructuredInvoiceTextExtractor {
             "(?m)^\\s*(?:[-*•]|\\d+[.)]?)?\\s*([A-Za-zÁÉÍÓÚáéíóúÑñ0-9][A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s/().,-]{2,60}?)\\s+(?:x?(\\d+(?:[.,]\\d+)?)\\s+)?\\$?\\s*([0-9]{1,3}(?:[.,][0-9]{3})+(?:[.,][0-9]{2})?|[0-9]{4,10}(?:[.,][0-9]{2})?)\\s*$"
     );
 
+    private static final Logger log = LoggerFactory.getLogger(StructuredInvoiceTextExtractor.class);
+
     private final ObjectMapper objectMapper;
+    private final GeminiFinancialAdvisorService geminiAdvisor;
 
     public StructuredInvoiceTextExtractor(ObjectMapper objectMapper) {
+        this(objectMapper, null);
+    }
+
+    @Autowired
+    public StructuredInvoiceTextExtractor(
+            ObjectMapper objectMapper,
+            @Autowired(required = false) GeminiFinancialAdvisorService geminiAdvisor
+    ) {
         this.objectMapper = objectMapper;
+        this.geminiAdvisor = geminiAdvisor;
     }
 
     public DianUblXmlParser.ParsedUblInvoice extractFromRawText(String rawText) {
         String safeText = rawText != null ? rawText.trim() : "";
 
+        String explicitMerchant = findFirstGroup(MERCHANT_LINE_PATTERN, safeText, null);
+        boolean merchantWasExplicit = explicitMerchant != null && !explicitMerchant.isBlank();
         String merchantName = extractMerchantName(safeText);
         String merchantNit = findFirstGroup(NIT_PATTERN, safeText, "0").replaceAll("[^0-9\\-]", "");
         String invoiceNumber = findFirstGroup(INVOICE_NUM_PATTERN, safeText, "SIN-NUMERO");
@@ -81,6 +100,47 @@ public class StructuredInvoiceTextExtractor {
         }
         if (subtotal.compareTo(BigDecimal.ZERO) == 0 && total.compareTo(BigDecimal.ZERO) > 0) {
             subtotal = total.subtract(tax).max(BigDecimal.ZERO);
+        }
+
+        // Si las expresiones regulares dejaron campos clave sin resolver y Gemini está activo, estructurar JSON con IA (RF-04)
+        boolean needsAiAssist = !safeText.isBlank()
+                && geminiAdvisor != null
+                && geminiAdvisor.isGeminiConfigured()
+                && (!merchantWasExplicit
+                || "Comercio no identificado".equals(merchantName)
+                || total.compareTo(BigDecimal.ZERO) <= 0
+                || "SIN-NUMERO".equals(invoiceNumber));
+
+        if (needsAiAssist) {
+            AiExtractedFields aiFields = extractViaGeminiJson(safeText);
+            if (aiFields != null) {
+                if ((!merchantWasExplicit || "Comercio no identificado".equals(merchantName)) && aiFields.merchantName() != null) {
+                    merchantName = aiFields.merchantName();
+                }
+                if ((merchantNit.isBlank() || "0".equals(merchantNit)) && aiFields.merchantNit() != null) {
+                    merchantNit = aiFields.merchantNit();
+                }
+                if ("SIN-NUMERO".equals(invoiceNumber) && aiFields.invoiceNumber() != null) {
+                    invoiceNumber = aiFields.invoiceNumber();
+                }
+                if (aiFields.issueDate() != null) {
+                    issueDate = aiFields.issueDate();
+                }
+                if (total.compareTo(BigDecimal.ZERO) <= 0 && aiFields.totalAmount() != null && aiFields.totalAmount().compareTo(BigDecimal.ZERO) > 0) {
+                    total = aiFields.totalAmount();
+                }
+                if (tax.compareTo(BigDecimal.ZERO) == 0 && aiFields.taxAmount() != null && aiFields.taxAmount().compareTo(BigDecimal.ZERO) >= 0) {
+                    tax = aiFields.taxAmount();
+                }
+                if (subtotal.compareTo(BigDecimal.ZERO) == 0 && total.compareTo(BigDecimal.ZERO) > 0) {
+                    subtotal = aiFields.subtotalAmount() != null && aiFields.subtotalAmount().compareTo(BigDecimal.ZERO) > 0
+                            ? aiFields.subtotalAmount()
+                            : total.subtract(tax).max(BigDecimal.ZERO);
+                }
+                if (items.isEmpty() && aiFields.items() != null && !aiFields.items().isEmpty()) {
+                    items = aiFields.items();
+                }
+            }
         }
 
         String itemsJson;
@@ -108,6 +168,82 @@ public class StructuredInvoiceTextExtractor {
                 suggestion.block(),
                 safeText
         );
+    }
+
+    private AiExtractedFields extractViaGeminiJson(String rawText) {
+        String systemPrompt = """
+                Eres un extractor estructurado de facturas y recibos colombianos (COP).
+                Responde EXCLUSIVAMENTE un objeto JSON válido con las llaves:
+                {"merchantName": "string|null", "merchantNit": "string|null", "invoiceNumber": "string|null", "issueDate": "YYYY-MM-DD|null", "subtotalAmount": number|null, "taxAmount": number|null, "totalAmount": number|null, "items": [{"description": "string", "quantity": number, "amount": number}]}
+                No inventes números si no aparecen en el texto.
+                """;
+        try {
+            String jsonResponse = geminiAdvisor.generateJsonCompletion(systemPrompt, rawText);
+            if (jsonResponse == null || jsonResponse.isBlank()) {
+                return null;
+            }
+            JsonNode root = objectMapper.readTree(jsonResponse.trim());
+            String merchant = jsonText(root, "merchantName");
+            String nit = jsonText(root, "merchantNit");
+            String invoiceNum = jsonText(root, "invoiceNumber");
+            LocalDate date = null;
+            String dateStr = jsonText(root, "issueDate");
+            if (dateStr != null) {
+                try {
+                    date = LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
+                } catch (Exception ignored) {
+                }
+            }
+            BigDecimal subtotal = jsonDecimal(root, "subtotalAmount");
+            BigDecimal tax = jsonDecimal(root, "taxAmount");
+            BigDecimal total = jsonDecimal(root, "totalAmount");
+            List<DianUblXmlParser.ParsedLineItem> parsedItems = new ArrayList<>();
+            if (root.has("items") && root.get("items").isArray()) {
+                for (JsonNode itemNode : root.get("items")) {
+                    String desc = jsonText(itemNode, "description");
+                    BigDecimal qty = jsonDecimal(itemNode, "quantity");
+                    BigDecimal amt = jsonDecimal(itemNode, "amount");
+                    if (desc != null && amt != null) {
+                        parsedItems.add(new DianUblXmlParser.ParsedLineItem(
+                                desc,
+                                qty != null ? qty : BigDecimal.ONE,
+                                amt
+                        ));
+                    }
+                }
+            }
+            return new AiExtractedFields(merchant, nit, invoiceNum, date, subtotal, tax, total, parsedItems);
+        } catch (Exception ex) {
+            log.debug("Fallback JSON Gemini omitido en extractor OCR: {}", ex.getMessage());
+            return null;
+        }
+    }
+
+    private String jsonText(JsonNode root, String field) {
+        if (!root.hasNonNull(field)) return null;
+        String val = root.get(field).asText("").trim();
+        return val.isEmpty() || "null".equalsIgnoreCase(val) ? null : val;
+    }
+
+    private BigDecimal jsonDecimal(JsonNode root, String field) {
+        if (!root.hasNonNull(field)) return null;
+        JsonNode node = root.get(field);
+        if (node.isNumber()) {
+            return node.decimalValue();
+        }
+        return parseColombianAmount(node.asText("0"));
+    }
+
+    private record AiExtractedFields(
+            String merchantName,
+            String merchantNit,
+            String invoiceNumber,
+            LocalDate issueDate,
+            BigDecimal subtotalAmount,
+            BigDecimal taxAmount,
+            BigDecimal totalAmount,
+            List<DianUblXmlParser.ParsedLineItem> items
+    ) {
     }
 
     private String extractMerchantName(String text) {

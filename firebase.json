@@ -1,0 +1,18 @@
+{
+  "auth": {
+    "providers": {
+      "anonymous": false,
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "CuentaClara",
+        "supportEmail": "gelvezrodriguezsamueldavid1@gmail.com",
+        "authorizedRedirectUris": [
+          "https://cuentaclara-515712.firebaseapp.com/__/auth/handler",
+          "http://localhost:8080",
+          "http://localhost:8088",
+          "https://localhost:8443"
+        ]
+      }
+    }
+  }
+}

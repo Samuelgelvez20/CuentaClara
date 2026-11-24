@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- SIDEBAR LATERAL COMPARTIDO EN ESCRITORIO (>= lg, colapsable en localStorage) -->
+<aside th:fragment="sidebar(activePage)"
+       id="cc-sidebar"
+       class="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex-col justify-between shadow-sm transition-all duration-200 ease-out">
+    <div class="flex flex-col flex-1 overflow-y-auto">
+        <div class="cc-sidebar-brand p-6 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md flex-shrink-0">
+                    <span class="material-symbols-outlined text-on-primary text-[24px]" aria-hidden="true">calendar_month</span>
+                </div>
+                <div class="flex flex-col cc-sidebar-text min-w-0">
+                    <span class="text-lg text-primary leading-tight font-extrabold tracking-tight truncate">CuentaClara</span>
+                    <span class="text-[11px] text-on-surface-variant font-medium truncate">Finanzas personales</span>
+                </div>
+            </div>
+            <button type="button" onclick="toggleDesktopSidebar()" id="cc-sidebar-collapse-btn"
+                    aria-label="Contraer o expandir menú" title="Contraer barra lateral"
+                    class="w-9 h-9 rounded-lg hover:bg-surface-container-high text-on-surface-variant hover:text-primary flex items-center justify-center border-0 bg-transparent cursor-pointer flex-shrink-0 transition-colors">
+                <span class="material-symbols-outlined text-[19px]" id="cc-sidebar-collapse-icon" aria-hidden="true">dock_to_left</span>
+            </button>
+        </div>
+
+        <div class="px-4 py-1">
+            <div class="px-3 pb-2 cc-sidebar-text">
+                <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Menú</span>
+            </div>
+            <nav class="flex flex-col gap-1.5" aria-label="Navegación lateral">
+                <a title="Calendario" href="/dashboard"
+                   class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
+                   th:classappend="${activePage == 'dashboard'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
+                   th:attr="aria-current=${activePage == 'dashboard'} ? 'page' : null">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0"
+                          th:classappend="${activePage == 'dashboard'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">calendar_month</span>
+                    <span class="cc-sidebar-text">Calendario</span>
+                </a>
+                <a title="Historial de gastos" href="/history"
+                   class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
+                   th:classappend="${activePage == 'history'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
+                   th:attr="aria-current=${activePage == 'history'} ? 'page' : null">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0"
+                          th:classappend="${activePage == 'history'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">receipt_long</span>
+                    <span class="cc-sidebar-text">Historial de gastos</span>
+                </a>
+                <a title="Facturas y recibos" href="/upload"
+                   class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
+                   th:classappend="${activePage == 'upload'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
+                   th:attr="aria-current=${activePage == 'upload'} ? 'page' : null">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0"
+                          th:classappend="${activePage == 'upload'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">upload_file</span>
+                    <span class="cc-sidebar-text">Facturas y recibos</span>
+                    <span th:if="${pendingConfirmations != null and !#lists.isEmpty(pendingConfirmations)}"
+                          class="cc-sidebar-text ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold"
+                          th:text="${#lists.size(pendingConfirmations)}"></span>
+                </a>
+                <a title="Presupuesto y deudas" href="/profile"
+                   class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
+                   th:classappend="${activePage == 'profile'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
+                   th:attr="aria-current=${activePage == 'profile'} ? 'page' : null">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0"
+                          th:classappend="${activePage == 'profile'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">savings</span>
+                    <span class="cc-sidebar-text">Presupuesto y deudas</span>
+                </a>
+                <a title="Recomendaciones" href="/recommendations"
+                   class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
+                   th:classappend="${activePage == 'recommendations'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
+                   th:attr="aria-current=${activePage == 'recommendations'} ? 'page' : null">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0"
+                          th:classappend="${activePage == 'recommendations'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">auto_awesome</span>
+                    <span class="cc-sidebar-text">Recomendaciones</span>
+                </a>
+                <a title="Consultas" href="/assistant"
+                   class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
+                   th:classappend="${activePage == 'assistant'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
+                   th:attr="aria-current=${activePage == 'assistant'} ? 'page' : null">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0"
+                          th:classappend="${activePage == 'assistant'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">chat_bubble</span>
+                    <span class="cc-sidebar-text">Consultas</span>
+                </a>
+                <a title="Configuración" href="/settings"
+                   class="cc-nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all no-underline"
+                   th:classappend="${activePage == 'settings'} ? ' bg-primary-container text-on-primary font-bold shadow-xs' : ' font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'"
+                   th:attr="aria-current=${activePage == 'settings'} ? 'page' : null">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0"
+                          th:classappend="${activePage == 'settings'} ? ' text-on-primary' : ' text-on-surface/80'" aria-hidden="true">tune</span>
+                    <span class="cc-sidebar-text">Configuración</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="p-4 flex flex-col gap-2 bg-surface-container-high/35">
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest cc-sidebar-user">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]" aria-hidden="true">person</span>
+                </div>
+                <div class="flex flex-col truncate cc-sidebar-text">
+                    <span class="text-xs text-on-surface truncate font-bold" th:text="${user != null ? user.fullName : 'Usuario'}">Usuario</span>
+                    <span class="text-[11px] text-on-surface-variant truncate" th:text="${user != null ? user.email : ''}">correo@co</span>
+                </div>
+            </div>
+            <form method="post" action="/auth/logout" class="m-0">
+                <button class="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors border-0 bg-transparent cursor-pointer"
+                        title="Cerrar sesión" aria-label="Cerrar sesión" type="submit">
+                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">logout</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+</body>
+</html>

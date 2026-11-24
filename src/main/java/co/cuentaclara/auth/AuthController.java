@@ -23,10 +23,16 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtTokenService jwtTokenService;
+    private final FirebaseIdTokenVerifierService firebaseTokenVerifier;
 
-    public AuthController(AuthService authService, JwtTokenService jwtTokenService) {
+    public AuthController(
+            AuthService authService,
+            JwtTokenService jwtTokenService,
+            FirebaseIdTokenVerifierService firebaseTokenVerifier
+    ) {
         this.authService = authService;
         this.jwtTokenService = jwtTokenService;
+        this.firebaseTokenVerifier = firebaseTokenVerifier;
     }
 
     @PostMapping("/register")
@@ -57,6 +63,36 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/firebase")
+    public ResponseEntity<?> loginWithFirebase(
+            @RequestBody FirebaseAuthRequest request,
+            HttpServletResponse response
+    ) {
+        try {
+            FirebaseIdTokenVerifierService.VerifiedFirebaseUser verified =
+                    firebaseTokenVerifier.verifyIdToken(request != null ? request.idToken() : null);
+            AuthService.GoogleAuthResult result = authService.loginOrRegisterWithGoogle(
+                    verified.email(),
+                    verified.fullName(),
+                    request != null && request.aiConsentAccepted()
+            );
+            AuthService.AuthResponse authResponse = result.authResponse();
+            attachAuthCookie(response, authResponse.token(), jwtTokenService.getExpirationSeconds());
+            return ResponseEntity.ok(Map.of(
+                    "userId", authResponse.userId(),
+                    "email", authResponse.email(),
+                    "fullName", authResponse.fullName(),
+                    "token", authResponse.token(),
+                    "newUser", result.newUser()
+            ));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    public record FirebaseAuthRequest(String idToken, boolean aiConsentAccepted) {
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletResponse response) {
         attachAuthCookie(response, "", 0);
@@ -79,8 +115,27 @@ public class AuthController {
     }
 
     public static void attachAuthCookie(HttpServletResponse response, String token, long maxAgeSeconds) {
+        attachAuthCookie(response, token, maxAgeSeconds, false);
+    }
+
+    public static void attachAuthCookie(
+            HttpServletResponse response,
+            String token,
+            long maxAgeSeconds,
+            boolean forceSecure
+    ) {
+        boolean secureRequest = forceSecure;
+        if (!secureRequest) {
+            var attrs = org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
+            if (attrs instanceof org.springframework.web.context.request.ServletRequestAttributes servletAttrs) {
+                var request = servletAttrs.getRequest();
+                String forwardedProto = request.getHeader("X-Forwarded-Proto");
+                secureRequest = request.isSecure() || "https".equalsIgnoreCase(forwardedProto);
+            }
+        }
         ResponseCookie cookie = ResponseCookie.from(JwtTokenService.AUTH_COOKIE_NAME, token)
                 .httpOnly(true)
+                .secure(secureRequest)
                 .path("/")
                 .maxAge(maxAgeSeconds)
                 .sameSite("Lax")

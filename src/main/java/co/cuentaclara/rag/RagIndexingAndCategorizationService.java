@@ -282,7 +282,7 @@ public class RagIndexingAndCategorizationService implements TransactionService.D
             String raw = extraction.getRawExtractedText() != null ? extraction.getRawExtractedText() : "";
             List<PageSection> sections = splitByPageMarkers(raw);
             for (PageSection pageSec : sections) {
-                List<String> windows = splitIntoOverlappingWindows(pageSec.text(), 600, 100);
+                List<String> windows = splitIntoOverlappingWindows(pageSec.text(), 600, 90);
                 for (String win : windows) {
                     String citation = TransactionService.buildCitationReference(doc, pageSec.pageNumber());
                     chunks.add(new ChunkDraft(
@@ -393,12 +393,17 @@ public class RagIndexingAndCategorizationService implements TransactionService.D
         }
     }
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private co.cuentaclara.document.TempFileLifecycleAndRetryService tempFileLifecycleService;
+
     /**
-     * Tarea programada de limpieza de archivos temporales huérfanos de documentos ya indexados (RNF-05).
+     * Limpieza bajo demanda de archivos temporales huérfanos; la ejecución periódica
+     * programada reside en {@link co.cuentaclara.document.TempFileLifecycleAndRetryService} (RF-08, RNF-05).
      */
-    @Scheduled(fixedDelay = 300_000)
     public void cleanupOrphanedTempFiles() {
-        // La limpieza principal ocurre sincrónicamente al verificar la indexación en onDocumentConfirmed
+        if (tempFileLifecycleService != null) {
+            tempFileLifecycleService.cleanupOrphanedTempFiles();
+        }
     }
 
     private List<Map<String, Object>> parseItemsJsonSafely(String itemsJson) {
@@ -442,24 +447,78 @@ public class RagIndexingAndCategorizationService implements TransactionService.D
         return result;
     }
 
-    private List<String> splitIntoOverlappingWindows(String text, int windowCharSize, int overlapChars) {
+    /**
+     * Divide texto en fragmentos superpuestos por presupuesto aproximado de tokens (~500-800 tokens por chunk, RF-07).
+     */
+    public List<String> splitIntoOverlappingWindows(String text, int targetMaxTokens, int overlapTokens) {
         List<String> windows = new ArrayList<>();
         if (text == null || text.isBlank()) {
             return windows;
         }
-        if (text.length() <= windowCharSize) {
-            windows.add(text);
+        String[] words = text.trim().split("\\s+");
+        if (estimateTokenCount(text) <= targetMaxTokens && text.length() <= 3200) {
+            windows.add(text.trim());
             return windows;
         }
-        int step = Math.max(100, windowCharSize - overlapChars);
-        for (int pos = 0; pos < text.length(); pos += step) {
-            int end = Math.min(text.length(), pos + windowCharSize);
-            windows.add(text.substring(pos, end).trim());
-            if (end == text.length()) {
+
+        int maxTokens = Math.max(120, Math.min(targetMaxTokens, 800));
+        int overlap = Math.max(20, Math.min(overlapTokens, maxTokens / 3));
+
+        int startIdx = 0;
+        while (startIdx < words.length) {
+            StringBuilder chunk = new StringBuilder();
+            int tokenSum = 0;
+            int endIdx = startIdx;
+
+            while (endIdx < words.length) {
+                int wTokens = estimateWordTokens(words[endIdx]);
+                if (endIdx > startIdx && (tokenSum + wTokens > maxTokens || chunk.length() + words[endIdx].length() + 1 > 3200)) {
+                    break;
+                }
+                if (chunk.length() > 0) {
+                    chunk.append(' ');
+                }
+                chunk.append(words[endIdx]);
+                tokenSum += wTokens;
+                endIdx++;
+            }
+
+            String built = chunk.toString().trim();
+            if (!built.isEmpty()) {
+                windows.add(built);
+            }
+            if (endIdx >= words.length) {
                 break;
             }
+
+            // Retroceder palabras suficientes para cubrir `overlap` tokens de superposición contextual
+            int overlapSum = 0;
+            int nextStart = endIdx;
+            while (nextStart > startIdx + 1 && overlapSum < overlap) {
+                nextStart--;
+                overlapSum += estimateWordTokens(words[nextStart]);
+            }
+            startIdx = Math.max(startIdx + 1, nextStart);
         }
         return windows;
+    }
+
+    public int estimateTokenCount(String text) {
+        if (text == null || text.isBlank()) {
+            return 0;
+        }
+        int total = 0;
+        for (String word : text.trim().split("\\s+")) {
+            total += estimateWordTokens(word);
+        }
+        return total;
+    }
+
+    private int estimateWordTokens(String word) {
+        if (word == null || word.isEmpty()) {
+            return 0;
+        }
+        return Math.max(1, (int) Math.ceil(word.length() / 4.0));
     }
 
     private record PageSection(int pageNumber, String text) {

@@ -2,470 +2,334 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
+    <meta name="description" content="Calendario financiero de CuentaClara para controlar pagos fijos, ingresos y gastos diarios del mes."/>
     <title>CuentaClara — Mi Calendario y Organizador de Gastos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-    <link rel="stylesheet" href="/css/cuentaclara-theme.css"/>
-    <script src="/js/cuentaclara-theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;icon_names=account_balance_wallet,add,add_circle,alternate_email,auto_awesome,bolt,calendar_month,chat_bubble,check,check_circle,chevron_left,chevron_right,close,dark_mode,delete_forever,dock_to_left,dock_to_right,error,event_repeat,expand_more,fact_check,forum,home,hourglass_top,insights,keyboard_arrow_down,keyboard_arrow_up,light_mode,local_cafe,lock,logout,pause_circle,person,person_remove,pie_chart,play_circle,progress_activity,receipt,receipt_long,save,savings,search,send,summarize,tune,upload_file,verified_user,visibility,visibility_off,warning&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/cuentaclara-tailwind.css"/>
+    <link rel="stylesheet" href="/css/cuentaclara-theme.min.css"/>
+    <link rel="stylesheet" href="/css/calendar-redesign.min.css"/>
+    <script src="/js/cuentaclara-theme.min.js"></script>
     <style>
-        @layer base { html, body { margin: 0; padding: 0; scroll-behavior: smooth; } body { overscroll-behavior: none; } }
+        html, body { margin: 0; padding: 0; scroll-behavior: smooth; }
+        body { overscroll-behavior: none; }
         ::-webkit-scrollbar { display: none; }
     </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "var(--primary)",
-                        "primary-container": "var(--primary-container)",
-                        "on-primary": "var(--on-primary)",
-                        "on-primary-container": "var(--on-primary-container)",
-                        "primary-fixed": "var(--primary-fixed)",
-                        "primary-fixed-dim": "var(--primary-fixed-dim)",
-                        "on-primary-fixed": "var(--on-primary-fixed)",
-                        "secondary": "var(--secondary)",
-                        "secondary-container": "var(--secondary-container)",
-                        "on-secondary": "var(--on-secondary)",
-                        "on-secondary-container": "var(--on-secondary-container)",
-                        "secondary-fixed": "var(--secondary-fixed)",
-                        "secondary-fixed-dim": "var(--secondary-fixed-dim)",
-                        "on-secondary-fixed": "var(--on-secondary-fixed)",
-                        "tertiary": "var(--tertiary)",
-                        "tertiary-container": "var(--tertiary-container)",
-                        "tertiary-fixed": "var(--tertiary-fixed)",
-                        "tertiary-fixed-dim": "var(--tertiary-fixed-dim)",
-                        "surface": "var(--surface)",
-                        "background": "var(--background)",
-                        "surface-bright": "var(--surface-bright)",
-                        "surface-container-lowest": "var(--surface-container-lowest)",
-                        "surface-container-low": "var(--surface-container-low)",
-                        "surface-container": "var(--surface-container)",
-                        "surface-container-high": "var(--surface-container-high)",
-                        "surface-container-highest": "var(--surface-container-highest)",
-                        "on-surface": "var(--on-surface)",
-                        "on-background": "var(--on-background)",
-                        "on-surface-variant": "var(--on-surface-variant)",
-                        "outline": "var(--outline)",
-                        "outline-variant": "var(--outline-variant)",
-                        "error": "var(--error)",
-                        "error-container": "var(--error-container)",
-                        "on-error-container": "var(--on-error-container)"
-                    },
-                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.35rem", "2xl": "1.75rem", "3xl": "2.15rem", "full": "9999px" },
-                    spacing: { "space-2xl": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "gutter-sm": "1rem", "margin-lg": "2.5rem", "margin-sm": "1rem", "gutter-lg": "2rem", "gutter": "1.5rem", "space-xxs": "0.25rem", "space-xs": "0.5rem", "margin": "2rem", "space-md": "1rem" },
-                    fontFamily: {
-                        "body-lg": ["Plus Jakarta Sans"],
-                        "data-mono": ["Plus Jakarta Sans"],
-                        "headline-sm": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "title-lg": ["Plus Jakarta Sans"],
-                        "body-sm": ["Plus Jakarta Sans"],
-                        "title-md": ["Plus Jakarta Sans"],
-                        "label-md": ["Plus Jakarta Sans"],
-                        "label-sm": ["Plus Jakarta Sans"],
-                        "body-md": ["Plus Jakarta Sans"],
-                        "display-lg": ["Plus Jakarta Sans"]
-                    },
-                    fontSize: {
-                        "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
-                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
-                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "700" }],
-                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
-                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "700" }],
-                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
-                        "title-md": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
-                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
-                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
-                        "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }]
-                    }
-                }
-            }
-        };
-    </script>
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased">
 
-<!-- LEFT FIXED SIDEBAR (Friendly & Rounded Personal Organizer) -->
-<aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-40 flex flex-col justify-between border-r border-outline-variant/25 shadow-sm">
-    <div class="flex flex-col flex-1 overflow-y-auto">
-        <div class="p-space-lg flex items-center gap-3">
-            <div class="w-11 h-11 rounded-2xl bg-primary-container flex items-center justify-center shadow-md">
-                <span class="material-symbols-outlined text-secondary-fixed text-[24px]">calendar_month</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="text-lg text-primary leading-tight font-extrabold tracking-tight">CuentaClara</span>
-                <span class="text-[11px] text-on-surface-variant font-medium">Finanzas personales</span>
-            </div>
-        </div>
+<!-- LEFT SIDEBAR COMPARTIDO (>= lg, colapsable) -->
+<div th:replace="~{fragments/app-sidebar :: sidebar('dashboard')}"></div>
 
-        <div class="px-space-md py-space-xs">
-            <div class="px-space-sm pb-2">
-                <span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider">Menú</span>
+<!-- RIGHT DESKTOP/MOBILE WORKSPACE -->
+<div id="cc-main-shell" class="pl-0 lg:pl-72 flex flex-col min-h-screen w-full min-w-0 overflow-x-clip transition-[padding] duration-200 ease-out">
+    <!-- Top Header Bar -->
+    <header id="cc-top-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 lg:h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20 transition-[left] duration-200 ease-out">
+        <div class="h-16 lg:h-20 w-full px-3 sm:px-6 lg:px-space-xl flex items-center justify-between gap-2 sm:gap-space-md">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+                <a href="/dashboard" aria-label="CuentaClara"
+                   class="lg:hidden w-10 h-10 flex-shrink-0 rounded-xl bg-primary-container text-secondary-fixed flex items-center justify-center shadow-xs no-underline">
+                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                </a>
+                <form method="post" action="/dashboard/chat" class="flex-1 max-w-xl m-0 min-w-0">
+                    <input type="hidden" name="returnTo" value="/assistant"/>
+                    <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-3 sm:left-4 text-on-surface-variant text-[18px] sm:text-[20px]" aria-hidden="true">search</span>
+                        <label for="cc-top-search" class="sr-only">Consultar gastos del mes</label>
+                        <input id="cc-top-search" name="question" class="w-full h-10 pl-9 sm:pl-11 pr-3 sm:pr-16 bg-surface-container-lowest rounded-xl font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" placeholder="Consultar gastos del mes..." type="text"/>
+                        <kbd class="hidden sm:inline-flex items-center gap-0.5 absolute right-3 px-1.5 py-0.5 rounded-md bg-surface-container text-[10px] font-bold text-on-surface-variant border border-outline-variant/40 pointer-events-none">Ctrl K</kbd>
+                    </div>
+                </form>
             </div>
-            <nav class="flex flex-col gap-1.5">
-                <a aria-current="page" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-primary-container text-on-primary font-bold shadow-xs no-underline" href="/dashboard">
-                    <span class="material-symbols-outlined text-[20px] text-secondary-fixed">calendar_month</span>
-                    <span>Calendario</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/history">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span>Historial de gastos</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/upload">
-                    <span class="material-symbols-outlined text-[20px]">upload_file</span>
-                    <span>Facturas y recibos</span>
-                    <span th:if="${!#lists.isEmpty(pendingConfirmations)}" class="ml-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold" th:text="${#lists.size(pendingConfirmations)}"></span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/profile">
-                    <span class="material-symbols-outlined text-[20px]">savings</span>
-                    <span>Presupuesto y deudas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/assistant">
-                    <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-                    <span>Consultas</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all no-underline" href="/settings">
-                    <span class="material-symbols-outlined text-[20px]">tune</span>
-                    <span>Configuración</span>
-                </a>
-            </nav>
-        </div>
-    </div>
-
-    <div class="p-space-md flex flex-col gap-space-sm bg-surface-container-high/35">
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-lowest shadow-xs border border-outline-variant/20">
-            <div class="flex items-center gap-2.5 overflow-hidden">
-                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">person</span>
-                </div>
-                <div class="flex flex-col truncate">
-                    <span class="text-xs text-on-surface truncate font-bold" th:text="${user.fullName}">Usuario</span>
-                    <span class="text-[11px] text-on-surface-variant truncate" th:text="${user.email}">correo@co</span>
-                </div>
-            </div>
-            <form method="post" action="/auth/logout" class="m-0">
-                <button class="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" title="Cerrar sesión" type="submit">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</aside>
-
-<!-- RIGHT DESKTOP WORKSPACE -->
-<div class="pl-72 flex flex-col min-h-screen">
-    <!-- Top Desktop Header Bar -->
-    <header class="fixed top-0 left-72 right-0 h-20 bg-surface/85 backdrop-blur-xl z-30 border-b border-outline-variant/20">
-        <div class="h-20 w-full px-space-xl flex items-center justify-between gap-space-md">
-            <form method="post" action="/dashboard/chat" class="flex-1 max-w-xl m-0">
-                <input type="hidden" name="returnTo" value="/assistant"/>
-                <div class="relative flex items-center">
-                    <span class="material-symbols-outlined absolute left-4 text-on-surface-variant text-[20px]">search</span>
-                    <input name="question" class="w-full h-10 pl-11 pr-4 bg-surface-container-lowest rounded-xl font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-secondary border border-outline-variant/40" placeholder="Consultar gastos del mes..." type="text"/>
-                </div>
-            </form>
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="window.CuentaClaraTheme.toggleDarkMode()"
-                        title="Alternar tema claro / oscuro"
-                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">dark_mode</span>
-                    <span>Tema</span>
-                </button>
-                <a href="/settings" title="Configuración"
-                   class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-surface-container-high transition-all no-underline">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
-                    <span>Ajustes</span>
-                </a>
-                <button type="button" onclick="openObligationModal()"
-                        class="h-9 px-3.5 bg-surface-container-lowest hover:bg-surface-container-high text-primary border border-outline-variant/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-secondary">add</span>
-                    <span>Pago fijo</span>
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                <div th:replace="~{fragments/mobile-nav :: headerUtilityActions('dashboard')}"></div>
+                <button type="button" onclick="openObligationModal()" title="Nuevo pago fijo"
+                        aria-label="Nuevo pago fijo"
+                        class="min-w-[40px] min-h-[40px] px-2.5 sm:px-3.5 bg-surface-container-lowest hover:bg-surface-container-high text-primary border border-outline-variant/40 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">add</span>
+                    <span class="hidden sm:inline">Pago fijo</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="w-full pt-20 bg-surface flex-1">
-        <div class="w-full px-margin-lg py-space-lg flex flex-col gap-space-xl max-w-[1600px] mx-auto">
+    <main class="w-full pt-16 lg:pt-20 pb-8 bg-surface flex-1 min-w-0">
+        <div class="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-4 flex flex-col gap-3 sm:gap-4 max-w-[1640px] mx-auto">
 
             <!-- Alertas Flash -->
-            <div th:if="${successMessage}" class="p-4 rounded-xl bg-secondary-container text-on-secondary-container font-semibold text-sm flex items-center gap-3 border border-secondary/20">
-                <span class="material-symbols-outlined text-[20px] text-secondary">check_circle</span>
+            <div th:if="${successMessage}" role="status" class="px-4 py-2.5 rounded-xl bg-secondary-container text-on-secondary-container font-semibold text-xs flex items-center gap-2.5 border border-secondary/25">
+                <span class="material-symbols-outlined text-[18px] text-secondary" aria-hidden="true">check_circle</span>
                 <span th:text="${successMessage}"></span>
             </div>
-            <div th:if="${errorMessage}" class="p-4 rounded-xl bg-error-container text-on-error-container font-semibold text-sm flex items-center gap-3">
-                <span class="material-symbols-outlined text-[20px]">error</span>
+            <div th:if="${errorMessage}" role="alert" class="px-4 py-2.5 rounded-xl bg-error-container text-on-error-container font-semibold text-xs flex items-center gap-2.5 border border-error/25">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
                 <span th:text="${errorMessage}"></span>
             </div>
 
-            <!-- 1. Encabezado -->
-            <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div class="flex flex-col gap-0.5">
-                    <h1 class="text-2xl sm:text-3xl font-bold text-primary tracking-tight m-0"
-                        th:text="${calendarMonthLabel}">Octubre 2026</h1>
-                    <p class="text-xs text-on-surface-variant m-0">Resumen mensual y registro diario de gastos</p>
-                </div>
-                <div class="flex items-center gap-2.5 flex-wrap">
-                    <form method="post" action="/dashboard/simulate-month" class="m-0">
-                        <input type="hidden" name="month" th:value="${selectedMonth}"/>
-                        <button type="submit" class="h-10 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-primary hover:bg-surface-container-high transition-all flex items-center gap-1.5 text-xs font-semibold">
-                            <span class="material-symbols-outlined text-[18px] text-secondary">dataset</span>
-                            <span>Cargar datos de ejemplo</span>
-                        </button>
-                    </form>
-                    <a href="/upload" class="h-10 px-4 rounded-xl bg-primary-container hover:opacity-95 text-on-primary transition-all flex items-center gap-1.5 shadow-xs text-xs font-semibold no-underline">
-                        <span class="material-symbols-outlined text-[18px] text-secondary-fixed">upload_file</span>
-                        <span>Subir factura o recibo</span>
-                    </a>
-                </div>
-            </header>
-
-            <!-- 2. Indicadores del Mes -->
-            <section aria-label="Resumen de tu dinero" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Tarjeta 1: Ingreso -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Ingreso mensual</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">payments</span>
-                    </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-primary"
+            <!-- 1. Métricas compactas en una sola fila delgada (el calendario entra completo en 1080p) -->
+            <section aria-label="Resumen financiero del mes" class="cc-metrics-strip">
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label">Ingreso mensual</span>
+                        <span class="cc-metric-value"
                               th:text="'$ ' + ${#numbers.formatDecimal(profile != null ? profile.netIncome : 4000000, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 4.000.000 COP</span>
                     </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant" th:text="${profile != null ? 'Regla ' + profile.needsPct + '/' + profile.wantsPct + '/' + profile.savingsPct : 'Regla 50/30/20'}">Regla 50/30/20</span>
-                        <a href="/profile" class="text-secondary font-semibold no-underline hover:underline">Editar</a>
-                    </div>
+                    <a href="/profile" class="cc-metric-action">Editar</a>
                 </div>
 
-                <!-- Tarjeta 2: Gastado en este filtro/mes -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Gastado este mes</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">receipt_long</span>
-                    </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-on-surface"
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label" th:text="'Gastado (' + ${#lists.size(history.transactions)} + ' mov.)'">Gastado</span>
+                        <span class="cc-metric-value"
                               th:text="'$ ' + ${#numbers.formatDecimal(history.grandTotal, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 0 COP</span>
                     </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant font-medium"
-                              th:text="${#lists.size(history.transactions)} + ' movimiento(s)'">0 movimientos</span>
-                        <a th:href="@{/history(month=${selectedMonth})}" class="text-secondary font-semibold no-underline hover:underline">Ver detalle</a>
-                    </div>
+                    <a th:href="@{/history(month=${selectedMonth})}" class="cc-metric-action">Detalle</a>
                 </div>
 
-                <!-- Tarjeta 3: Pagos Fijos / Deudas Mensuales -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Pagos fijos del mes</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">event_repeat</span>
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label">Pagos fijos</span>
+                        <span class="cc-metric-value text-secondary" th:text="${#lists.size(obligations)} + ' programados'">0 programados</span>
                     </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-secondary" th:text="${#lists.size(obligations)} + ' programados'">0 programados</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant">Recordatorio mensual</span>
-                        <button type="button" onclick="openObligationModal()" class="text-primary font-semibold hover:underline bg-transparent border-0 p-0 cursor-pointer">+ Agregar</button>
-                    </div>
+                    <button type="button" onclick="openObligationModal()" class="cc-metric-action">+ Agregar</button>
                 </div>
 
-                <!-- Tarjeta 4: Meta de Ahorro -->
-                <div class="bg-surface-container-lowest rounded-2xl p-5 flex flex-col justify-between border border-outline-variant/30">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface-variant font-semibold">Meta de ahorro</span>
-                        <span class="material-symbols-outlined text-[20px] text-secondary">savings</span>
-                    </div>
-                    <div class="my-2">
-                        <span class="text-2xl font-bold text-on-surface"
+                <div class="cc-metric-chip">
+                    <div class="cc-metric-meta">
+                        <span class="cc-metric-label" th:text="'Meta ahorro (' + ${(profile != null ? profile.savingsPct : 20)} + '%)'">Meta ahorro</span>
+                        <span class="cc-metric-value"
                               th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 800.000 COP</span>
                     </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-on-surface-variant" th:text="${(profile != null ? profile.savingsPct : 20) + '% del ingreso'}">20% del ingreso</span>
+                    <div class="flex items-center gap-1">
+                        <form method="post" action="/dashboard/simulate-month" class="m-0">
+                            <input type="hidden" name="month" th:value="${selectedMonth}"/>
+                            <button type="submit" title="Cargar datos de ejemplo" class="cc-metric-action">Cargar ejemplo</button>
+                        </form>
                     </div>
                 </div>
             </section>
 
             <!-- ========================================================================================
-                 3. CALENDARIO INTERACTIVO MENSUAL DE GASTOS DIARIOS Y PAGOS FIJOS (#calendario-mes)
+                 2. MÓDULO DE CALENDARIO REDISEÑADO (#calendario-mes)
                  ======================================================================================== -->
-            <section id="calendario-mes" class="bg-surface-container-lowest rounded-2xl p-6 sm:p-7 border border-outline-variant/30 flex flex-col gap-5">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant/20 pb-4">
-                    <div>
-                        <div class="flex items-center gap-2.5 flex-wrap">
-                            <h2 class="text-lg font-bold text-primary m-0" th:text="'Calendario — ' + ${calendarMonthLabel}">Calendario</h2>
-                            <span class="px-2.5 py-0.5 rounded-md bg-surface-container text-on-surface text-xs font-semibold"
-                                  th:text="'Hoy: ' + ${todayFullLabel}">Hoy</span>
+            <section id="calendario-mes" class="cc-calendar-shell"
+                     th:attr="data-selected-month=${selectedMonth},data-selected-year=${selectedYear},data-selected-month-num=${selectedMonthNumber},data-today-iso=${todayIso},data-prev-month=${prevMonth},data-next-month=${nextMonth},data-current-real-month=${currentRealMonth}">
+
+                <!-- Encabezado del calendario -->
+                <div class="cc-cal-header">
+                    <!-- Izquierda: Título del mes + selector visual amplio de fechas -->
+                    <div class="cc-cal-title-group">
+                        <h1 class="cc-cal-month-title" id="cc-cal-heading" th:text="${calendarMonthLabel}">Noviembre 2026</h1>
+                        <div th:replace="~{fragments/date-picker :: datePicker('cc-cal-datepicker', 'month', '/dashboard', 'Elegir fecha', ${selectedMonth}, '', '', '', '', false)}"></div>
+                    </div>
+
+                    <!-- Centro: Selector segmentado Mes / Semana / Día -->
+                    <div class="cc-segmented" role="tablist" aria-label="Vista del calendario">
+                        <button type="button" role="tab" id="cc-tab-month" class="cc-segmented-btn" data-view="month" aria-selected="true">Mes</button>
+                        <button type="button" role="tab" id="cc-tab-week" class="cc-segmented-btn" data-view="week" aria-selected="false">Semana</button>
+                        <button type="button" role="tab" id="cc-tab-day" class="cc-segmented-btn" data-view="day" aria-selected="false">Día</button>
+                    </div>
+
+                    <!-- Derecha: Anterior / Hoy / Siguiente + acceso rápido Subir factura -->
+                    <div class="flex items-center gap-2 flex-wrap min-w-0 max-w-full">
+                        <div class="cc-nav-group" role="group" aria-label="Navegar periodo">
+                            <a id="cc-nav-prev" th:href="@{/dashboard(month=${prevMonth})}" class="cc-nav-btn" aria-label="Anterior" title="Anterior">
+                                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                            </a>
+                            <a id="cc-nav-today" th:href="@{/dashboard(month=${currentRealMonth})}" class="cc-nav-btn cc-nav-btn-today">Hoy</a>
+                            <a id="cc-nav-next" th:href="@{/dashboard(month=${nextMonth})}" class="cc-nav-btn" aria-label="Siguiente" title="Siguiente">
+                                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                            </a>
                         </div>
-                        <p class="text-xs text-on-surface-variant m-0 mt-1">
-                            Selecciona cualquier día para registrar o consultar tus gastos.
-                        </p>
-                    </div>
-
-                    <!-- Controles de Navegación de Mes en el Calendario -->
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <a th:href="@{/dashboard(month=${currentRealMonth})}"
-                           title="Ir al mes actual"
-                           class="h-9 px-3.5 rounded-xl bg-secondary text-white hover:opacity-95 text-xs font-semibold flex items-center gap-1.5 no-underline">
-                            <span>Hoy</span>
-                        </a>
-
-                        <a th:href="@{/dashboard(month=${prevMonth})}"
-                           class="h-9 px-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1 no-underline border border-outline-variant/30">
-                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-                            <span>Anterior</span>
-                        </a>
-
-                        <form method="get" action="/dashboard" class="m-0 flex items-center gap-1.5 bg-surface-container-low p-1 rounded-xl border border-outline-variant/30">
-                            <select name="monthNum" onchange="this.form.submit()" aria-label="Filtrar por mes"
-                                    class="h-7 px-3 rounded-lg bg-primary-container text-on-primary text-xs font-semibold cursor-pointer border-0 focus:outline-none">
-                                <option th:each="entry : ${availableMonthNames}"
-                                        th:value="${entry.key}"
-                                        th:text="${entry.value}"
-                                        th:selected="${entry.key == selectedMonthNumber}">Noviembre</option>
-                            </select>
-                            <select name="year" onchange="this.form.submit()" aria-label="Filtrar por año"
-                                    class="h-7 px-2.5 rounded-lg bg-surface-container-lowest text-primary text-xs font-bold cursor-pointer border border-outline-variant/30 focus:outline-none">
-                                <option th:each="yr : ${availableYears}"
-                                        th:value="${yr}"
-                                        th:text="${yr}"
-                                        th:selected="${yr == selectedYear}">2026</option>
-                            </select>
-                        </form>
-
-                        <a th:href="@{/dashboard(month=${nextMonth})}"
-                           class="h-9 px-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1 no-underline border border-outline-variant/30">
-                            <span>Siguiente</span>
-                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                        <a href="/upload" class="cc-nav-btn cc-nav-btn-primary whitespace-nowrap flex-shrink-0" title="Subir factura o recibo">
+                            <span class="material-symbols-outlined text-[18px] mr-1">upload_file</span>
+                            <span class="hidden sm:inline">+ Factura</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- Leyenda del Calendario -->
-                <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-on-surface-variant bg-surface-container-low/50 px-4 py-2 rounded-xl">
-                    <div class="flex flex-wrap items-center gap-5">
-                        <span class="flex items-center gap-1.5 font-semibold text-secondary">
-                            <span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
-                            <span>Día actual</span>
-                        </span>
-                        <span class="flex items-center gap-1.5 font-medium">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                            <span>Pago fijo pendiente</span>
-                        </span>
-                        <span class="flex items-center gap-1.5 font-medium">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                            <span>Pago fijo al día</span>
-                        </span>
-                        <span class="flex items-center gap-1.5 font-medium">
-                            <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
-                            <span>Gasto registrado</span>
-                        </span>
+                <!-- Barra de filtros rápidos con conteos -->
+                <div class="cc-legend-inline" aria-label="Filtros del calendario">
+                    <div class="cc-filter-pills" id="cc-filter-pills" role="group" aria-label="Filtrar movimientos del calendario">
+                        <button type="button" class="cc-filter-pill is-active" data-cal-filter="all">
+                            <span>Todos</span>
+                            <span class="cc-pill-count" id="cc-count-all">0</span>
+                        </button>
+                        <button type="button" class="cc-filter-pill" data-cal-filter="pending">
+                            <span class="cc-dot cc-dot-pending"></span>
+                            <span>Pendientes</span>
+                            <span class="cc-pill-count" id="cc-count-pending">0</span>
+                        </button>
+                        <button type="button" class="cc-filter-pill" data-cal-filter="paid">
+                            <span class="cc-dot cc-dot-paid"></span>
+                            <span>Al día</span>
+                            <span class="cc-pill-count" id="cc-count-paid">0</span>
+                        </button>
+                        <button type="button" class="cc-filter-pill" data-cal-filter="expense">
+                            <span class="cc-dot cc-dot-expense"></span>
+                            <span>Gastos</span>
+                            <span class="cc-pill-count" id="cc-count-expense">0</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Encabezado de Días de la Semana (Lunes a Domingo - Resalta el día de la semana de hoy) -->
-                <div class="grid grid-cols-7 gap-2.5 text-center">
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 1} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Lun</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 2} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Mar</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 3} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Mié</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 4} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Jue</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 5} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-primary'">Vie</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 6} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-secondary'">Sáb</div>
-                    <div class="py-2 rounded-xl text-xs font-extrabold transition-all"
-                         th:classappend="${isCurrentRealMonth and todayDayOfWeek == 7} ? 'bg-secondary text-white shadow-sm ring-2 ring-secondary/40' : 'bg-surface-container-low text-secondary'">Dom</div>
-                </div>
+                <!-- Área principal del calendario (izquierda: vista Mes/Semana/Día; derecha: panel de día en Paso 4) -->
+                <div class="cc-cal-workspace" id="cc-cal-workspace">
+                    <div class="cc-cal-main" id="cc-cal-main">
 
-                <!-- Cuadrícula del Mes (Días 1 a 30/31) -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
-                    <th:block th:each="cell : ${calendarCells}">
-                        <!-- Casilla vacía de relleno para alinear el día 1 -->
-                        <div th:if="${cell.empty}" class="hidden lg:block min-h-[135px] rounded-2xl bg-surface-container-low/25 border border-dashed border-outline-variant/20"></div>
+                        <!-- Mini leyenda de puntos en móvil -->
+                        <div class="sm:hidden flex items-center justify-center gap-3 px-3 py-1.5 text-[10px] font-semibold text-on-surface-variant border-b border-outline-variant/25 bg-surface-container-low/50">
+                            <span class="inline-flex items-center gap-1"><span class="cc-dot cc-dot-pending"></span>Pendiente</span>
+                            <span class="inline-flex items-center gap-1"><span class="cc-dot cc-dot-paid"></span>Al día</span>
+                            <span class="inline-flex items-center gap-1"><span class="cc-dot cc-dot-expense"></span>Gasto</span>
+                        </div>
 
-                        <!-- Casilla de Día Real Interactiva (Resalta especialmente el Día de HOY) -->
-                        <div th:if="${!cell.empty}"
-                             th:attr="onclick='openDayModal(' + ${cell.dayNumber} + ')',data-cell-iso=${cell.isoDate}"
-                             class="calendar-day-card min-h-[135px] p-3 cursor-pointer flex flex-col justify-between gap-1.5 relative group"
-                             th:classappend="${cell.today} ? 'bg-secondary-container/35 ring-2 ring-secondary border-2 border-secondary shadow-md' : 'bg-surface-container-low/70 hover:bg-surface-container border border-outline-variant/35'">
-
-                            <!-- Fila superior: Número del día, Etiqueta HOY (si es hoy) y botón + al pasar el mouse -->
-                            <div class="flex items-center justify-between gap-1">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold"
-                                          th:classappend="${cell.today} ? 'bg-secondary text-white ring-4 ring-secondary/25 shadow-sm' : (${!#lists.isEmpty(cell.transactions) or !#lists.isEmpty(cell.obligations)} ? 'bg-primary-container text-on-primary shadow-xs' : 'bg-surface-container-lowest text-on-surface')"
-                                          th:text="${cell.dayNumber}">1</span>
-
-                                    <!-- Insignia destacada cuando la casilla corresponde al Día de HOY -->
-                                    <span th:if="${cell.today}"
-                                          class="px-2 py-0.5 rounded-md bg-secondary text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                                        <span th:text="'HOY • ' + ${cell.dayOfWeekName}">HOY</span>
-                                    </span>
-                                    <span th:if="${!cell.today}"
-                                          class="text-[10px] font-semibold text-on-surface-variant/75"
-                                          th:text="${cell.dayOfWeekName}">Mar</span>
-                                </div>
-
-                                <span class="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 rounded-md bg-primary-container text-white text-[10px] font-semibold flex items-center gap-0.5">
-                                    <span class="material-symbols-outlined text-[12px]">add</span> Registrar
-                                </span>
+                        <!-- VISTA MENSUAL -->
+                        <div id="cc-view-month" class="cc-view-panel" role="tabpanel" aria-labelledby="cc-tab-month">
+                            <!-- Encabezado único de días de la semana (sin resaltar columna de hoy) -->
+                            <div class="cc-weekdays-row" role="row">
+                                <div class="cc-weekday-label" role="columnheader">Lun</div>
+                                <div class="cc-weekday-label" role="columnheader">Mar</div>
+                                <div class="cc-weekday-label" role="columnheader">Mié</div>
+                                <div class="cc-weekday-label" role="columnheader">Jue</div>
+                                <div class="cc-weekday-label" role="columnheader">Vie</div>
+                                <div class="cc-weekday-label" role="columnheader">Sáb</div>
+                                <div class="cc-weekday-label" role="columnheader">Dom</div>
                             </div>
 
-                            <!-- Lista de Pagos Fijos / Deudas Mensuales y Gastos del Día -->
-                            <div class="flex flex-col gap-1 my-1 overflow-hidden">
-                                <!-- Pagos Fijos / Deudas que vencen este día cada mes -->
-                                <div th:each="ob : ${cell.obligations}"
-                                     class="px-2 py-1 rounded-lg text-[11px] font-semibold truncate flex items-center justify-between gap-1"
-                                     th:classappend="${ob.paidThisMonth} ? 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/40'">
-                                    <span class="truncate" th:text="${(ob.paidThisMonth ? '✓ ' : '') + ob.name}">Alquiler</span>
-                                    <span class="flex-shrink-0 font-bold" th:text="'$' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}"></span>
-                                </div>
-
-                                <!-- Gastos Reales Registrados en este Día (máx 2 visibles en la miniatura) -->
-                                <div th:each="tx, iterStat : ${cell.transactions}" th:if="${iterStat.index < 2}"
-                                     class="px-2 py-1 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-[11px] text-on-surface truncate flex items-center justify-between gap-1">
-                                    <span class="truncate font-semibold" th:text="${tx.merchantName}">Comercio</span>
-                                    <span class="text-secondary font-bold flex-shrink-0" th:text="'$' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span>
-                                </div>
-                                <div th:if="${#lists.size(cell.transactions) > 2}"
-                                     class="text-[10px] text-primary font-semibold pl-1"
-                                     th:text="'+ ' + (${#lists.size(cell.transactions) - 2}) + ' más'">
-                                </div>
-                            </div>
-
-                            <!-- Pie de casilla: Total del día -->
-                            <div class="pt-1 border-t border-outline-variant/20 flex items-center justify-between text-[11px]">
-                                <span th:if="${cell.dayTotal > 0}" class="text-on-surface-variant font-medium">Total:</span>
-                                <span th:if="${cell.dayTotal > 0}" class="font-bold text-primary"
-                                      th:text="'$ ' + ${#numbers.formatDecimal(cell.dayTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</span>
-                                <span th:if="${cell.dayTotal == 0 and #lists.isEmpty(cell.obligations)}" class="text-[10px] text-on-surface-variant/60">Sin gastos</span>
-                            </div>
-
-                            <!-- Datos ocultos de este día para alimentar la Mini-Ventana al hacer clic -->
-                            <div th:id="'day-data-' + ${cell.dayNumber}" class="hidden"
-                                 th:attr="data-iso=${cell.isoDate},data-label=${cell.fullDateLabel}">
-                                <div class="day-obligations-list">
-                                    <div th:each="ob : ${cell.obligations}" class="day-ob-item"
-                                         th:attr="data-name=${ob.name},data-amount=${ob.estimatedAmount},data-category=${ob.category},data-block=${ob.budgetBlock},data-paid=${ob.paidThisMonth}">
+                            <!-- Cuadrícula del Mes -->
+                            <div class="cc-month-grid" id="cc-month-grid" role="grid" aria-label="Calendario mensual de gastos">
+                                <th:block th:each="cell : ${calendarCells}">
+                                    <!-- Días del mes anterior (gris suave, sin borde punteado) -->
+                                    <div th:if="${cell.empty}"
+                                         class="cc-day-cell is-outside cc-leading-outside"
+                                         aria-hidden="true">
+                                        <div class="cc-day-top">
+                                            <span class="cc-day-num"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="day-transactions-list">
-                                    <div th:each="tx : ${cell.transactions}" class="day-tx-item"
-                                         th:attr="data-merchant=${tx.merchantName},data-amount=${tx.totalAmount},data-category=${tx.category},data-desc=${tx.description != null ? tx.description : tx.itemsSummary}">
+
+                                    <!-- Día real del mes seleccionado -->
+                                    <div th:if="${!cell.empty}"
+                                         role="gridcell"
+                                         tabindex="0"
+                                         th:attr="data-day=${cell.dayNumber},data-cell-iso=${cell.isoDate},data-today=${cell.today},data-day-total=${cell.dayTotal},aria-label=${cell.fullDateLabel}"
+                                         class="cc-day-cell"
+                                         th:classappend="${cell.today} ? 'is-today' : ''">
+
+                                        <div class="cc-day-top">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="cc-day-num" th:text="${cell.dayNumber}">1</span>
+                                                <span th:if="${cell.today}" class="cc-today-pill">Hoy</span>
+                                            </div>
+                                            <button type="button"
+                                                    class="cc-cell-add-btn"
+                                                    th:attr="data-quick-add-day=${cell.dayNumber}"
+                                                    title="Registrar gasto en este día"
+                                                    aria-label="Registrar gasto">
+                                                <span class="material-symbols-outlined text-[16px]">add</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Chips de movimientos (máx. 2 visibles + "+N más") -->
+                                        <div class="cc-cell-items"
+                                             th:with="obCount=${#lists.size(cell.obligations)}, txCount=${#lists.size(cell.transactions)}, totalItems=${obCount + txCount}">
+                                            <div th:each="ob, obStat : ${cell.obligations}"
+                                                 th:if="${obStat.index < 2}"
+                                                 th:title="${ob.name}"
+                                                 class="cc-chip"
+                                                 th:classappend="${ob.paidThisMonth} ? 'cc-chip-paid' : 'cc-chip-pending'">
+                                                <span class="cc-chip-title" th:text="${ob.name}">Arriendo</span>
+                                                <span class="cc-chip-amt" th:text="'$' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}"></span>
+                                            </div>
+
+                                            <div th:each="tx, txStat : ${cell.transactions}"
+                                                 th:if="${(obCount + txStat.index) < 2}"
+                                                 th:title="${tx.merchantName}"
+                                                 class="cc-chip cc-chip-expense">
+                                                <span class="cc-chip-title" th:text="${tx.merchantName}">Comercio</span>
+                                                <span class="cc-chip-amt" th:text="'$' + ${#numbers.formatDecimal(tx.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span>
+                                            </div>
+
+                                            <span th:if="${totalItems > 2}"
+                                                  class="cc-chip-more"
+                                                  th:text="'+' + (${totalItems - 2}) + ' más'">+1 más</span>
+                                        </div>
+
+                                        <!-- Puntos de color en vista móvil -->
+                                        <div class="cc-mobile-dots" aria-hidden="true">
+                                            <span th:each="ob, obStat : ${cell.obligations}"
+                                                  th:if="${obStat.index < 2}"
+                                                  class="cc-dot"
+                                                  th:classappend="${ob.paidThisMonth} ? 'cc-dot-paid' : 'cc-dot-pending'"></span>
+                                            <span th:if="${!#lists.isEmpty(cell.transactions)}" class="cc-dot cc-dot-expense"></span>
+                                        </div>
+
+                                        <!-- Total del día solo cuando hay múltiples movimientos (evita duplicar el monto de un solo ítem) -->
+                                        <div th:if="${cell.dayTotal > 0 and (#lists.size(cell.obligations) + #lists.size(cell.transactions)) > 1}"
+                                             class="cc-cell-total"
+                                             th:text="'Total: $ ' + ${#numbers.formatDecimal(cell.dayTotal, 1, 'POINT', 0, 'COMMA')}">Total: $ 0</div>
+
+                                        <!-- Datos ocultos del día para panel lateral, popover, vista semanal y vista diaria -->
+                                        <div th:id="'day-data-' + ${cell.dayNumber}" class="hidden"
+                                             th:attr="data-day=${cell.dayNumber},data-iso=${cell.isoDate},data-label=${cell.fullDateLabel},data-weekday=${cell.dayOfWeekName},data-today=${cell.today},data-total=${cell.dayTotal}">
+                                            <div class="day-obligations-list">
+                                                <div th:each="ob : ${cell.obligations}" class="day-ob-item"
+                                                     th:attr="data-name=${ob.name},data-amount=${ob.estimatedAmount},data-category=${ob.category},data-block=${ob.budgetBlock},data-paid=${ob.paidThisMonth}">
+                                                </div>
+                                            </div>
+                                            <div class="day-transactions-list">
+                                                <div th:each="tx : ${cell.transactions}" class="day-tx-item"
+                                                     th:attr="data-merchant=${tx.merchantName},data-amount=${tx.totalAmount},data-category=${tx.category},data-desc=${tx.description != null ? tx.description : tx.itemsSummary}">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                </th:block>
                             </div>
                         </div>
-                    </th:block>
+
+                        <!-- Contenedores para Vista Semanal y Vista Diaria (se poblan en Paso 5) -->
+                        <div id="cc-view-week" class="cc-view-panel hidden" role="tabpanel" aria-labelledby="cc-tab-week"></div>
+                        <div id="cc-view-day" class="cc-view-panel hidden" role="tabpanel" aria-labelledby="cc-tab-day"></div>
+                    </div>
+
+                    <!-- Panel lateral de día (desktop) / Bottom sheet (móvil) -->
+                    <aside id="cc-day-panel" class="cc-day-panel hidden" aria-label="Detalle del día seleccionado">
+                        <div class="cc-sheet-handle" aria-hidden="true"></div>
+                        <div class="cc-day-panel-header">
+                            <div class="min-w-0">
+                                <h2 id="cc-panel-date-title" class="cc-day-panel-title">Detalle del día</h2>
+                                <div id="cc-panel-day-total" class="cc-day-panel-total"></div>
+                            </div>
+                            <button type="button" id="cc-panel-close-btn" class="cc-icon-btn" aria-label="Cerrar panel del día" title="Cerrar">
+                                <span class="material-symbols-outlined text-[20px]">close</span>
+                            </button>
+                        </div>
+
+                        <div class="cc-day-panel-body">
+                            <div id="cc-panel-ob-section" class="hidden">
+                                <span class="cc-panel-section-label">Pagos fijos</span>
+                                <div id="cc-panel-ob-list" class="flex flex-col gap-2"></div>
+                            </div>
+
+                            <div>
+                                <span class="cc-panel-section-label">Movimientos</span>
+                                <div id="cc-panel-tx-list" class="flex flex-col gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="cc-day-panel-footer">
+                            <button type="button" id="cc-panel-add-btn" class="cc-primary-btn">
+                                <span class="material-symbols-outlined text-[18px]">add</span>
+                                <span>Registrar gasto</span>
+                            </button>
+                        </div>
+                    </aside>
                 </div>
             </section>
 
@@ -486,20 +350,20 @@
                         <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/confirm'}" class="p-6 flex flex-col gap-4 m-0">
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-surface-container-low p-4 rounded-xl">
                                 <div>
-                                    <label class="text-xs text-on-surface-variant font-semibold">Comercio o lugar</label>
-                                    <input type="text" name="merchantName" required
+                                    <label th:for="'dash-merchant-' + ${item.document.id}" class="text-xs text-on-surface-variant font-semibold">Comercio o lugar</label>
+                                    <input th:id="'dash-merchant-' + ${item.document.id}" type="text" name="merchantName" required
                                            class="mt-1 w-full p-2.5 rounded-xl bg-surface-container-lowest text-sm text-primary font-bold border border-outline-variant/40"
                                            th:value="${item.extraction != null ? item.extraction.merchantName : item.document.originalFilename}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs text-on-surface-variant font-semibold">Fecha</label>
-                                    <input type="date" name="transactionDate"
+                                    <label th:for="'dash-date-' + ${item.document.id}" class="text-xs text-on-surface-variant font-semibold">Fecha</label>
+                                    <input th:id="'dash-date-' + ${item.document.id}" type="date" name="transactionDate"
                                            class="mt-1 w-full p-2.5 rounded-xl bg-surface-container-lowest text-sm border border-outline-variant/40"
                                            th:value="${item.extraction != null ? item.extraction.issueDate : ''}"/>
                                 </div>
                                 <div>
-                                    <label class="text-xs text-on-surface-variant font-semibold">Categoría</label>
-                                    <select name="category" class="mt-1 w-full p-2.5 rounded-xl bg-surface-container-lowest text-sm text-secondary font-bold border border-outline-variant/40">
+                                    <label th:for="'dash-cat-' + ${item.document.id}" class="text-xs text-on-surface-variant font-semibold">Categoría</label>
+                                    <select th:id="'dash-cat-' + ${item.document.id}" name="category" class="mt-1 w-full p-2.5 rounded-xl bg-surface-container-lowest text-sm text-secondary font-bold border border-outline-variant/40">
                                         <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}"
                                                 th:selected="${item.extraction != null and item.extraction.suggestedCategory == cat}"></option>
                                     </select>
@@ -507,35 +371,44 @@
                                 <input type="hidden" name="merchantNit" th:value="${item.extraction != null ? item.extraction.merchantNit : '0'}"/>
                                 <input type="hidden" name="invoiceNumber" th:value="${item.extraction != null ? item.extraction.invoiceNumber : 'SIN-NUMERO'}"/>
                                 <div>
-                                    <label class="text-xs text-on-surface-variant font-semibold">Bloque</label>
-                                    <select name="budgetBlock" class="mt-1 w-full p-2.5 rounded-xl bg-surface-container-lowest text-sm border border-outline-variant/40">
+                                    <label th:for="'dash-blk-' + ${item.document.id}" class="text-xs text-on-surface-variant font-semibold">Bloque</label>
+                                    <select th:id="'dash-blk-' + ${item.document.id}" name="budgetBlock" class="mt-1 w-full p-2.5 rounded-xl bg-surface-container-lowest text-sm border border-outline-variant/40">
                                         <option th:each="blk : ${budgetBlocks}" th:value="${blk}" th:text="${blk.label}"
                                                 th:selected="${item.extraction != null and item.extraction.suggestedBudgetBlock == blk}"></option>
                                     </select>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="text-xs text-on-surface-variant font-semibold">Valor total ($ COP)</label>
-                                    <input type="number" step="0.01" name="totalAmount" required
+                                    <label th:for="'dash-total-' + ${item.document.id}" class="text-xs text-on-surface-variant font-semibold">Valor total ($ COP)</label>
+                                    <input th:id="'dash-total-' + ${item.document.id}" type="number" step="0.01" name="totalAmount" required
                                            class="mt-1 w-full p-2.5 rounded-xl bg-surface-container-lowest text-base text-secondary font-bold border border-outline-variant/40"
                                            th:value="${item.extraction != null ? item.extraction.totalAmount : 0}"/>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full h-10 px-6 rounded-xl bg-secondary hover:bg-primary-container text-on-secondary transition-all text-sm flex items-center justify-center gap-2 font-semibold">
+                            <button type="submit" class="cc-cta-tactile w-full min-h-[44px] px-6 rounded-full bg-secondary hover:bg-primary-container hover:text-on-primary text-on-secondary transition-all text-sm flex items-center justify-center gap-2 font-bold border-0 cursor-pointer">
                                 <span class="material-symbols-outlined text-[18px]">check</span>
                                 <span>Confirmar y guardar</span>
+                            </button>
+                        </form>
+                        <form method="post" th:action="@{'/dashboard/documents/' + ${item.document.id} + '/cancel'}" data-loading-submit class="px-6 pb-6 -mt-3 m-0">
+                            <input type="hidden" name="returnTo" th:value="'/dashboard?month=' + ${selectedMonth}"/>
+                            <button type="submit" data-loading-text="Descartando..."
+                                    class="w-full min-h-[44px] px-6 rounded-full bg-surface-container-low hover:bg-error-container text-on-surface-variant hover:text-on-error-container border border-outline-variant/40 hover:border-error/30 transition-colors text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                                <span>Cancelar y no guardar</span>
                             </button>
                         </form>
                     </article>
 
                     <!-- b) Mis Pagos y Deudas Fijas de Cada Mes -->
-                    <section class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 flex flex-col gap-4">
+                    <section class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-4">
                         <div class="flex items-center justify-between flex-wrap gap-2">
-                            <div>
-                                <h3 class="text-base text-primary font-bold m-0">Pagos fijos mensuales</h3>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="cc-eyebrow">Compromisos recurrentes</span>
+                                <h2 class="text-base text-primary font-bold m-0">Pagos fijos mensuales</h2>
                                 <p class="text-xs text-on-surface-variant m-0">Se repiten en la fecha indicada de cada mes</p>
                             </div>
                             <button type="button" onclick="openObligationModal()"
-                                    class="px-3.5 py-2 rounded-xl bg-secondary text-white text-xs font-semibold hover:opacity-95 transition-opacity cursor-pointer border-0">
+                                    class="cc-cta-tactile px-3.5 py-2 rounded-full bg-secondary text-on-secondary text-xs font-bold hover:opacity-95 cursor-pointer border-0">
                                 + Agregar pago fijo
                             </button>
                         </div>
@@ -554,7 +427,7 @@
                                             &minus;
                                         </button>
                                     </form>
-                                    <div class="w-10 h-10 rounded-xl bg-primary-container text-white flex flex-col items-center justify-center flex-shrink-0 leading-none">
+                                    <div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary flex flex-col items-center justify-center flex-shrink-0 leading-none">
                                         <span class="text-[9px] uppercase font-semibold opacity-80">Día</span>
                                         <span class="text-sm font-bold" th:text="${ob.dueDay}">5</span>
                                     </div>
@@ -564,7 +437,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 flex-shrink-0">
-                                    <span class="text-xs font-bold text-secondary"
+                                    <span class="text-xs font-bold text-secondary tabular-nums"
                                           th:text="'$ ' + ${#numbers.formatDecimal(ob.estimatedAmount, 1, 'POINT', 0, 'COMMA')}">$ 1.200.000</span>
                                 </div>
                             </div>
@@ -574,7 +447,7 @@
                         <div class="pt-3 border-t border-outline-variant/20 flex items-center justify-between flex-wrap gap-2">
                             <span class="text-xs text-on-surface-variant">Consulta y filtra todos los movimientos del mes</span>
                             <a th:href="@{/history(month=${selectedMonth})}"
-                               class="px-3.5 py-1.5 rounded-xl bg-surface-container-high hover:bg-primary-container hover:text-white text-primary text-xs font-semibold no-underline transition-all flex items-center gap-1.5">
+                               class="px-3.5 py-1.5 rounded-xl bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-primary text-xs font-semibold no-underline transition-all flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-[16px]">receipt_long</span>
                                 <span>Ver historial del mes</span>
                             </a>
@@ -586,12 +459,14 @@
                 <div class="lg:col-span-5 flex flex-col gap-space-xl">
 
                     <!-- a) Distribución 50/30/20 -->
-                    <section aria-label="Distribución de tu dinero" class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 flex flex-col gap-4">
+                    <section aria-label="Distribución de tu dinero" class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
-                            <div class="flex flex-col">
-                                <h3 class="text-base text-primary font-bold m-0"
-                                    th:text="${profile != null ? 'Presupuesto ' + profile.needsPct + ' / ' + profile.wantsPct + ' / ' + profile.savingsPct : 'Presupuesto 50 / 30 / 20'}">Presupuesto 50 / 30 / 20</h3>
-                                <p class="text-xs text-on-surface-variant m-0">Distribución mensual según tu ingreso</p>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="cc-eyebrow">Meta de reparto</span>
+                                <h2 class="text-base text-primary font-bold m-0 tabular-nums"
+                                    th:text="${profile != null ? 'Presupuesto ' + profile.needsPct + ' / ' + profile.wantsPct + ' / ' + profile.savingsPct : 'Presupuesto 50 / 30 / 20'}">Presupuesto 50 / 30 / 20</h2>
+                                <p class="text-xs text-on-surface-variant m-0 tabular-nums"
+                                   th:text="${profile != null ? profile.needsPct + '% Necesidades · ' + profile.wantsPct + '% Deseos · ' + profile.savingsPct + '% Ahorro' : '50% Necesidades · 30% Deseos · 20% Ahorro'}">50% Necesidades · 30% Deseos · 20% Ahorro</p>
                             </div>
                             <a class="p-2 rounded-xl text-primary hover:bg-surface-container-high transition-colors no-underline" href="/profile" title="Editar presupuesto">
                                 <span class="material-symbols-outlined text-[20px]">tune</span>
@@ -609,8 +484,8 @@
                                     <span class="text-xs text-on-surface font-bold"
                                           th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.needsLimit : 2000000, 1, 'POINT', 0, 'COMMA')}"></span>
                                 </div>
-                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
-                                    <div class="h-full bg-secondary rounded-full" th:style="'width:' + ${(profile != null ? profile.needsPct : 50)} + '%'"></div>
+                                <div class="cc-capacity-track">
+                                    <div class="cc-capacity-fill cc-fill-needs" th:style="'width:' + ${(profile != null ? profile.needsPct : 50)} + '%'"></div>
                                 </div>
                             </div>
 
@@ -624,8 +499,8 @@
                                     <span class="text-xs text-on-surface font-bold"
                                           th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.wantsLimit : 1200000, 1, 'POINT', 0, 'COMMA')}"></span>
                                 </div>
-                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
-                                    <div class="h-full bg-amber-500 rounded-full" th:style="'width:' + ${(profile != null ? profile.wantsPct : 30)} + '%'"></div>
+                                <div class="cc-capacity-track">
+                                    <div class="cc-capacity-fill cc-fill-wants" th:style="'width:' + ${(profile != null ? profile.wantsPct : 30)} + '%'"></div>
                                 </div>
                             </div>
 
@@ -639,14 +514,17 @@
                                     <span class="text-xs text-on-surface font-bold"
                                           th:text="'$ ' + ${#numbers.formatDecimal(initialBudget != null ? initialBudget.savingsTarget : 800000, 1, 'POINT', 0, 'COMMA')}"></span>
                                 </div>
-                                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
-                                    <div class="h-full bg-emerald-600 rounded-full" th:style="'width:' + ${(profile != null ? profile.savingsPct : 20)} + '%'"></div>
+                                <div class="cc-capacity-track">
+                                    <div class="cc-capacity-fill cc-fill-savings" th:style="'width:' + ${(profile != null ? profile.savingsPct : 20)} + '%'"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div th:if="${latestClosure != null}" class="p-4 rounded-xl bg-primary-container text-on-primary space-y-2 mt-1">
-                            <span class="text-xs uppercase text-secondary-fixed font-bold">Balance del mes</span>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs uppercase text-secondary-fixed font-bold">Balance del mes</span>
+                                <a th:href="@{/recommendations(month=${selectedMonth})}" class="text-[11px] font-bold text-secondary-fixed underline">Abrir en Plan IA &rarr;</a>
+                            </div>
                             <p class="text-xs text-white/90 m-0" th:text="${latestClosure.report.verdictSummary}"></p>
                             <ul class="list-disc pl-4 space-y-1 text-xs text-white">
                                 <li th:each="r : ${latestClosure.recommendations}" th:text="${r.explanation}"></li>
@@ -655,16 +533,17 @@
                     </section>
 
                     <!-- b) Consultas rápidas -->
-                    <section aria-label="Consultas" class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 flex flex-col gap-4">
+                    <section aria-label="Consultas" class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 border border-outline-variant/45 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2.5">
                                 <span class="material-symbols-outlined text-[20px] text-primary">chat_bubble</span>
                                 <div class="flex flex-col">
-                                    <h3 class="text-base text-primary font-bold m-0">Consultas rápidas</h3>
+                                    <span class="cc-eyebrow">Asistente SQL</span>
+                                    <h2 class="text-base text-primary font-bold m-0">Consultas rápidas</h2>
                                     <span class="text-[11px] text-on-surface-variant">Pregunta sobre tus gastos registrados</span>
                                 </div>
                             </div>
-                            <a href="/assistant" class="px-3 py-1 rounded-lg bg-surface-container-high text-primary text-xs font-semibold no-underline">Abrir &rarr;</a>
+                            <a href="/assistant" class="px-3 py-1 rounded-full bg-surface-container-high text-primary text-xs font-semibold no-underline">Abrir &rarr;</a>
                         </div>
 
                         <div class="flex flex-wrap gap-2">
@@ -691,9 +570,9 @@
 
                         <form method="post" action="/dashboard/chat" class="relative flex items-center m-0">
                             <input type="hidden" name="returnTo" value="/dashboard"/>
-                            <input name="question" required class="w-full h-10 pl-4 pr-10 rounded-xl bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/60 text-xs focus:outline-none focus:ring-2 focus:ring-primary border border-outline-variant/30" placeholder="Escribe una consulta..." type="text"/>
-                            <button type="submit" class="absolute right-1.5 w-7 h-7 rounded-lg bg-primary-container text-on-primary flex items-center justify-center hover:opacity-95 transition-opacity" title="Consultar">
-                                <span class="material-symbols-outlined text-[15px]">send</span>
+                            <input name="question" required aria-label="Escribe una consulta" class="w-full h-10 pl-4 pr-10 rounded-xl bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/60 text-xs focus:outline-none focus:ring-2 focus:ring-primary border border-outline-variant/30" placeholder="Escribe una consulta..." type="text"/>
+                            <button type="submit" aria-label="Consultar" class="absolute right-1.5 w-7 h-7 rounded-lg bg-primary-container text-on-primary flex items-center justify-center hover:opacity-95 transition-opacity" title="Consultar">
+                                <span class="material-symbols-outlined text-[15px]" aria-hidden="true">send</span>
                             </button>
                         </form>
                     </section>
@@ -703,99 +582,76 @@
     </main>
 </div>
 
+<!-- Backdrop sutil para bottom sheet en móvil -->
+<div id="cc-sheet-backdrop" class="cc-sheet-backdrop" aria-hidden="true"></div>
+
 <!-- ========================================================================================
-     MODAL DEL DÍA
+     POPOVER DE REGISTRO RÁPIDO ANCLADO A LA CELDA
      ======================================================================================== -->
-<div id="day-modal-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-xl border border-outline-variant/40 overflow-hidden flex flex-col max-h-[90vh]">
-        <div class="bg-primary-container text-on-primary px-6 py-4 flex items-center justify-between">
-            <div>
-                <span class="text-[11px] uppercase tracking-wider text-secondary-fixed font-semibold">Detalle del día</span>
-                <h3 id="modal-day-title" class="text-base font-bold text-white m-0">15 de Octubre de 2026</h3>
-            </div>
-            <button type="button" onclick="closeDayModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
-                <span class="material-symbols-outlined text-[18px]">close</span>
-            </button>
+<div id="cc-quick-popover" class="cc-quick-popover hidden" role="dialog" aria-modal="false" aria-labelledby="cc-quick-date-label">
+    <div class="cc-quick-popover-header">
+        <div>
+            <span class="text-[10px] uppercase tracking-wider font-bold text-on-surface-variant block">Registrar gasto</span>
+            <span id="cc-quick-date-label" class="cc-quick-popover-date">15 de Noviembre de 2026</span>
         </div>
-
-        <div class="p-6 overflow-y-auto flex flex-col gap-5">
-            <!-- 1. Pagos Fijos / Deudas de este día (si existen) -->
-            <div id="modal-obligations-section" class="hidden flex-col gap-2">
-                <span class="text-xs font-bold text-secondary">Pagos fijos programados</span>
-                <div id="modal-obligations-container" class="flex flex-col gap-2"></div>
-            </div>
-
-            <!-- 2. Gastos ya registrados en este día -->
-            <div class="flex flex-col gap-2">
-                <span class="text-xs font-bold text-primary">Gastos del día</span>
-                <div id="modal-transactions-container" class="flex flex-col gap-2"></div>
-            </div>
-
-            <!-- 3. Formulario para agregar un nuevo gasto en este día -->
-            <form method="post" action="/dashboard/manual-expense" enctype="multipart/form-data"
-                  class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/35 flex flex-col gap-3.5 m-0">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-primary">Registrar gasto</span>
-                </div>
-
-                <input type="hidden" name="transactionDate" id="modal-input-date" value="2026-10-15"/>
-                <input type="hidden" name="returnMonth" th:value="${selectedMonth}"/>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Concepto o comercio</label>
-                        <input type="text" name="merchantName" id="modal-input-merchant" required
-                               placeholder="Supermercado, almuerzo..."
-                               class="w-full h-10 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary"/>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Valor ($ COP)</label>
-                        <input type="number" step="1000" min="0" name="totalAmount" id="modal-input-amount" required
-                               placeholder="45000"
-                               oninput="this.setCustomValidity('')"
-                               class="w-full h-10 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-bold text-secondary focus:outline-none focus:ring-2 focus:ring-secondary"/>
-                        <div class="flex flex-wrap items-center gap-1 mt-1.5">
-                            <button type="button" onclick="addQuickAmount(1000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+1.000</button>
-                            <button type="button" onclick="addQuickAmount(5000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+5.000</button>
-                            <button type="button" onclick="addQuickAmount(10000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+10.000</button>
-                            <button type="button" onclick="addQuickAmount(50000)" class="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-[10px] font-semibold text-primary border border-outline-variant/30 cursor-pointer">+50.000</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Categoría</label>
-                        <select name="category" id="modal-input-category"
-                                class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface">
-                            <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}"></option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface mb-1">Bloque</label>
-                        <select name="budgetBlock" id="modal-input-block"
-                                class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs font-semibold text-on-surface">
-                            <option value="NEEDS">Necesidades</option>
-                            <option value="WANTS">Deseos</option>
-                            <option value="SAVINGS">Ahorro / Deuda</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-on-surface mb-1">Notas (opcional)</label>
-                    <textarea name="description" id="modal-input-description" rows="2"
-                              placeholder="Detalle adicional del gasto..."
-                              class="w-full p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary"></textarea>
-                </div>
-
-                <button type="submit"
-                        class="w-full h-10 rounded-xl bg-primary-container hover:opacity-95 text-on-primary text-xs font-semibold flex items-center justify-center gap-2 transition-all">
-                    <span>Guardar gasto</span>
-                </button>
-            </form>
-        </div>
+        <button type="button" id="cc-quick-close-btn" class="cc-icon-btn" aria-label="Cerrar" title="Cerrar">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
     </div>
+
+    <form id="cc-quick-form" method="post" action="/dashboard/manual-expense" enctype="multipart/form-data" class="flex flex-col gap-2.5 m-0">
+        <input type="hidden" name="transactionDate" id="cc-quick-input-date" value=""/>
+        <input type="hidden" name="returnMonth" th:value="${selectedMonth}"/>
+
+        <div>
+            <label for="cc-quick-merchant" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Concepto o comercio</label>
+            <input type="text" name="merchantName" id="cc-quick-merchant" required
+                   placeholder="Supermercado, almuerzo..."
+                   class="cc-quick-field"/>
+        </div>
+
+        <div>
+            <label for="cc-quick-amount" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Valor ($ COP)</label>
+            <input type="number" inputmode="numeric" step="1000" min="0" name="totalAmount" id="cc-quick-amount" required
+                   placeholder="45000"
+                   oninput="this.setCustomValidity('')"
+                   class="cc-quick-field font-extrabold text-secondary tabular-nums"/>
+            <div class="cc-quick-amount-pills">
+                <button type="button" class="cc-quick-pill" data-quick-delta="1000">+1.000</button>
+                <button type="button" class="cc-quick-pill" data-quick-delta="5000">+5.000</button>
+                <button type="button" class="cc-quick-pill" data-quick-delta="10000">+10.000</button>
+                <button type="button" class="cc-quick-pill" data-quick-delta="50000">+50.000</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+                <label for="cc-quick-category" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Categoría</label>
+                <select name="category" id="cc-quick-category" class="cc-quick-field">
+                    <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="cc-quick-block" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Bloque</label>
+                <select name="budgetBlock" id="cc-quick-block" class="cc-quick-field">
+                    <option value="NEEDS">Necesidades</option>
+                    <option value="WANTS">Deseos</option>
+                    <option value="SAVINGS">Ahorro / Deuda</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label for="cc-quick-desc" class="block text-[11px] font-semibold text-on-surface-variant mb-1">Descripción (opcional)</label>
+            <input type="text" name="description" id="cc-quick-desc"
+                   placeholder="Detalle adicional..."
+                   class="cc-quick-field"/>
+        </div>
+
+        <button type="submit" class="cc-primary-btn mt-1">
+            <span>Guardar gasto</span>
+        </button>
+    </form>
 </div>
 
 <!-- ========================================================================================
@@ -804,9 +660,9 @@
 <div id="obligation-modal-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-surface-container-lowest w-full max-w-md rounded-2xl shadow-xl border border-outline-variant/40 overflow-hidden flex flex-col">
         <div class="bg-primary-container text-on-primary px-6 py-4 flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white m-0">Nuevo pago fijo mensual</h3>
-            <button type="button" onclick="closeObligationModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
-                <span class="material-symbols-outlined text-[18px]">close</span>
+            <h2 class="text-sm font-bold text-white m-0">Nuevo pago fijo mensual</h2>
+            <button type="button" onclick="closeObligationModal()" aria-label="Cerrar ventana" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
             </button>
         </div>
 
@@ -816,25 +672,25 @@
                 Se recordará el mismo día de cada mes en el calendario.
             </p>
             <div>
-                <label class="block text-xs font-semibold text-on-surface mb-1">Concepto</label>
-                <input type="text" name="name" required placeholder="Arriendo, cuota préstamo, internet..."
+                <label for="ob-modal-name" class="block text-xs font-semibold text-on-surface mb-1">Concepto</label>
+                <input id="ob-modal-name" type="text" name="name" required placeholder="Arriendo, cuota préstamo, internet..."
                        class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-semibold text-on-surface"/>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface mb-1">Monto mensual ($ COP)</label>
-                    <input type="number" step="1000" min="0" name="estimatedAmount" required placeholder="1200000"
-                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-secondary"/>
+                    <label for="ob-modal-amt" class="block text-xs font-semibold text-on-surface mb-1">Monto mensual ($ COP)</label>
+                    <input id="ob-modal-amt" type="number" inputmode="numeric" step="1000" min="0" name="estimatedAmount" required placeholder="1200000"
+                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-secondary tabular-nums"/>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface mb-1">Día de pago (1-31)</label>
-                    <input type="number" min="1" max="31" name="dueDay" required value="5"
-                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-primary"/>
+                    <label for="ob-modal-day" class="block text-xs font-semibold text-on-surface mb-1">Día de pago (1-31)</label>
+                    <input id="ob-modal-day" type="number" inputmode="numeric" min="1" max="31" name="dueDay" required value="5"
+                           class="w-full h-10 px-3.5 rounded-xl bg-surface border border-outline-variant text-xs font-bold text-primary tabular-nums"/>
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-semibold text-on-surface mb-1">Categoría</label>
-                <select name="category" class="w-full h-10 px-3 rounded-xl bg-surface border border-outline-variant text-xs font-semibold text-on-surface">
+                <label for="ob-modal-cat" class="block text-xs font-semibold text-on-surface mb-1">Categoría</label>
+                <select id="ob-modal-cat" name="category" class="w-full h-10 px-3 rounded-xl bg-surface border border-outline-variant text-xs font-semibold text-on-surface">
                     <option value="Vivienda">Vivienda / Alquiler</option>
                     <option value="Deudas y Préstamos">Deudas y préstamos</option>
                     <option value="Servicios">Servicios e internet</option>
@@ -849,120 +705,21 @@
     </div>
 </div>
 
+<div th:replace="~{fragments/mobile-nav :: bottomNav('dashboard')}"></div>
+
+<script src="/js/cc-date-picker.min.js"></script>
+<script src="/js/calendar-redesign.min.js"></script>
 <script>
-    function formatCOP(val) {
-        if (window.CuentaClaraTheme && window.CuentaClaraTheme.formatAmount) {
-            return window.CuentaClaraTheme.formatAmount(val);
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            const searchInput = document.getElementById('cc-top-search');
+            if (searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
         }
-        const num = Number(val) || 0;
-        return '$ ' + num.toLocaleString('es-CO', { maximumFractionDigits: 0 }) + ' COP';
-    }
-
-    function openDayModal(dayNum) {
-        const dataEl = document.getElementById('day-data-' + dayNum);
-        if (!dataEl) return;
-
-        const isoDate = dataEl.getAttribute('data-iso');
-        const dateLabel = dataEl.getAttribute('data-label');
-
-        document.getElementById('modal-day-title').textContent = dateLabel;
-        document.getElementById('modal-input-date').value = isoDate;
-        document.getElementById('modal-input-merchant').value = '';
-        document.getElementById('modal-input-amount').value = '';
-        document.getElementById('modal-input-description').value = '';
-
-        // 1. Renderizar obligaciones del día
-        const obSection = document.getElementById('modal-obligations-section');
-        const obContainer = document.getElementById('modal-obligations-container');
-        obContainer.innerHTML = '';
-        const obItems = dataEl.querySelectorAll('.day-ob-item');
-
-        if (obItems.length > 0) {
-            obSection.classList.remove('hidden');
-            obSection.classList.add('flex');
-            obItems.forEach(item => {
-                const name = item.getAttribute('data-name');
-                const amount = item.getAttribute('data-amount');
-                const category = item.getAttribute('data-category');
-                const paid = item.getAttribute('data-paid') === 'true';
-
-                const div = document.createElement('div');
-                div.className = 'p-3 rounded-2xl border flex items-center justify-between gap-2 ' +
-                    (paid ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-amber-500/15 border-amber-500/40');
-
-                const info = document.createElement('div');
-                info.className = 'flex flex-col';
-                info.innerHTML = `<span class="text-xs font-bold text-on-surface">${paid ? '✓ ' : ''}${name} (${category})</span>
-                                  <span class="text-xs font-bold text-secondary">${formatCOP(amount)}</span>`;
-                div.appendChild(info);
-
-                if (!paid) {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'px-3 py-1.5 rounded-xl bg-primary-container text-white text-[11px] font-semibold hover:opacity-90';
-                    btn.textContent = 'Registrar pago';
-                    btn.onclick = () => {
-                        document.getElementById('modal-input-merchant').value = name;
-                        document.getElementById('modal-input-amount').value = Math.round(Number(amount));
-                        document.getElementById('modal-input-category').value = category;
-                        document.getElementById('modal-input-description').value = 'Pago mensual de ' + name;
-                        document.getElementById('modal-input-description').focus();
-                    };
-                    div.appendChild(btn);
-                } else {
-                    const badge = document.createElement('span');
-                    badge.className = 'px-2.5 py-1 rounded-md bg-emerald-600 text-white text-[10px] font-semibold';
-                    badge.textContent = 'Pagado';
-                    div.appendChild(badge);
-                }
-                obContainer.appendChild(div);
-            });
-        } else {
-            obSection.classList.add('hidden');
-            obSection.classList.remove('flex');
-        }
-
-        // 2. Renderizar gastos ya registrados en ese día
-        const txContainer = document.getElementById('modal-transactions-container');
-        txContainer.innerHTML = '';
-        const txItems = dataEl.querySelectorAll('.day-tx-item');
-
-        if (txItems.length === 0) {
-            txContainer.innerHTML = '<div class="p-3 rounded-xl bg-surface-container-low text-xs text-on-surface-variant text-center">Sin gastos registrados en este día.</div>';
-        } else {
-            txItems.forEach(item => {
-                const merchant = item.getAttribute('data-merchant');
-                const amount = item.getAttribute('data-amount');
-                const category = item.getAttribute('data-category');
-                const desc = item.getAttribute('data-desc') || 'Sin descripción adicional';
-
-                const row = document.createElement('div');
-                row.className = 'p-3 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-between gap-2';
-                row.innerHTML = `<div class="flex flex-col min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="text-xs font-extrabold text-primary">${merchant}</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-surface-container-high text-[10px] font-bold text-on-surface">${category}</span>
-                                    </div>
-                                    <span class="text-[11px] text-on-surface-variant truncate">${desc}</span>
-                                 </div>
-                                 <span class="text-xs font-extrabold text-secondary flex-shrink-0">${formatCOP(amount)}</span>`;
-                txContainer.appendChild(row);
-            });
-        }
-
-        const backdrop = document.getElementById('day-modal-backdrop');
-        backdrop.classList.remove('hidden');
-        backdrop.classList.add('flex');
-        if (window.CuentaClaraTheme && window.CuentaClaraTheme.refreshLocalization) {
-            window.CuentaClaraTheme.refreshLocalization();
-        }
-    }
-
-    function closeDayModal() {
-        const backdrop = document.getElementById('day-modal-backdrop');
-        backdrop.classList.add('hidden');
-        backdrop.classList.remove('flex');
-    }
+    });
 
     function openObligationModal() {
         const backdrop = document.getElementById('obligation-modal-backdrop');
@@ -976,14 +733,7 @@
         backdrop.classList.remove('flex');
     }
 
-    function addQuickAmount(delta) {
-        const input = document.getElementById('modal-input-amount');
-        if (!input) return;
-        const current = parseInt(input.value, 10) || 0;
-        input.value = current + delta;
-    }
-
-    // Permitir cualquier valor escrito manualmente al enviar formularios, mientras las flechas suben de 1.000 en 1.000 desde 0
+    // Permitir cualquier valor escrito manualmente al enviar formularios
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', () => {
             form.querySelectorAll('input[type="number"]').forEach(numInput => {
@@ -994,10 +744,6 @@
         });
     });
 
-    // Cerrar modales al hacer clic fuera de la tarjeta
-    document.getElementById('day-modal-backdrop').addEventListener('click', (e) => {
-        if (e.target.id === 'day-modal-backdrop') closeDayModal();
-    });
     document.getElementById('obligation-modal-backdrop').addEventListener('click', (e) => {
         if (e.target.id === 'obligation-modal-backdrop') closeObligationModal();
     });

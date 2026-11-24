@@ -295,11 +295,44 @@ public class TransactionService {
             String categoryFilter,
             String merchantFilter
     ) {
+        return getExpenseHistory(userId, yearMonthFilter, null, null, categoryFilter, merchantFilter);
+    }
+
+    /**
+     * Consulta el historial de gastos con filtros opcionales (mes YYYY-MM o ALL, rango de fechas, categoría, comercio)
+     * y calcula los totales generales y por categoría directamente en SQL (RF-10, RNF-06).
+     */
+    @Transactional(readOnly = true)
+    public ExpenseHistorySummary getExpenseHistory(
+            UUID userId,
+            String yearMonthFilter,
+            LocalDate startDate,
+            LocalDate endDate,
+            String categoryFilter,
+            String merchantFilter
+    ) {
         StringBuilder whereClause = new StringBuilder(" WHERE confirmed = TRUE AND user_id = ? ");
         List<Object> params = new ArrayList<>();
         params.add(userId);
 
-        if (yearMonthFilter != null && !yearMonthFilter.isBlank()) {
+        if (startDate != null || endDate != null) {
+            LocalDate effectiveStart = startDate;
+            LocalDate effectiveEnd = endDate;
+            if (effectiveStart != null && effectiveEnd != null && effectiveStart.isAfter(effectiveEnd)) {
+                LocalDate tmp = effectiveStart;
+                effectiveStart = effectiveEnd;
+                effectiveEnd = tmp;
+            }
+            if (effectiveStart != null) {
+                whereClause.append(" AND transaction_date >= ? ");
+                params.add(java.sql.Date.valueOf(effectiveStart));
+            }
+            if (effectiveEnd != null) {
+                whereClause.append(" AND transaction_date <= ? ");
+                params.add(java.sql.Date.valueOf(effectiveEnd));
+            }
+        } else if (yearMonthFilter != null && !yearMonthFilter.isBlank()
+                && !"ALL".equalsIgnoreCase(yearMonthFilter.trim())) {
             YearMonth ym = YearMonth.parse(yearMonthFilter.trim());
             whereClause.append(" AND transaction_date >= ? AND transaction_date <= ? ");
             params.add(java.sql.Date.valueOf(ym.atDay(1)));

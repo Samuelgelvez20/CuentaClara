@@ -64,9 +64,11 @@ public class DocumentIngestionService {
         DocumentEntity doc = createPendingDocumentRecord(userId, validated, savedTempFile);
 
         // 5. Encolar en Redis y procesar en el Worker
-        ingestionWorker.enqueueJob(userId, doc.getId());
         if (asyncExecution) {
-            ingestionWorker.processDocumentAsync(userId, doc.getId());
+            boolean enqueuedInRedis = ingestionWorker.enqueueJob(userId, doc.getId());
+            if (!enqueuedInRedis && ingestionWorker.isInlineAsyncFallbackEnabled()) {
+                ingestionWorker.processDocumentAsync(userId, doc.getId());
+            }
         } else {
             try {
                 ingestionWorker.processDocumentDeterministically(userId, doc.getId());
@@ -129,6 +131,29 @@ public class DocumentIngestionService {
         } catch (IOException ex) {
             throw new IllegalStateException("No se pudo almacenar el archivo temporal para su procesamiento", ex);
         }
+    }
+
+    /**
+     * Descarta un comprobante pendiente sin registrar gasto y libera sus claves de duplicado.
+     */
+    @Transactional
+    public void cancelPendingDocument(UUID userId, UUID documentId) {
+        DocumentEntity doc = documentRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado: " + documentId));
+        if (!doc.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("No tienes permiso para descartar este comprobante.");
+        }
+        if (doc.getStatus() == DocumentStatus.INDEXED) {
+            throw new IllegalStateException("Este comprobante ya fue confirmado y guardado como gasto.");
+        }
+        if (doc.getTempFilePath() != null && !doc.getTempFilePath().isBlank()) {
+            deleteTempQuietly(Path.of(doc.getTempFilePath()));
+        }
+        extractionRepository.findByDocumentId(documentId).ifPresent(ext -> {
+            extractionRepository.delete(ext);
+            extractionRepository.flush();
+        });
+        documentRepository.delete(doc);
     }
 
     private void deleteTempQuietly(Path path) {

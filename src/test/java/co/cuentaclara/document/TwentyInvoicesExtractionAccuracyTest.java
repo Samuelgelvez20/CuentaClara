@@ -148,6 +148,59 @@ class TwentyInvoicesExtractionAccuracyTest {
                 .isGreaterThanOrEqualTo(85.0);
     }
 
+    @Test
+    @DisplayName("Bloque 3 (RF-04): Ejecuta Tesseract OCR real sobre imagen PNG renderizada en memoria sin payload oculto")
+    void shouldExtractStructuredFieldsFromRealRenderedPngViaTesseractOcr() throws Exception {
+        if (!java.nio.file.Files.exists(java.nio.file.Path.of("/usr/share/tessdata/eng.traineddata"))
+                && !java.nio.file.Files.exists(java.nio.file.Path.of("/usr/share/tessdata/spa.traineddata"))) {
+            return;
+        }
+
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                1400, 760, java.awt.image.BufferedImage.TYPE_INT_RGB
+        );
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            g.setColor(java.awt.Color.WHITE);
+            g.fillRect(0, 0, image.getWidth(), image.getHeight());
+            g.setRenderingHint(
+                    java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+            );
+            g.setColor(java.awt.Color.BLACK);
+            g.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.BOLD, 34));
+
+            String[] lines = {
+                    "Comercio: SUPERMERCADO DEL VALLE",
+                    "NIT: 900555444",
+                    "Factura: IMG-9090",
+                    "Fecha: 2026-10-19",
+                    "1. Mercado organico x1 80000",
+                    "Subtotal: 80000",
+                    "IVA: 15200",
+                    "Total a pagar: 95200"
+            };
+            int y = 90;
+            for (String line : lines) {
+                g.drawString(line, 60, y);
+                y += 75;
+            }
+        } finally {
+            g.dispose();
+        }
+
+        ByteArrayOutputStream pngOut = new ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(image, "png", pngOut);
+
+        var outcome = pdfAndOcrExtractionService.extractFromPdfOrImage(pngOut.toByteArray(), DocumentSourceType.IMAGE);
+        assertThat(outcome.extractionMethod()).isEqualTo("TESSERACT_OCR_IMAGE");
+        assertThat(outcome.parsedInvoice().merchantName()).containsIgnoringCase("SUPERMERCADO");
+        assertThat(outcome.parsedInvoice().merchantNit()).contains("900555444");
+        assertThat(outcome.parsedInvoice().invoiceNumber()).isEqualTo("IMG-9090");
+        assertThat(outcome.parsedInvoice().issueDate()).isEqualTo(LocalDate.of(2026, 10, 19));
+        assertThat(outcome.parsedInvoice().totalAmount()).isEqualByComparingTo("95200");
+    }
+
     private byte[] buildSyntheticUblXml(ExpectedInvoiceCase tc) {
         String xml = String.format("""
                 <?xml version="1.0" encoding="UTF-8"?>

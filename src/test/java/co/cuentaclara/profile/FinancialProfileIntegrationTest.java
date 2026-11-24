@@ -133,9 +133,10 @@ class FinancialProfileIntegrationTest {
         JsonNode json = objectMapper.readTree(profileResult.getResponse().getContentAsString());
         String recommendationsText = json.get("preliminaryRecommendations").toString();
 
-        // Verificar que se identifica como ESTIMACIÓN INICIAL y no recomienda incumplir obligaciones básicas
-        assertThat(recommendationsText).contains("ESTIMACIÓN INICIAL");
-        assertThat(recommendationsText).contains("No te recomendamos incumplir obligaciones básicas");
+        // Verificar que la etapa es INITIAL_ESTIMATE y las notas explican el ajuste sin recomendar incumplir pagos fijos
+        assertThat(recommendationsText).contains("se calcula con tus datos actuales");
+        assertThat(recommendationsText).contains("superan en $200.000 COP");
+        assertThat(recommendationsText).contains("reduciendo el porcentaje de Deseos");
 
         // 3. Consultar perfil guardado por GET
         mockMvc.perform(get("/api/profile")

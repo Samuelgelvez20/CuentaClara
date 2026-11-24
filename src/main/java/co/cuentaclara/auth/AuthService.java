@@ -8,7 +8,16 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.UUID;
+import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,18 +25,32 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
+    private final Path tempStorageRoot;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtTokenService jwtTokenService
     ) {
+        this(userRepository, passwordEncoder, jwtTokenService, "./tmp/uploads");
+    }
+
+    @Autowired
+    public AuthService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtTokenService jwtTokenService,
+            @Value("${cuentaclara.storage.temp-dir:./tmp/uploads}") String tempStorageDir
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenService = jwtTokenService;
+        this.tempStorageRoot = Path.of(tempStorageDir).toAbsolutePath().normalize();
     }
 
     @Transactional
@@ -69,10 +92,15 @@ public class AuthService {
     }
 
     /**
-     * Inicia sesión o registra automáticamente al usuario mediante su cuenta de Google (OAuth2 / Google Identity).
+     * Inicia sesión o registra automáticamente al usuario mediante su cuenta verificada de Google (OAuth2 / Google Identity).
      */
     @Transactional
     public GoogleAuthResult loginOrRegisterWithGoogle(String email, String fullName) {
+        return loginOrRegisterWithGoogle(email, fullName, false);
+    }
+
+    @Transactional
+    public GoogleAuthResult loginOrRegisterWithGoogle(String email, String fullName, boolean aiConsentAccepted) {
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("El correo de la cuenta de Google es obligatorio.");
         }
@@ -84,10 +112,26 @@ public class AuthService {
         var existingOpt = userRepository.findByEmailIgnoreCase(normalizedEmail);
         if (existingOpt.isPresent()) {
             User existing = existingOpt.get();
+            if (!existing.isAiConsentAccepted()) {
+                if (!aiConsentAccepted) {
+                    throw new IllegalArgumentException(
+                            "Debes aceptar el consentimiento explícito de privacidad (Ley 1581 de 2012)."
+                    );
+                }
+                existing.setAiConsentAccepted(true);
+                existing.setAiConsentAt(java.time.OffsetDateTime.now());
+                existing = userRepository.save(existing);
+            }
             String token = jwtTokenService.generateToken(existing.getId(), existing.getEmail(), existing.getFullName());
             return new GoogleAuthResult(
                     new AuthResponse(existing.getId(), existing.getEmail(), existing.getFullName(), token),
                     false
+            );
+        }
+
+        if (!aiConsentAccepted) {
+            throw new IllegalArgumentException(
+                    "Debes aceptar el consentimiento explícito de procesamiento de texto y transferencia de datos (Ley 1581 de 2012)."
             );
         }
 
@@ -112,11 +156,31 @@ public class AuthService {
     }
 
     /**
-     * Elimina la cuenta del usuario y todos sus datos relacionados en cascada (RF-14, RNF-04).
+     * Elimina la cuenta del usuario, todos sus datos en cascada (RF-14, RNF-04)
+     * y cualquier archivo temporal remanente en disco.
      */
     @Transactional
     public void deleteAccount(UUID userId) {
         userRepository.deleteById(userId);
+        deleteUserTempDirectory(userId);
+    }
+
+    private void deleteUserTempDirectory(UUID userId) {
+        Path userDir = tempStorageRoot.resolve(userId.toString()).normalize();
+        if (!userDir.startsWith(tempStorageRoot) || !Files.exists(userDir)) {
+            return;
+        }
+        try (Stream<Path> walk = Files.walk(userDir)) {
+            walk.sorted(Comparator.reverseOrder()).forEach(path -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException ex) {
+                    log.warn("No se pudo eliminar archivo temporal de cuenta {}: {}", path, ex.getMessage());
+                }
+            });
+        } catch (IOException ex) {
+            log.warn("Error limpiando carpeta temporal del usuario {}: {}", userId, ex.getMessage());
+        }
     }
 
     public record RegisterRequest(

@@ -33,6 +33,12 @@ public class DocumentIngestionWorker {
     private final TransactionTemplate transactionTemplate;
     private final StringRedisTemplate redisTemplate;
 
+    @org.springframework.beans.factory.annotation.Value("${cuentaclara.worker.consumer-enabled:true}")
+    private boolean consumerEnabled = true;
+
+    @org.springframework.beans.factory.annotation.Value("${cuentaclara.worker.inline-async-fallback:true}")
+    private boolean inlineAsyncFallback = true;
+
     public DocumentIngestionWorker(
             DocumentRepository documentRepository,
             DocumentExtractionRepository extractionRepository,
@@ -49,13 +55,92 @@ public class DocumentIngestionWorker {
         this.redisTemplate = redisTemplate;
     }
 
-    public void enqueueJob(UUID userId, UUID documentId) {
+    public boolean enqueueJob(UUID userId, UUID documentId) {
         if (redisTemplate != null) {
             try {
                 redisTemplate.opsForList().leftPush(REDIS_QUEUE_KEY, userId + ":" + documentId);
+                return true;
             } catch (Exception ex) {
                 log.debug("Redis no disponible localmente, procesando directamente en worker: {}", ex.getMessage());
             }
+        }
+        return false;
+    }
+
+    public boolean isConsumerEnabled() {
+        return consumerEnabled;
+    }
+
+    public boolean isInlineAsyncFallbackEnabled() {
+        return inlineAsyncFallback;
+    }
+
+    private volatile boolean shuttingDown = false;
+
+    @jakarta.annotation.PreDestroy
+    void onShutdown() {
+        this.shuttingDown = true;
+    }
+
+    /**
+     * Consumidor periódico de la cola Redis (`cuentaclara:queue:document-jobs`) (RF-03).
+     */
+    @org.springframework.scheduling.annotation.Scheduled(fixedDelay = 300)
+    public void pollRedisQueue() {
+        if (shuttingDown || !consumerEnabled || redisTemplate == null) {
+            return;
+        }
+        for (int i = 0; i < 10 && !shuttingDown; i++) {
+            if (!consumeNextQueuedJob()) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Extrae y procesa un trabajo pendiente desde Redis bajo contexto RLS explícito.
+     */
+    public boolean consumeNextQueuedJob() {
+        if (redisTemplate == null) {
+            return false;
+        }
+        String payload;
+        try {
+            payload = redisTemplate.opsForList().rightPop(REDIS_QUEUE_KEY);
+        } catch (Exception ex) {
+            log.debug("No se pudo leer la cola Redis {}: {}", REDIS_QUEUE_KEY, ex.getMessage());
+            return false;
+        }
+        if (payload == null || payload.isBlank()) {
+            return false;
+        }
+
+        String[] parts = payload.trim().split(":", 2);
+        if (parts.length != 2) {
+            log.warn("Carga inválida en cola Redis {}: {}", REDIS_QUEUE_KEY, payload);
+            return true;
+        }
+        try {
+            UUID userId = UUID.fromString(parts[0]);
+            UUID documentId = UUID.fromString(parts[1]);
+            processDocumentDeterministically(userId, documentId);
+        } catch (DuplicateInvoiceException dupEx) {
+            log.info("Documento duplicado rechazado al consumir cola ({}): {}", payload, dupEx.getMessage());
+        } catch (Exception ex) {
+            log.warn("Error procesando trabajo Redis {}: {}", payload, ex.getMessage());
+        }
+        return true;
+    }
+
+    public long getQueueDepth() {
+        if (redisTemplate == null) {
+            return 0L;
+        }
+        try {
+            Long size = redisTemplate.opsForList().size(REDIS_QUEUE_KEY);
+            return size != null ? size : 0L;
+        } catch (Exception ex) {
+            return 0L;
         }
     }
 
@@ -93,6 +178,12 @@ public class DocumentIngestionWorker {
     private void executeSingleExtractionAttempt(UUID userId, UUID documentId) {
         DocumentEntity doc = documentRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado: " + documentId));
+
+        if (doc.getStatus() == DocumentStatus.PROCESSING
+                || doc.getStatus() == DocumentStatus.AWAITING_CONFIRMATION
+                || doc.getStatus() == DocumentStatus.INDEXED) {
+            return;
+        }
 
         doc.setStatus(DocumentStatus.PROCESSING);
         documentRepository.saveAndFlush(doc);

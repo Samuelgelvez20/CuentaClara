@@ -3,76 +3,92 @@
    ========================================================================== */
 
 :root {
-    /* DEFAULT PALETTE: VINO TINTO (Elegante, Distintivo, Fintech Premium) */
-    --primary: #4a0020;
+    color-scheme: light;
+    accent-color: var(--secondary);
+    /* DEFAULT PALETTE: VINO TINTO (Elegante, Neutro en lienzo, Acento Vino) */
+    --primary: #3f0b20;
     --primary-container: #630d32;
     --on-primary: #ffffff;
-    --on-primary-container: #ffd9e2;
+    --on-primary-container: #ffe4eb;
     --primary-fixed: #ffd9e2;
     --primary-fixed-dim: #ffb1c8;
     --on-primary-fixed: #3f001b;
     --secondary: #b32446;
-    --secondary-container: #ffe0e6;
+    --secondary-container: #fce7ec;
     --on-secondary: #ffffff;
-    --on-secondary-container: #63001e;
-    --secondary-fixed: #ffd9dc;
+    --on-secondary-container: #5c0d24;
+    --secondary-fixed: #ffe4ea;
     --secondary-fixed-dim: #ffb2ba;
-    --on-secondary-fixed: #400010;
+    --on-secondary-fixed: #3f0818;
     --tertiary: #004d46;
     --tertiary-container: #00695f;
     --tertiary-fixed: #89f5e7;
     --tertiary-fixed-dim: #6bd8cb;
-    --surface: #fff8f8;
-    --background: #fff8f8;
+    --surface: #faf7f8;
+    --background: #faf7f8;
     --surface-bright: #ffffff;
     --surface-container-lowest: #ffffff;
-    --surface-container-low: #fff0f2;
-    --surface-container: #ffe8ec;
-    --surface-container-high: #ffdfe5;
-    --surface-container-highest: #ffd5dd;
-    --on-surface: #2d0012;
-    --on-background: #2d0012;
-    --on-surface-variant: #5c4048;
-    --outline: #8a6e76;
-    --outline-variant: #dec0c8;
+    --surface-container-low: #f4eff1;
+    --surface-container: #ede5e8;
+    --surface-container-high: #e5dae0;
+    --surface-container-highest: #dccdd4;
+    --on-surface: #1f1016;
+    --on-background: #1f1016;
+    --on-surface-variant: #5a464e;
+    --outline: #856d76;
+    --outline-variant: #e2d5da;
     --error: #ba1a1a;
     --error-container: #ffdad6;
     --on-error-container: #93000a;
+
+    /* Tokens compartidos de movimiento y elevación (emil-design-eng / apple-design) */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    /* Apple surface discipline: bordes hairline limpios sin sombras pesadas en reposo; elevación solo en popovers/sheets */
+    --cal-shadow-card: 0 1px 0 color-mix(in srgb, var(--outline-variant) 28%, transparent);
+    --cal-shadow-popover: 0 18px 40px -12px rgba(74, 0, 32, 0.18), 0 4px 12px -2px rgba(74, 0, 32, 0.08);
+    --cal-amber-bg: rgba(245, 158, 11, 0.14);
+    --cal-amber-border: rgba(217, 119, 6, 0.32);
+    --cal-amber-text: #92400e;
+    --cal-emerald-bg: rgba(16, 185, 129, 0.14);
+    --cal-emerald-border: rgba(5, 150, 105, 0.30);
+    --cal-emerald-text: #065f46;
 }
 
 /* PALETTE 2: VERDE ESMERALDA (Finanzas Clásicas & Crecimiento) */
 [data-theme="emerald"] {
-    --primary: #003527;
+    --primary: #052e22;
     --primary-container: #064e3b;
     --on-primary: #ffffff;
-    --on-primary-container: #b0f0d6;
+    --on-primary-container: #d1fae5;
     --primary-fixed: #b0f0d6;
     --primary-fixed-dim: #95d3ba;
     --on-primary-fixed: #002117;
-    --secondary: #006c49;
-    --secondary-container: #6cf8bb;
+    --secondary: #047857;
+    --secondary-container: #d1fae5;
     --on-secondary: #ffffff;
-    --on-secondary-container: #002113;
-    --secondary-fixed: #6ffbbe;
-    --secondary-fixed-dim: #4edea3;
-    --on-secondary-fixed: #002113;
+    --on-secondary-container: #064e3b;
+    --secondary-fixed: #d1fae5;
+    --secondary-fixed-dim: #6ee7b7;
+    --on-secondary-fixed: #022c22;
     --tertiary: #00342f;
     --tertiary-container: #004d46;
     --tertiary-fixed: #89f5e7;
     --tertiary-fixed-dim: #6bd8cb;
-    --surface: #f8fbf9;
-    --background: #f8fbf9;
+    --surface: #f7faf8;
+    --background: #f7faf8;
     --surface-bright: #ffffff;
     --surface-container-lowest: #ffffff;
-    --surface-container-low: #eff7f3;
-    --surface-container: #e2f1ea;
-    --surface-container-high: #d5e9df;
-    --surface-container-highest: #c8e0d4;
-    --on-surface: #0b1c15;
-    --on-background: #0b1c15;
-    --on-surface-variant: #404944;
-    --outline: #707974;
-    --outline-variant: #bfc9c3;
+    --surface-container-low: #eff5f2;
+    --surface-container: #e3eee8;
+    --surface-container-high: #d7e6de;
+    --surface-container-highest: #c9ddd2;
+    --on-surface: #0d1f18;
+    --on-background: #0d1f18;
+    --on-surface-variant: #415149;
+    --outline: #6c7c74;
+    --outline-variant: #c8d7cf;
 }
 
 /* PALETTE 3: AZUL ZAFIRO (Corporativo, Solidez & Confianza) */
@@ -80,15 +96,15 @@
     --primary: #0a2540;
     --primary-container: #123e6b;
     --on-primary: #ffffff;
-    --on-primary-container: #dbeafe;
+    --on-primary-container: #e0f2fe;
     --primary-fixed: #dbeafe;
     --primary-fixed-dim: #93c5fd;
     --on-primary-fixed: #082f49;
-    --secondary: #0284c7;
+    --secondary: #0369a1;
     --secondary-container: #e0f2fe;
     --on-secondary: #ffffff;
     --on-secondary-container: #082f49;
-    --secondary-fixed: #bae6fd;
+    --secondary-fixed: #e0f2fe;
     --secondary-fixed-dim: #7dd3fc;
     --on-secondary-fixed: #082f49;
     --tertiary: #0369a1;
@@ -99,10 +115,10 @@
     --background: #f8fafc;
     --surface-bright: #ffffff;
     --surface-container-lowest: #ffffff;
-    --surface-container-low: #f0f6fa;
-    --surface-container: #e2eef7;
-    --surface-container-high: #d3e5f2;
-    --surface-container-highest: #c3dced;
+    --surface-container-low: #f1f5f9;
+    --surface-container: #e2ecf4;
+    --surface-container-high: #d5e4f0;
+    --surface-container-highest: #c6d9ea;
     --on-surface: #0f172a;
     --on-background: #0f172a;
     --on-surface-variant: #475569;
@@ -110,39 +126,39 @@
     --outline-variant: #cbd5e1;
 }
 
-/* PALETTE 4: MORADO AMATISTA (Moderno, Creativo & Exclusivo) */
+/* PALETTE 4: MORADO AMATISTA (Moderno, Nítido & Equilibrado) */
 [data-theme="amethyst"] {
-    --primary: #3b0764;
+    --primary: #2f0a4d;
     --primary-container: #581c87;
     --on-primary: #ffffff;
-    --on-primary-container: #f3e8ff;
+    --on-primary-container: #f5ecff;
     --primary-fixed: #f3e8ff;
     --primary-fixed-dim: #d8b4fe;
-    --on-primary-fixed: #3b0764;
-    --secondary: #9333ea;
+    --on-primary-fixed: #2f0a4d;
+    --secondary: #7e22ce;
     --secondary-container: #f3e8ff;
     --on-secondary: #ffffff;
     --on-secondary-container: #3b0764;
-    --secondary-fixed: #e9d5ff;
+    --secondary-fixed: #f5ecff;
     --secondary-fixed-dim: #d8b4fe;
-    --on-secondary-fixed: #3b0764;
+    --on-secondary-fixed: #2f0a4d;
     --tertiary: #6b21a8;
     --tertiary-container: #581c87;
     --tertiary-fixed: #e9d5ff;
     --tertiary-fixed-dim: #c084fc;
-    --surface: #faf7fd;
-    --background: #faf7fd;
+    --surface: #faf8fc;
+    --background: #faf8fc;
     --surface-bright: #ffffff;
     --surface-container-lowest: #ffffff;
-    --surface-container-low: #f5eeff;
-    --surface-container: #ede0fd;
-    --surface-container-high: #e2d0fa;
-    --surface-container-highest: #d7bff7;
-    --on-surface: #1e0933;
-    --on-background: #1e0933;
-    --on-surface-variant: #58446e;
-    --outline: #7c6894;
-    --outline-variant: #d6cae3;
+    --surface-container-low: #f3eff7;
+    --surface-container: #ebe3f3;
+    --surface-container-high: #dfd3ee;
+    --surface-container-highest: #d3c2e7;
+    --on-surface: #1b1026;
+    --on-background: #1b1026;
+    --on-surface-variant: #4b3b5c;
+    --outline: #746287;
+    --outline-variant: #d9cee6;
 }
 
 /* PALETTE 5: GRAFITO EJECUTIVO (Minimalista & Sobrio) */
@@ -150,15 +166,15 @@
     --primary: #18181b;
     --primary-container: #27272a;
     --on-primary: #ffffff;
-    --on-primary-container: #e4e4e7;
+    --on-primary-container: #f4f4f5;
     --primary-fixed: #e4e4e7;
     --primary-fixed-dim: #d4d4d8;
     --on-primary-fixed: #18181b;
-    --secondary: #4f46e5;
+    --secondary: #4338ca;
     --secondary-container: #e0e7ff;
     --on-secondary: #ffffff;
     --on-secondary-container: #1e1b4b;
-    --secondary-fixed: #e0e7ff;
+    --secondary-fixed: #eef2ff;
     --secondary-fixed-dim: #c7d2fe;
     --on-secondary-fixed: #1e1b4b;
     --tertiary: #374151;
@@ -172,144 +188,153 @@
     --surface-container-low: #f4f4f5;
     --surface-container: #e4e4e7;
     --surface-container-high: #d4d4d8;
-    --surface-container-highest: #a1a1aa;
+    --surface-container-highest: #c4c4cc;
     --on-surface: #09090b;
     --on-background: #09090b;
-    --on-surface-variant: #52525b;
+    --on-surface-variant: #4e4e58;
     --outline: #71717a;
     --outline-variant: #d4d4d8;
 }
 
 /* ==========================================================================
-   MODO OSCURO (DARK MODE) — Alto Contraste y Legibilidad Garantizada
+   MODO OSCURO (DARK MODE) — Texto Neutro Limpio + Acentos Armoniosos (WCAG AA+)
    ========================================================================== */
 
 html.dark {
-    --primary: #ff85a2;
-    --primary-container: #7a113a;
+    color-scheme: dark;
+    --primary: #f5eff2;
+    --primary-container: #831843;
     --on-primary: #ffffff;
-    --on-primary-container: #ffd9e2;
+    --on-primary-container: #ffe4ec;
     --primary-fixed: #ffd9e2;
     --primary-fixed-dim: #ffb1c8;
-    --on-primary-fixed: #ffffff;
-    --secondary: #ff5c7c;
-    --secondary-container: #5c0b24;
-    --on-secondary: #ffffff;
-    --on-secondary-container: #ffd9dc;
-    --secondary-fixed: #7a113a;
-    --secondary-fixed-dim: #ffb2ba;
-    --on-secondary-fixed: #ffd9dc;
-    --surface: #130b0e;
-    --background: #130b0e;
-    --surface-bright: #24151b;
-    --surface-container-lowest: #1c1015;
-    --surface-container-low: #211319;
-    --surface-container: #291820;
-    --surface-container-high: #341f29;
-    --surface-container-highest: #402632;
-    --on-surface: #fceef2;
-    --on-background: #fceef2;
-    --on-surface-variant: #dfc5cc;
-    --outline: #a38990;
-    --outline-variant: #523b42;
-    --error: #ff897d;
-    --error-container: #690005;
-    --on-error-container: #ffdad6;
+    --on-primary-fixed: #2b0714;
+    --secondary: #fb7185;
+    --secondary-container: #4a1526;
+    --on-secondary: #26040e;
+    --on-secondary-container: #ffe4ea;
+    --secondary-fixed: #ffe4ec;
+    --secondary-fixed-dim: #fda4af;
+    --on-secondary-fixed: #2b0714;
+    --surface: #110d10;
+    --background: #110d10;
+    --surface-bright: #241b20;
+    --surface-container-lowest: #181317;
+    --surface-container-low: #1e181d;
+    --surface-container: #261e24;
+    --surface-container-high: #30262e;
+    --surface-container-highest: #3b2f38;
+    --on-surface: #f5eff2;
+    --on-background: #f5eff2;
+    --on-surface-variant: #cbbec5;
+    --outline: #988690;
+    --outline-variant: #463841;
+    --error: #fca5a5;
+    --error-container: #5f1116;
+    --on-error-container: #fee2e2;
+    --cal-shadow-card: 0 1px 0 rgba(0, 0, 0, 0.35);
+    --cal-shadow-popover: 0 22px 48px -12px rgba(0, 0, 0, 0.65), 0 6px 16px -4px rgba(0, 0, 0, 0.45);
+    --cal-amber-bg: rgba(245, 158, 11, 0.20);
+    --cal-amber-border: rgba(251, 191, 36, 0.36);
+    --cal-amber-text: #fde68a;
+    --cal-emerald-bg: rgba(16, 185, 129, 0.20);
+    --cal-emerald-border: rgba(52, 211, 153, 0.36);
+    --cal-emerald-text: #a7f3d0;
 }
 
 html.dark[data-theme="emerald"] {
-    --primary: #6ee7b7;
+    --primary: #eef6f2;
     --primary-container: #065f46;
     --on-primary: #ffffff;
     --on-primary-container: #d1fae5;
     --secondary: #34d399;
     --secondary-container: #064e3b;
-    --on-secondary: #ffffff;
-    --on-secondary-container: #a7f3d0;
-    --secondary-fixed: #065f46;
+    --on-secondary: #022c22;
+    --on-secondary-container: #d1fae5;
+    --secondary-fixed: #d1fae5;
     --secondary-fixed-dim: #6ee7b7;
-    --on-secondary-fixed: #ecfdf5;
-    --surface: #0b1410;
-    --background: #0b1410;
-    --surface-bright: #16261f;
-    --surface-container-lowest: #111f19;
-    --surface-container-low: #15251e;
-    --surface-container: #1b2e26;
-    --surface-container-high: #233930;
-    --surface-container-highest: #2c473c;
-    --on-surface: #ecfdf5;
-    --on-background: #ecfdf5;
-    --on-surface-variant: #c6dbd2;
-    --outline: #88a096;
-    --outline-variant: #354c43;
+    --on-secondary-fixed: #022c22;
+    --surface: #0b120f;
+    --background: #0b120f;
+    --surface-bright: #192620;
+    --surface-container-lowest: #111b17;
+    --surface-container-low: #16221d;
+    --surface-container: #1d2c26;
+    --surface-container-high: #263830;
+    --surface-container-highest: #30453c;
+    --on-surface: #eef6f2;
+    --on-background: #eef6f2;
+    --on-surface-variant: #c2d4cc;
+    --outline: #869b91;
+    --outline-variant: #34473e;
 }
 
 html.dark[data-theme="ocean"] {
-    --primary: #7dd3fc;
+    --primary: #eef4fa;
     --primary-container: #0369a1;
     --on-primary: #ffffff;
     --on-primary-container: #e0f2fe;
     --secondary: #38bdf8;
-    --secondary-container: #075985;
-    --on-secondary: #ffffff;
-    --on-secondary-container: #bae6fd;
-    --secondary-fixed: #075985;
+    --secondary-container: #0c3b5e;
+    --on-secondary: #062033;
+    --on-secondary-container: #e0f2fe;
+    --secondary-fixed: #e0f2fe;
     --secondary-fixed-dim: #7dd3fc;
-    --on-secondary-fixed: #f0f9ff;
-    --surface: #0a1017;
-    --background: #0a1017;
-    --surface-bright: #14202e;
-    --surface-container-lowest: #0f1822;
-    --surface-container-low: #131e2b;
-    --surface-container: #192738;
-    --surface-container-high: #213247;
-    --surface-container-highest: #2a3f59;
-    --on-surface: #f0f9ff;
-    --on-background: #f0f9ff;
-    --on-surface-variant: #c4d7e8;
-    --outline: #7f97ad;
-    --outline-variant: #304559;
+    --on-secondary-fixed: #082f49;
+    --surface: #0b1016;
+    --background: #0b1016;
+    --surface-bright: #182330;
+    --surface-container-lowest: #101720;
+    --surface-container-low: #141d28;
+    --surface-container: #1a2634;
+    --surface-container-high: #223142;
+    --surface-container-highest: #2c3e52;
+    --on-surface: #eef4fa;
+    --on-background: #eef4fa;
+    --on-surface-variant: #c0cfdf;
+    --outline: #8195aa;
+    --outline-variant: #304254;
 }
 
 html.dark[data-theme="amethyst"] {
-    --primary: #d8b4fe;
-    --primary-container: #6b21a8;
+    --primary: #f4effa;
+    --primary-container: #6d28d9;
     --on-primary: #ffffff;
-    --on-primary-container: #f3e8ff;
+    --on-primary-container: #f5ecff;
     --secondary: #c084fc;
-    --secondary-container: #581c87;
-    --on-secondary: #ffffff;
-    --on-secondary-container: #e9d5ff;
-    --secondary-fixed: #6b21a8;
+    --secondary-container: #3b1768;
+    --on-secondary: #1e0538;
+    --on-secondary-container: #f3e8ff;
+    --secondary-fixed: #f5ecff;
     --secondary-fixed-dim: #d8b4fe;
-    --on-secondary-fixed: #faf5ff;
-    --surface: #110a19;
-    --background: #110a19;
-    --surface-bright: #1f132e;
-    --surface-container-lowest: #170e22;
-    --surface-container-low: #1b1129;
-    --surface-container: #231636;
-    --surface-container-high: #2d1d45;
-    --surface-container-highest: #382557;
-    --on-surface: #faf5ff;
-    --on-background: #faf5ff;
-    --on-surface-variant: #dacae8;
-    --outline: #9884ab;
-    --outline-variant: #463359;
+    --on-secondary-fixed: #2e1065;
+    --surface: #0f0b15;
+    --background: #0f0b15;
+    --surface-bright: #20172b;
+    --surface-container-lowest: #16111e;
+    --surface-container-low: #1c1526;
+    --surface-container: #241b31;
+    --surface-container-high: #2e233e;
+    --surface-container-highest: #392c4c;
+    --on-surface: #f4effa;
+    --on-background: #f4effa;
+    --on-surface-variant: #cfc3de;
+    --outline: #9384a8;
+    --outline-variant: #433458;
 }
 
 html.dark[data-theme="graphite"] {
-    --primary: #e4e4e7;
+    --primary: #fafafa;
     --primary-container: #3f3f46;
     --on-primary: #ffffff;
     --on-primary-container: #fafafa;
     --secondary: #818cf8;
-    --secondary-container: #312e81;
-    --on-secondary: #ffffff;
+    --secondary-container: #252263;
+    --on-secondary: #121036;
     --on-secondary-container: #e0e7ff;
-    --secondary-fixed: #3730a3;
+    --secondary-fixed: #e0e7ff;
     --secondary-fixed-dim: #a5b4fc;
-    --on-secondary-fixed: #eef2ff;
+    --on-secondary-fixed: #1e1b4b;
     --surface: #09090b;
     --background: #09090b;
     --surface-bright: #18181b;
@@ -325,31 +350,441 @@ html.dark[data-theme="graphite"] {
     --outline-variant: #3f3f46;
 }
 
-/* Transiciones suaves y estética amigable con esquinas redondeadas */
-body, aside, main, header, div, nav, button, input, select, textarea {
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+/* Transiciones suaves de tema sin interferir con transformaciones puntuales */
+body, aside, main, header, nav, button, input, select, textarea {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-
-.rounded-lg { border-radius: 1rem !important; }
-.rounded-xl { border-radius: 1.35rem !important; }
-.rounded-2xl { border-radius: 1.75rem !important; }
-.rounded-3xl { border-radius: 2.15rem !important; }
 
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 select,
 textarea {
-    border-radius: 1rem !important;
+    border-radius: 0.75rem;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
 }
 
 .calendar-day-card {
     border-radius: 1.35rem;
-    transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+    transition: background-color 150ms ease, border-color 150ms ease;
 }
-.calendar-day-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px -8px rgba(99, 13, 50, 0.16);
+
+/* ==========================================================================
+   NAVEGACIÓN FLOTANTE INFERIOR EN MÓVIL + REGLAS FORM-FACTOR & MOBILE-NATIVE
+   ========================================================================== */
+html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+    background-color: var(--surface);
+    scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
 }
-html.dark .calendar-day-card:hover {
-    box-shadow: 0 12px 24px -8px rgba(255, 92, 124, 0.22);
+
+body {
+    background-color: var(--surface);
+    min-height: 100dvh;
+    overflow-wrap: break-word;
+    font-size-adjust: from-font;
+}
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    flex-shrink: 0;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+}
+
+aside nav a,
+#cc-sidebar .cc-nav-link {
+    border-radius: 0.75rem;
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   SISTEMA VISUAL HÍBRIDO: Apple Hairlines + Shopify SaaS Hierarchy + Duolingo Tactile CTA
+   ========================================================================== */
+h1, h2, h3 {
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+}
+
+p, li {
+    text-wrap: pretty;
+}
+
+.cc-eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.055em;
+    color: var(--on-surface-variant);
+    line-height: 1.25;
+}
+
+.cc-card-featured {
+    background-color: color-mix(in srgb, var(--secondary-container) 34%, var(--surface-container-lowest));
+    border: 1px solid color-mix(in srgb, var(--secondary) 32%, transparent);
+    border-left: 3px solid var(--secondary);
+}
+
+html.dark .cc-card-featured {
+    background-color: color-mix(in srgb, var(--secondary-container) 55%, var(--surface-container-lowest));
+    border-color: color-mix(in srgb, var(--secondary) 42%, transparent);
+}
+
+.cc-cta-tactile {
+    box-shadow: 0 2px 0 color-mix(in srgb, var(--primary) 35%, rgba(0, 0, 0, 0.22));
+    transition: transform 110ms var(--ease-out), box-shadow 110ms var(--ease-out), opacity 140ms ease, background-color 140ms ease;
+}
+
+.cc-cta-tactile:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--primary) 25%, rgba(0, 0, 0, 0.16));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cc-cta-tactile {
+        transition: opacity 120ms ease, background-color 120ms ease;
+    }
+    .cc-cta-tactile:active:not(:disabled) {
+        transform: none;
+    }
+}
+
+button, a, [role="button"] {
+    touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+        font-size: max(1rem, 1em);
+    }
+    :where(button, select, textarea, [role="button"], nav a) {
+        min-block-size: 44px;
+    }
+}
+
+/* Riel colapsable compartido en escritorio (>= 1024px) */
+@media (min-width: 1024px) {
+    body.cc-sidebar-collapsed #cc-sidebar {
+        width: 78px;
+    }
+    body.cc-sidebar-collapsed #cc-main-shell {
+        padding-left: 78px;
+    }
+    body.cc-sidebar-collapsed #cc-top-header {
+        left: 78px;
+    }
+    body.cc-sidebar-collapsed .cc-sidebar-text {
+        display: none;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-nav-link {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-sidebar-user {
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.45rem;
+        padding: 0.5rem 0.35rem;
+    }
+    body.cc-sidebar-collapsed #cc-sidebar .cc-sidebar-brand {
+        padding: 1rem 0.75rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+.cc-mobile-bottom-nav {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
+    z-index: 45;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem;
+    border-radius: 1.35rem;
+    background-color: color-mix(in srgb, var(--surface-container-lowest) 92%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 55%, transparent);
+    box-shadow: 0 12px 30px -8px rgba(45, 9, 25, 0.22), 0 4px 12px -4px rgba(45, 9, 25, 0.12);
+}
+
+html.dark .cc-mobile-bottom-nav {
+    background-color: color-mix(in srgb, var(--surface-container-low) 92%, transparent);
+    box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.65), 0 4px 12px -4px rgba(0, 0, 0, 0.45);
+}
+
+.cc-mobile-nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 48px;
+    padding: 0.3rem 0.15rem;
+    border-radius: 1rem !important;
+    text-decoration: none;
+    color: var(--on-surface-variant);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    transition: transform 110ms ease-out, background-color 140ms ease, color 140ms ease;
+}
+
+.cc-mobile-nav-item:active {
+    transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .cc-mobile-nav-item:not(.is-active):hover {
+        background-color: var(--surface-container-high);
+        color: var(--primary);
+    }
+}
+
+.cc-mobile-nav-item.is-active {
+    background-color: var(--primary-container);
+    color: var(--on-primary);
+}
+
+.cc-mobile-nav-item.is-active .cc-mobile-nav-icon {
+    color: var(--on-primary);
+}
+
+.cc-mobile-nav-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.cc-mobile-nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cc-mobile-nav-badge {
+    position: absolute;
+    top: 4px;
+    right: 10%;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 9999px;
+    background-color: var(--secondary);
+    color: var(--on-secondary);
+    font-size: 9px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 1023px) {
+    body {
+        padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+@media (min-width: 1024px) {
+    .cc-mobile-bottom-nav {
+        display: none !important;
+    }
+}
+
+/* Native accessible modal dialogs (scroll containment + backdrop polish) */
+dialog:modal {
+    overscroll-behavior: contain;
+    border: 0 !important;
+}
+
+dialog::backdrop {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+}
+
+/* ==========================================================================
+   SISTEMA SIN BORDES BLANCOS — Superficies Tonales Limpias (Modo Oscuro y Claro)
+   Corrige además las utilidades Tailwind con /alpha sobre variables CSS hex
+   que hacían fallback a currentColor (blanco en modo oscuro).
+   ========================================================================== */
+
+[class*="border-outline-variant"],
+[class*="border-secondary/"],
+[class*="border-primary/"] {
+    border-color: transparent !important;
+}
+
+[class*="border-error/"] {
+    border-color: color-mix(in srgb, var(--error) 22%, transparent) !important;
+}
+
+[class*="bg-surface-container-low/"] {
+    background-color: color-mix(in srgb, var(--surface-container-low) 78%, transparent) !important;
+}
+
+[class*="bg-error-container/"] {
+    background-color: color-mix(in srgb, var(--error-container) 55%, transparent) !important;
+}
+
+html:not(.dark) main section.bg-surface-container-lowest {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.045);
+}
+
+#cc-top-header {
+    background-color: color-mix(in srgb, var(--surface) 88%, transparent) !important;
+    border-bottom-color: transparent !important;
+}
+
+#cc-sidebar {
+    border-right-color: transparent !important;
+}
+
+.cc-theme-active {
+    background-color: var(--surface-container) !important;
+    box-shadow: inset 0 0 0 2px var(--secondary);
+}
+
+/* Dropzone de facturas: línea discontinua sutil sin blanco chillón */
+#cc-upload-form {
+    border: 1.5px dashed color-mix(in srgb, var(--on-surface-variant) 24%, transparent) !important;
+}
+
+#cc-upload-form:hover,
+#cc-upload-form.cc-drop-active {
+    border-color: var(--secondary) !important;
+}
+
+/* Entradas de formulario sin bordes duros, con contraste tonal limpio */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+    border-color: transparent !important;
+    transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+
+html.dark section input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark section select,
+html.dark section textarea,
+html.dark dialog input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark form select,
+html.dark form textarea {
+    background-color: var(--surface-container) !important;
+}
+
+html:not(.dark) section input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html:not(.dark) section select,
+html:not(.dark) section textarea,
+html:not(.dark) form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html:not(.dark) form select,
+html:not(.dark) form textarea {
+    background-color: var(--surface-container-low);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary) 45%, transparent);
+}
+
+/* Autocompletado del navegador integrado con el tema sin parches blancos ni amarillos */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill) {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 45%, transparent),
+        inset 0 0 0 100vmax var(--surface-container-low);
+    -webkit-text-fill-color: var(--on-surface);
+    caret-color: var(--on-surface);
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill) {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 50%, transparent),
+        inset 0 0 0 100vmax var(--surface-container);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill):focus {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 60%, transparent),
+        inset 0 0 0 100vmax var(--surface-container-low),
+        0 0 0 3px color-mix(in srgb, var(--secondary) 35%, transparent);
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:autofill, :-webkit-autofill):focus {
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb, var(--secondary) 65%, transparent),
+        inset 0 0 0 100vmax var(--surface-container),
+        0 0 0 3px color-mix(in srgb, var(--secondary) 40%, transparent);
+}
+
+/* Calendario, tarjetas y Date Picker sin bordes duros en modo oscuro */
+html.dark .cc-metric-chip,
+html.dark .cc-calendar-shell,
+html.dark .cc-nav-btn:not(.cc-nav-btn-today):not(.cc-nav-btn-primary),
+html.dark .cc-dp-trigger,
+html.dark .cc-dp-popover,
+html.dark .cc-panel-tx-card,
+html.dark .cc-mobile-bottom-nav {
+    border-color: transparent !important;
+}
+
+html.dark .cc-cal-header,
+html.dark .cc-legend-inline,
+html.dark .cc-day-panel,
+html.dark .cc-day-panel-header,
+html.dark .cc-panel-tx-details,
+html.dark .cc-cell-total {
+    border-color: color-mix(in srgb, var(--on-surface) 6%, transparent) !important;
+}
+
+html.dark .cc-day-cell {
+    border-color: color-mix(in srgb, var(--on-surface) 5%, transparent) !important;
+}
+
+@media (forced-colors: active) {
+    [class*="border-outline-variant"],
+    section,
+    input,
+    select,
+    textarea,
+    .cc-metric-chip,
+    .cc-calendar-shell {
+        border: 1px solid ButtonBorder !important;
+    }
 }
 
