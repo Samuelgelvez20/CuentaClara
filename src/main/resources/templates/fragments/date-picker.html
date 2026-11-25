@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="datePicker(pickerId, mode, actionUrl, displayLabel, selectedMonth, startDate, endDate, extraCategory, extraMerchant, isAll)"
+     class="cc-dp-root"
+     th:id="${pickerId}"
+     data-cc-dp
+     th:attr="data-dp-mode=${mode},
+              data-dp-action=${actionUrl},
+              data-dp-month=${selectedMonth},
+              data-dp-start=${startDate},
+              data-dp-end=${endDate},
+              data-dp-all=${isAll},
+              data-dp-today=${todayIso}">
+    <button type="button"
+            class="cc-dp-trigger"
+            data-cc-dp-trigger
+            th:aria-controls="${pickerId + '-popover'}"
+            aria-expanded="false"
+            th:aria-label="'Cambiar fecha o periodo: ' + ${displayLabel}">
+        <span class="material-symbols-outlined text-[18px] text-secondary flex-shrink-0" aria-hidden="true">calendar_month</span>
+        <span class="cc-dp-trigger-label truncate" th:text="${displayLabel}">Noviembre 2026</span>
+        <span class="material-symbols-outlined text-[18px] text-on-surface-variant flex-shrink-0" aria-hidden="true">keyboard_arrow_down</span>
+    </button>
+
+    <div th:id="${pickerId + '-popover'}"
+         popover="auto"
+         class="cc-dp-popover"
+         role="dialog"
+         aria-modal="false"
+         aria-label="Selector visual de fecha y periodo"
+         data-cc-dp-panel>
+    </div>
+
+    <form method="get" th:action="${actionUrl}" class="hidden" data-cc-dp-form>
+        <input type="hidden" name="month" th:value="${isAll ? 'ALL' : selectedMonth}" data-dp-input-month/>
+        <input th:if="${mode == 'month'}" type="hidden" name="day" value="" data-dp-input-day/>
+        <input th:if="${mode == 'range'}" type="hidden" name="startDate" th:value="${startDate}" data-dp-input-start/>
+        <input th:if="${mode == 'range'}" type="hidden" name="endDate" th:value="${endDate}" data-dp-input-end/>
+        <input th:if="${extraCategory != null and extraCategory != ''}" type="hidden" name="category" th:value="${extraCategory}"/>
+        <input th:if="${extraMerchant != null and extraMerchant != ''}" type="hidden" name="merchant" th:value="${extraMerchant}"/>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: cuentaclara
+  config:
+    import: optional:file:.env[.properties]
+
+  # Datasource principal de la aplicación: usa el rol SIN privilegios de propietario para garantizar RLS (RNF-01)
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5440}/${DB_NAME:cuentaclara}
+    username: ${DB_APP_USER:cuentaclara_app}
+    password: ${DB_APP_PASSWORD:app_secret_dev}
+    driver-class-name: org.postgresql.Driver
+
+  # Flyway corre con el usuario propietario para crear tablas, índices y políticas RLS
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5440}/${DB_NAME:cuentaclara}
+    user: ${DB_ADMIN_USER:cuentaclara_owner}
+    password: ${DB_ADMIN_PASSWORD:owner_secret_dev}
+    locations: classpath:db/migration
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: America/Bogota
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          no-cache: true
+          must-revalidate: true
+
+server:
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml,image/svg+xml
+
+cuentaclara:
+  security:
+    jwt-secret: ${JWT_SECRET:c3VwZXItc2VjcmV0LWtleS1mb3ItY3VlbnRhY2xhcmEtZGV2LW1pbmltdW0tMzItYnl0ZXM=}
+    jwt-expiration-minutes: ${JWT_EXPIRATION_MINUTES:30}
+    google-client-id: ${GOOGLE_CLIENT_ID:}
+    cookie-secure: ${COOKIE_SECURE:false}
+    firebase:
+      project-id: ${FIREBASE_PROJECT_ID:}
+      api-key: ${FIREBASE_API_KEY:}
+      auth-domain: ${FIREBASE_AUTH_DOMAIN:}
+      app-id: ${FIREBASE_APP_ID:}
+  storage:
+    temp-dir: ${TEMP_STORAGE_DIR:./tmp/uploads}
+  clamav:
+    enabled: ${CLAMAV_ENABLED:false}
+    host: ${CLAMAV_HOST:localhost}
+    port: ${CLAMAV_PORT:3310}
+  ai:
+    provider: ${AI_PROVIDER:openai}
+    api-key: ${OPENAI_API_KEY:}
+    chat-model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+    embedding-model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+    embedding-version: ${OPENAI_EMBEDDING_VERSION:v1}
+    ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    ollama-embedding-model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+    daily-user-call-limit: ${AI_DAILY_USER_CALL_LIMIT:60}
+    gemini-api-key: ${GEMINI_API_KEY:}
+    gemini-model: ${GEMINI_CHAT_MODEL:gemini-2.5-flash}
+  worker:
+    consumer-enabled: ${WORKER_CONSUMER_ENABLED:true}
+    inline-async-fallback: ${WORKER_INLINE_ASYNC_FALLBACK:true}

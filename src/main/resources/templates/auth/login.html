@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" name="viewport"/>
+    <meta name="color-scheme" content="light dark"/>
+    <meta name="description" content="Inicia sesión o crea tu cuenta en CuentaClara para organizar tus ingresos, presupuestos 50/30/20 y facturas con inteligencia artificial."/>
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf7f8"/>
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#110d10"/>
+    <meta name="theme-color" id="cc-theme-color-meta" content="#faf7f8"/>
+    <title>CuentaClara — Iniciar Sesión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;icon_names=account_balance_wallet,add,add_circle,alternate_email,auto_awesome,bolt,calendar_month,chat_bubble,check,check_circle,chevron_left,chevron_right,close,dark_mode,delete_forever,dock_to_left,dock_to_right,error,event_repeat,expand_more,fact_check,forum,home,hourglass_top,insights,keyboard_arrow_down,keyboard_arrow_up,light_mode,local_cafe,lock,logout,pause_circle,person,person_remove,pie_chart,play_circle,progress_activity,receipt,receipt_long,save,savings,search,send,summarize,tune,upload_file,verified_user,visibility,visibility_off,warning&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/cuentaclara-tailwind.css?v=2"/>
+    <link rel="stylesheet" href="/css/cuentaclara-theme.min.css?v=2"/>
+    <script src="/js/cuentaclara-theme.min.js?v=2"></script>
+    <style>
+        html, body { margin: 0; padding: 0; }
+        body { overscroll-behavior: none; }
+
+        /* ==============================================================
+           OPCIÓN A1 (Escritorio) + OPCIÓN C (Celular)
+           Superficies tonales sin bordes blancos + Aurora GPU
+           ============================================================== */
+        @keyframes ccAuroraDriftA {
+            0%, 100% { transform: translate3d(-4%, -3%, 0) scale(1); }
+            50%      { transform: translate3d(8%, 6%, 0) scale(1.09); }
+        }
+        @keyframes ccAuroraDriftB {
+            0%, 100% { transform: translate3d(4%, 4%, 0) scale(1.04); }
+            50%      { transform: translate3d(-8%, -5%, 0) scale(0.94); }
+        }
+        @keyframes ccAuroraDriftC {
+            0%, 100% { transform: translate3d(-2%, 4%, 0) scale(1); }
+            50%      { transform: translate3d(6%, -6%, 0) scale(1.1); }
+        }
+
+        .cc-login-canvas {
+            background:
+                radial-gradient(920px 620px at 14% 16%, color-mix(in srgb, var(--primary-container) 24%, transparent), transparent 64%),
+                radial-gradient(840px 560px at 88% 84%, color-mix(in srgb, var(--secondary) 18%, transparent), transparent 64%),
+                var(--surface);
+        }
+
+        html.dark .cc-login-canvas {
+            background:
+                radial-gradient(960px 640px at 12% 14%, color-mix(in srgb, var(--primary-container) 44%, transparent), transparent 64%),
+                radial-gradient(880px 580px at 88% 86%, color-mix(in srgb, var(--secondary) 24%, transparent), transparent 64%),
+                var(--surface);
+        }
+
+        .cc-aurora-orb {
+            position: absolute;
+            border-radius: 9999px;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .cc-aurora-orb-1 {
+            width: 820px;
+            height: 820px;
+            top: -280px;
+            left: -200px;
+            background: radial-gradient(circle,
+                color-mix(in srgb, var(--primary-container) 34%, transparent) 0%,
+                color-mix(in srgb, var(--primary-container) 12%, transparent) 44%,
+                transparent 72%);
+        }
+
+        .cc-aurora-orb-2 {
+            width: 760px;
+            height: 760px;
+            bottom: -260px;
+            right: -160px;
+            background: radial-gradient(circle,
+                color-mix(in srgb, var(--secondary) 26%, transparent) 0%,
+                color-mix(in srgb, var(--secondary) 10%, transparent) 46%,
+                transparent 72%);
+        }
+
+        .cc-aurora-orb-3 {
+            width: 580px;
+            height: 580px;
+            top: 12%;
+            right: 18%;
+            background: radial-gradient(circle,
+                color-mix(in srgb, var(--tertiary-container) 20%, transparent) 0%,
+                transparent 68%);
+        }
+
+        html.dark .cc-aurora-orb-1 {
+            background: radial-gradient(circle,
+                color-mix(in srgb, var(--primary-container) 78%, transparent) 0%,
+                color-mix(in srgb, var(--primary-container) 30%, transparent) 44%,
+                transparent 72%);
+        }
+
+        html.dark .cc-aurora-orb-2 {
+            background: radial-gradient(circle,
+                color-mix(in srgb, var(--secondary) 46%, transparent) 0%,
+                color-mix(in srgb, var(--secondary) 16%, transparent) 46%,
+                transparent 72%);
+        }
+
+        html.dark .cc-aurora-orb-3 {
+            background: radial-gradient(circle,
+                color-mix(in srgb, var(--tertiary-container) 32%, transparent) 0%,
+                transparent 68%);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .cc-login-stage:not(.cc-bg-paused) .cc-aurora-orb-1 {
+                animation: ccAuroraDriftA 18s ease-in-out infinite;
+            }
+            .cc-login-stage:not(.cc-bg-paused) .cc-aurora-orb-2 {
+                animation: ccAuroraDriftB 22s ease-in-out infinite;
+            }
+            .cc-login-stage:not(.cc-bg-paused) .cc-aurora-orb-3 {
+                animation: ccAuroraDriftC 26s ease-in-out infinite;
+            }
+        }
+
+        .cc-dot-grid {
+            background-image: radial-gradient(color-mix(in srgb, var(--on-surface) 14%, transparent) 1px, transparent 1px);
+            background-size: 24px 24px;
+            -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 32%, transparent 100%);
+            mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 32%, transparent 100%);
+        }
+
+        html.dark .cc-dot-grid {
+            background-image: radial-gradient(color-mix(in srgb, var(--on-surface) 18%, transparent) 1px, transparent 1px);
+        }
+
+        .cc-login-stage {
+            min-height: 100dvh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .cc-login-card {
+            width: 100%;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: color-mix(in srgb, var(--surface-container-lowest) 92%, transparent);
+            box-shadow:
+                0 28px 70px -18px rgba(31, 16, 22, 0.16),
+                0 6px 20px -4px rgba(31, 16, 22, 0.08);
+            transition: opacity 260ms var(--ease-out), transform 260ms var(--ease-out);
+        }
+
+        .cc-appearance-dock {
+            position: fixed;
+            right: max(1rem, env(safe-area-inset-right));
+            bottom: max(1rem, env(safe-area-inset-bottom));
+            z-index: 40;
+        }
+
+        @media (min-width: 640px) {
+            .cc-appearance-dock {
+                right: 1.5rem;
+                bottom: 1.5rem;
+            }
+        }
+
+        @starting-style {
+            .cc-login-card {
+                opacity: 0;
+                transform: translateY(10px) scale(0.985);
+            }
+        }
+
+        html.dark .cc-login-card {
+            background-color: color-mix(in srgb, var(--surface-container-low) 90%, transparent);
+            box-shadow:
+                0 32px 84px -18px rgba(0, 0, 0, 0.72),
+                0 8px 24px -6px rgba(0, 0, 0, 0.44);
+        }
+
+        .cc-glass-pill {
+            background-color: color-mix(in srgb, var(--surface-container-lowest) 82%, transparent);
+            box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.12);
+        }
+
+        html.dark .cc-glass-pill {
+            background-color: color-mix(in srgb, var(--surface-container-low) 84%, transparent);
+            box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.42);
+        }
+
+        /* Segmented Control deslizante (resuelve contraste blanco-sobre-blanco en oscuro) */
+        .cc-segmented-track {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            padding: 4px;
+            border-radius: 14px;
+            background-color: var(--surface-container);
+        }
+
+        .cc-segmented-thumb {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            border-radius: 10px;
+            background-color: var(--primary-container);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+            transition: transform 220ms var(--ease-out), background-color 180ms var(--ease-out);
+            pointer-events: none;
+        }
+
+        .cc-segmented-track[data-mode="register"] .cc-segmented-thumb {
+            transform: translateX(100%);
+        }
+
+        .cc-tab-btn {
+            position: relative;
+            z-index: 1;
+            touch-action: manipulation;
+            transition: color 160ms var(--ease-out), transform 140ms var(--ease-out);
+        }
+
+        .cc-tab-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Acordeón CSS fluido para alternar entre Iniciar sesión y Crear cuenta sin saltos */
+        .cc-auth-accordion {
+            display: grid;
+            grid-template-rows: 0fr;
+            opacity: 0;
+            filter: blur(2px);
+            transition:
+                grid-template-rows 240ms var(--ease-out),
+                opacity 200ms var(--ease-out),
+                filter 200ms var(--ease-out);
+        }
+
+        .cc-auth-accordion[data-open="true"] {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            filter: blur(0);
+        }
+
+        .cc-auth-accordion-inner {
+            overflow: hidden;
+        }
+
+        .cc-tactile-btn {
+            touch-action: manipulation;
+            transition: transform 140ms var(--ease-out), background-color 160ms var(--ease-out), opacity 140ms var(--ease-out);
+        }
+
+        .cc-tactile-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        /* Entrada suave de filas de pago fijo y alertas */
+        .cc-row-enter {
+            transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+        }
+
+        @starting-style {
+            .cc-row-enter {
+                opacity: 0;
+                transform: translateY(6px) scale(0.985);
+            }
+        }
+
+        .cc-alert-enter {
+            transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+        }
+
+        @starting-style {
+            .cc-alert-enter {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+        }
+
+        /* Validación diferida tras interacción (:user-invalid) */
+        .cc-field-error {
+            display: none;
+            align-items: center;
+            gap: 0.35rem;
+            margin: 0.25rem 0 0;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--error);
+        }
+
+        .cc-field-group:has(input:user-invalid) input:user-invalid,
+        .cc-field-group:has(input.user-invalid-fallback) input.user-invalid-fallback {
+            box-shadow: inset 0 0 0 1.5px var(--error), 0 0 0 3px color-mix(in srgb, var(--error) 18%, transparent);
+        }
+
+        .cc-field-group:has(input:user-invalid) .cc-field-error,
+        .cc-field-group:has(input.user-invalid-fallback) .cc-field-error {
+            display: flex;
+        }
+
+        /* Hover únicamente en dispositivos con puntero fino (mobile-native: evita hovers pegados en touch) */
+        @media (hover: hover) and (pointer: fine) {
+            .cc-hover-surface:hover {
+                background-color: var(--surface-container-high);
+            }
+            .cc-hover-text:hover {
+                color: var(--on-surface);
+            }
+            .cc-hover-underline:hover {
+                text-decoration: underline;
+            }
+            .cc-swatch-btn:hover {
+                transform: scale(1.12);
+            }
+        }
+
+        .cc-swatch-btn {
+            touch-action: manipulation;
+            transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+        }
+
+        .cc-swatch-btn.is-active {
+            box-shadow: 0 0 0 2px var(--surface-container-lowest), 0 0 0 4px var(--secondary);
+        }
+
+        html.dark .cc-swatch-btn.is-active {
+            box-shadow: 0 0 0 2px var(--surface-container-low), 0 0 0 4px var(--secondary);
+        }
+
+        @media (pointer: coarse) {
+            .cc-tap-target {
+                min-height: 44px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .cc-login-card,
+            .cc-segmented-thumb,
+            .cc-auth-accordion,
+            .cc-tactile-btn,
+            .cc-row-enter,
+            .cc-alert-enter,
+            .cc-tab-btn,
+            .cc-swatch-btn {
+                transition-duration: 0.01s !important;
+                transform: none !important;
+                filter: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+<main id="ccLoginStage"
+      class="cc-login-stage cc-login-canvas relative min-h-dvh w-full flex flex-col items-center justify-center overflow-x-hidden px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(5rem,calc(env(safe-area-inset-bottom)+4rem))] sm:p-8 sm:pb-20">
+
+    <!-- Fondo A1: Aurora GPU en capas + cuadrícula de puntos sutil -->
+    <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        <div class="cc-aurora-orb cc-aurora-orb-1"></div>
+        <div class="cc-aurora-orb cc-aurora-orb-2"></div>
+        <div class="cc-aurora-orb cc-aurora-orb-3"></div>
+        <div class="cc-dot-grid absolute inset-0"></div>
+    </div>
+
+    <!-- Barra flotante inferior derecha de apariencia (Claro/Oscuro, 5 paletas y pausa de fondo WCAG 2.2.2) -->
+    <div class="cc-appearance-dock">
+        <div class="cc-glass-pill backdrop-blur-md inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-full">
+            <button type="button" id="loginModeToggleBtn" onclick="toggleLoginMode()"
+                    class="cc-tactile-btn cc-tap-target inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface text-xs font-semibold border-0 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]" id="loginModeIcon" aria-hidden="true">dark_mode</span>
+                <span id="loginModeLabel">Oscuro</span>
+            </button>
+
+            <span class="h-4 w-[1px] bg-on-surface/15" aria-hidden="true"></span>
+
+            <div class="flex items-center gap-1.5 px-1" role="group" aria-label="Paleta de color">
+                <button type="button" onclick="selectLoginTheme('vinotinto')" data-login-theme="vinotinto"
+                        aria-label="Tema Vino Tinto" title="Vino Tinto"
+                        class="cc-swatch-btn w-4 h-4 rounded-full border-0 cursor-pointer" style="background-color: #831843;"></button>
+                <button type="button" onclick="selectLoginTheme('emerald')" data-login-theme="emerald"
+                        aria-label="Tema Verde Esmeralda" title="Verde Esmeralda"
+                        class="cc-swatch-btn w-4 h-4 rounded-full border-0 cursor-pointer" style="background-color: #065f46;"></button>
+                <button type="button" onclick="selectLoginTheme('ocean')" data-login-theme="ocean"
+                        aria-label="Tema Azul Zafiro" title="Azul Zafiro"
+                        class="cc-swatch-btn w-4 h-4 rounded-full border-0 cursor-pointer" style="background-color: #0369a1;"></button>
+                <button type="button" onclick="selectLoginTheme('amethyst')" data-login-theme="amethyst"
+                        aria-label="Tema Morado Amatista" title="Morado Amatista"
+                        class="cc-swatch-btn w-4 h-4 rounded-full border-0 cursor-pointer" style="background-color: #6d28d9;"></button>
+                <button type="button" onclick="selectLoginTheme('graphite')" data-login-theme="graphite"
+                        aria-label="Tema Grafito" title="Grafito"
+                        class="cc-swatch-btn w-4 h-4 rounded-full border-0 cursor-pointer" style="background-color: #3f3f46;"></button>
+            </div>
+
+            <span class="h-4 w-[1px] bg-on-surface/15 hidden sm:inline-block" aria-hidden="true"></span>
+
+            <button type="button" id="toggleBackdropMotionBtn" onclick="toggleBackdropMotion()"
+                    aria-label="Pausar animación de fondo" title="Pausar animación de fondo"
+                    class="cc-tactile-btn cc-hover-text cc-tap-target w-8 h-8 rounded-full flex items-center justify-center bg-transparent text-on-surface-variant border-0 cursor-pointer">
+                <span class="material-symbols-outlined text-[18px]" id="backdropMotionIcon" aria-hidden="true">pause_circle</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tarjeta Principal Centrada -->
+    <div class="cc-login-card backdrop-blur-xl relative z-10 w-full max-w-[480px] rounded-3xl overflow-hidden">
+        <section class="p-6 sm:p-10 flex flex-col justify-center">
+            <div class="w-full mx-auto flex flex-col gap-4">
+
+                <!-- Marca y saludo unificados -->
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-8 h-8 rounded-xl bg-primary-container text-white flex items-center justify-center shadow-sm">
+                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">account_balance_wallet</span>
+                        </div>
+                        <span class="text-sm font-bold tracking-tight text-on-surface">CuentaClara</span>
+                    </div>
+                    <h1 id="authGreetingTitle" class="text-xl font-bold tracking-tight text-on-surface m-0">Bienvenido de nuevo</h1>
+                    <p id="authGreetingSubtitle" class="text-xs text-on-surface-variant m-0">
+                        Ingresa para continuar gestionando tu mes.
+                    </p>
+                </div>
+
+                <!-- Alertas Flash -->
+                <div th:if="${errorMessage}" role="alert"
+                     class="cc-alert-enter p-3.5 rounded-xl bg-error-container text-on-error-container font-semibold font-body-sm text-body-sm flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-[20px] shrink-0" aria-hidden="true">error</span>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+                <div th:if="${successMessage}" role="status"
+                     class="cc-alert-enter p-3.5 rounded-xl bg-primary-container text-on-primary font-semibold font-body-sm text-body-sm flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-[20px] shrink-0" aria-hidden="true">check_circle</span>
+                    <span th:text="${successMessage}"></span>
+                </div>
+                <div th:if="${param.deleted != null}" role="status"
+                     class="cc-alert-enter p-3.5 rounded-xl bg-primary-container text-on-primary font-semibold font-body-sm text-body-sm flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-[20px] shrink-0" aria-hidden="true">check_circle</span>
+                    <span>Tu cuenta y tus datos fueron eliminados permanentemente.</span>
+                </div>
+                <div id="clientAuthError" role="alert"
+                     class="hidden cc-alert-enter p-3.5 rounded-xl bg-error-container text-on-error-container font-semibold font-body-sm text-body-sm items-center gap-2.5">
+                    <span class="material-symbols-outlined text-[20px] shrink-0" aria-hidden="true">error</span>
+                    <span id="clientAuthErrorText"></span>
+                </div>
+
+                <!-- Control Segmentado Deslizante -->
+                <div id="authTabTrack" class="cc-segmented-track" data-mode="login" role="tablist" aria-label="Modo de acceso">
+                    <div class="cc-segmented-thumb" aria-hidden="true"></div>
+                    <button class="cc-tab-btn cc-tap-target py-2 px-4 rounded-lg font-title-md text-xs sm:text-sm font-semibold text-white bg-transparent border-0 cursor-pointer flex items-center justify-center gap-2"
+                            id="tabLogin" role="tab" aria-selected="true" onclick="switchAuthTab('login')" type="button">
+                        <span>Iniciar sesión</span>
+                    </button>
+                    <button class="cc-tab-btn cc-tap-target py-2 px-4 rounded-lg font-title-md text-xs sm:text-sm font-semibold text-on-surface-variant bg-transparent border-0 cursor-pointer flex items-center justify-center gap-2"
+                            id="tabRegister" role="tab" aria-selected="false" onclick="switchAuthTab('register')" type="button">
+                        <span>Crear cuenta</span>
+                    </button>
+                </div>
+
+                <!-- Formulario de Autenticación -->
+                <form id="auth-form" method="post" action="/auth/login" data-loading-submit class="flex flex-col gap-3.5">
+
+                    <!-- Campo: Nombre completo (Acordeón fluido en modo Registro) -->
+                    <div id="fieldName" class="cc-auth-accordion" data-open="false" aria-hidden="true" inert>
+                        <div class="cc-auth-accordion-inner flex flex-col gap-1.5 pb-0.5">
+                            <label class="font-label-md text-label-md text-on-surface font-semibold" for="nameInput">
+                                Nombre completo
+                            </label>
+                            <div class="relative flex items-center">
+                                <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none" aria-hidden="true">person</span>
+                                <input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/65"
+                                       id="nameInput" name="fullName" autocomplete="name" enterkeyhint="next" placeholder="Carlos Mendoza" type="text"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo: Correo electrónico -->
+                    <div class="cc-field-group flex flex-col gap-1.5">
+                        <label class="font-label-md text-label-md text-on-surface font-semibold" for="emailInput">
+                            Correo electrónico
+                        </label>
+                        <div class="relative flex items-center">
+                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none" aria-hidden="true">alternate_email</span>
+                            <input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/65"
+                                   id="emailInput" name="email" autocomplete="username" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="email" enterkeyhint="next"
+                                   data-error="email-inline-error" aria-invalid="false"
+                                   placeholder="nombre@correo.com" required type="email"/>
+                        </div>
+                        <p id="email-inline-error" class="cc-field-error">
+                            <span class="material-symbols-outlined text-[15px]" role="img" aria-label="Error">error</span>
+                            <span>Ingresa un correo electrónico válido (ej. nombre@correo.com).</span>
+                        </p>
+                    </div>
+
+                    <!-- Campo: Contraseña -->
+                    <div class="cc-field-group flex flex-col gap-1.5">
+                        <label class="font-label-md text-label-md text-on-surface font-semibold" for="passwordInput">
+                            Contraseña
+                        </label>
+                        <div class="relative flex items-center">
+                            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none" aria-hidden="true">lock</span>
+                            <input class="w-full h-11 pl-10 pr-12 rounded-xl bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/65"
+                                   id="passwordInput" name="password" autocomplete="current-password" minlength="8" enterkeyhint="done"
+                                   data-error="password-inline-error" aria-invalid="false"
+                                   placeholder="Mínimo 8 caracteres" required type="password"/>
+                            <button id="togglePasswordBtn" aria-pressed="false" aria-label="Mostrar contraseña"
+                                    class="cc-tactile-btn cc-hover-text absolute right-1 min-w-[44px] min-h-[44px] p-1 text-on-surface-variant rounded-lg flex items-center justify-center bg-transparent border-0 cursor-pointer"
+                                    onclick="togglePasswordVisibility()" type="button">
+                                <span class="material-symbols-outlined text-[20px]" id="eyeIcon" aria-hidden="true">visibility</span>
+                            </button>
+                        </div>
+                        <p id="password-inline-error" class="cc-field-error">
+                            <span class="material-symbols-outlined text-[15px]" role="img" aria-label="Error">error</span>
+                            <span>La contraseña debe tener al menos 8 caracteres.</span>
+                        </p>
+                    </div>
+
+                    <!-- Sección adicional al crear cuenta (Acordeón fluido sin bordes blancos) -->
+                    <div id="registerObligationsSection" class="cc-auth-accordion" data-open="false" aria-hidden="true" inert>
+                        <div class="cc-auth-accordion-inner">
+                            <div class="flex flex-col gap-3 p-4 rounded-2xl bg-surface-container-low">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-secondary">Pagos fijos mensuales (opcional)</span>
+                                </div>
+                                <p class="text-[11px] text-on-surface-variant m-0">
+                                    Indica tu ingreso y los pagos que realizas el mismo día de cada mes para agregarlos al calendario.
+                                </p>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface mb-1" for="initialNetIncomeInput">Ingreso mensual ($ COP)</label>
+                                    <input id="initialNetIncomeInput" type="number" step="50000" name="initialNetIncome" inputmode="numeric" placeholder="3500000"
+                                           class="w-full h-10 px-3.5 rounded-xl bg-surface-container-lowest text-xs font-bold text-primary"/>
+                                </div>
+
+                                <div id="register-obligations-list" class="flex flex-col gap-2">
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" onclick="this.parentElement.remove()" title="Eliminar deuda fija" aria-label="Eliminar deuda fija"
+                                                class="cc-tactile-btn w-8 h-8 rounded-full bg-error-container text-error flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none border-0 cursor-pointer">
+                                            &minus;
+                                        </button>
+                                        <div class="grid grid-cols-12 gap-1.5 items-center flex-1">
+                                            <input type="text" name="obligationName" placeholder="Arriendo" aria-label="Nombre pago fijo"
+                                                   class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest text-xs font-semibold text-on-surface"/>
+                                            <input type="number" step="1000" name="obligationAmount" inputmode="numeric" placeholder="Monto $" aria-label="Monto pago fijo"
+                                                   class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest text-xs font-bold text-secondary"/>
+                                            <input type="number" min="1" max="31" name="obligationDueDay" inputmode="numeric" placeholder="Día (5)" title="Día del mes en que pagas (1-31)" aria-label="Día del mes"
+                                                   class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest text-xs font-bold text-primary text-center"/>
+                                            <input type="hidden" name="obligationCategory" value="Vivienda"/>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" onclick="this.parentElement.remove()" title="Eliminar deuda fija" aria-label="Eliminar deuda fija"
+                                                class="cc-tactile-btn w-8 h-8 rounded-full bg-error-container text-error flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none border-0 cursor-pointer">
+                                            &minus;
+                                        </button>
+                                        <div class="grid grid-cols-12 gap-1.5 items-center flex-1">
+                                            <input type="text" name="obligationName" placeholder="Cuota préstamo" aria-label="Nombre pago fijo"
+                                                   class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest text-xs font-semibold text-on-surface"/>
+                                            <input type="number" step="1000" name="obligationAmount" inputmode="numeric" placeholder="Monto $" aria-label="Monto pago fijo"
+                                                   class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest text-xs font-bold text-secondary"/>
+                                            <input type="number" min="1" max="31" name="obligationDueDay" inputmode="numeric" placeholder="Día (15)" title="Día del mes en que pagas (1-31)" aria-label="Día del mes"
+                                                   class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest text-xs font-bold text-primary text-center"/>
+                                            <input type="hidden" name="obligationCategory" value="Deudas y Préstamos"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="button" onclick="addRegisterObligationRow()"
+                                        class="cc-tactile-btn cc-hover-underline self-start min-h-[36px] text-xs font-semibold text-secondary flex items-center gap-1 bg-transparent border-0 p-0 cursor-pointer">
+                                    <span>+ Agregar otro pago fijo</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox: Privacidad -->
+                    <label class="cc-tap-target flex items-center gap-2.5 py-1 cursor-pointer select-none" for="habeasData">
+                        <input checked class="w-4 h-4 rounded shrink-0 cursor-pointer"
+                               id="habeasData" name="aiConsentAccepted" value="true" required type="checkbox"/>
+                        <span class="font-body-sm text-[12px] leading-snug text-on-surface-variant">
+                            Acepto la política de tratamiento de datos (Ley 1581 de 2012).
+                        </span>
+                    </label>
+
+                    <!-- Primary Submit Button -->
+                    <button id="authSubmitBtn" data-loading-text="Ingresando..."
+                            class="cc-cta-tactile cc-tap-target w-full h-11 rounded-full bg-primary-container text-white font-title-md text-sm font-bold flex items-center justify-center gap-2 cursor-pointer border-0"
+                            type="submit">
+                        <span id="submitBtnLabel">Iniciar sesión</span>
+                    </button>
+                </form>
+
+                <!-- Divisor -->
+                <div class="flex items-center gap-3 my-0.5 text-xs text-on-surface-variant">
+                    <span class="h-[1px] flex-1 bg-on-surface/10" aria-hidden="true"></span>
+                    <span>o</span>
+                    <span class="h-[1px] flex-1 bg-on-surface/10" aria-hidden="true"></span>
+                </div>
+
+                <!-- Botón Google vía Firebase Auth (primario) o Google Identity Services (respaldo) + Demo -->
+                <div class="flex flex-col gap-2.5">
+                    <!-- MODO 1: Firebase Authentication (Popup modular Web SDK + verificación RS256 en servidor) -->
+                    <div th:if="${firebaseEnabled}" class="flex flex-col gap-2 w-full">
+                        <button id="firebaseGoogleBtn" type="button"
+                                class="cc-tactile-btn cc-hover-surface cc-tap-target w-full h-11 rounded-full bg-surface-container text-on-surface font-title-md text-xs sm:text-sm font-semibold flex items-center justify-center gap-2.5 cursor-pointer border-0">
+                            <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" class="shrink-0">
+                                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                                <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+                                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+                            </svg>
+                            <span id="firebaseGoogleBtnLabel">Continuar con Google</span>
+                        </button>
+                        <form id="firebase-auth-form" method="post" action="/auth/firebase" class="hidden m-0">
+                            <input type="hidden" name="idToken" id="firebaseIdTokenInput"/>
+                            <input type="hidden" name="aiConsentAccepted" id="firebaseAiConsentInput" value="true"/>
+                        </form>
+                        <script type="module" th:inline="javascript">
+                            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+                            import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+
+                            const firebaseConfig = {
+                                apiKey: /*[[${firebaseApiKey}]]*/ "",
+                                authDomain: /*[[${firebaseAuthDomain}]]*/ "",
+                                projectId: /*[[${firebaseProjectId}]]*/ ""
+                            };
+                            const appIdVal = /*[[${firebaseAppId}]]*/ "";
+                            if (appIdVal) {
+                                firebaseConfig.appId = appIdVal;
+                            }
+
+                            const fbApp = initializeApp(firebaseConfig);
+                            const fbAuth = getAuth(fbApp);
+                            const googleProvider = new GoogleAuthProvider();
+                            googleProvider.setCustomParameters({ prompt: "select_account" });
+
+                            const btn = document.getElementById("firebaseGoogleBtn");
+                            const btnLabel = document.getElementById("firebaseGoogleBtnLabel");
+
+                            if (btn) {
+                                btn.addEventListener("click", async () => {
+                                    const consentCheckbox = document.getElementById("habeasData");
+                                    if (consentCheckbox && !consentCheckbox.checked) {
+                                        window.showClientAuthError("Debes aceptar la política de tratamiento de datos (Ley 1581 de 2012) antes de continuar con Google.");
+                                        consentCheckbox.scrollIntoView({ behavior: "smooth", block: "center" });
+                                        consentCheckbox.focus();
+                                        return;
+                                    }
+
+                                    btn.disabled = true;
+                                    btn.classList.add("opacity-75", "cursor-wait");
+                                    const prevLabel = btnLabel ? btnLabel.textContent : "Continuar con Google";
+                                    if (btnLabel) {
+                                        btnLabel.textContent = "Conectando con Google...";
+                                        if (btnLabel.firstChild && btnLabel.firstChild.nodeType === Node.TEXT_NODE) {
+                                            btnLabel.firstChild._ccOrigText = "Conectando con Google...";
+                                        }
+                                        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === "function") {
+                                            window.CuentaClaraTheme.refreshLocalization();
+                                        }
+                                    }
+
+                                    try {
+                                        fbAuth.languageCode = (window.CuentaClaraTheme && window.CuentaClaraTheme.getLanguage() === "en-US") ? "en" : "es";
+                                        const result = await signInWithPopup(fbAuth, googleProvider);
+                                        const idToken = await result.user.getIdToken();
+                                        document.getElementById("firebaseIdTokenInput").value = idToken;
+                                        document.getElementById("firebaseAiConsentInput").value = consentCheckbox && consentCheckbox.checked ? "true" : "false";
+                                        document.getElementById("firebase-auth-form").submit();
+                                    } catch (err) {
+                                        btn.disabled = false;
+                                        btn.classList.remove("opacity-75", "cursor-wait");
+                                        if (btnLabel) {
+                                            btnLabel.textContent = "Continuar con Google";
+                                            if (btnLabel.firstChild && btnLabel.firstChild.nodeType === Node.TEXT_NODE) {
+                                                btnLabel.firstChild._ccOrigText = "Continuar con Google";
+                                            }
+                                            if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === "function") {
+                                                window.CuentaClaraTheme.refreshLocalization();
+                                            }
+                                        }
+                                        const code = err && err.code ? String(err.code) : "";
+                                        if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+                                            return;
+                                        }
+                                        if (code === "auth/unauthorized-domain") {
+                                            window.showClientAuthError("Este dominio aún no está autorizado en Firebase Auth. Agrega localhost en Firebase Console → Authentication → Settings → Authorized domains.");
+                                            return;
+                                        }
+                                        window.showClientAuthError("Error al autenticar con Firebase (" + (code || "desconocido") + "). Verifica tu configuración de Firebase Auth.");
+                                    }
+                                });
+                            }
+                        </script>
+                    </div>
+
+                    <!-- MODO 2 (Respaldo): Google Identity Services si FIREBASE_API_KEY aún no se ha completado -->
+                    <div th:if="${!firebaseEnabled and googleClientId != null and !googleClientId.isEmpty()}" class="flex flex-col items-center gap-2 w-full">
+                        <div id="googleSignInMount"
+                             th:attr="data-client-id=${googleClientId}"
+                             class="w-full min-h-[44px] flex items-center justify-center">
+                        </div>
+                        <script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleSignIn()"></script>
+                        <form id="google-gsi-form" method="post" action="/auth/google" class="hidden m-0">
+                            <input type="hidden" name="credential" id="googleCredentialInput"/>
+                            <input type="hidden" name="aiConsentAccepted" id="googleAiConsentInput" value="true"/>
+                        </form>
+                        <div th:if="${firebaseProjectId != null and !firebaseProjectId.isEmpty()}"
+                             class="w-full px-3 py-2 rounded-xl bg-surface-container-low text-on-surface-variant text-[11px] flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[15px] text-secondary shrink-0" aria-hidden="true">bolt</span>
+                            <span>Firebase Auth preparado (<code class="font-mono font-bold" th:text="${firebaseProjectId}"></code>): añade <code class="font-mono font-bold">FIREBASE_API_KEY</code> en <code class="font-mono">.env</code> para activar el popup nativo de Firebase.</span>
+                        </div>
+                    </div>
+
+                    <div th:if="${!firebaseEnabled and (googleClientId == null or googleClientId.isEmpty())}"
+                         class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low text-on-surface-variant text-[11px] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px] text-secondary shrink-0" aria-hidden="true">verified_user</span>
+                        <span>Configura <code class="font-mono font-bold">FIREBASE_PROJECT_ID</code> y <code class="font-mono font-bold">FIREBASE_API_KEY</code> (o <code class="font-mono font-bold">GOOGLE_CLIENT_ID</code>) en <code class="font-mono">.env</code> para habilitar Google Sign-In.</span>
+                    </div>
+
+                    <form method="post" action="/auth/demo" class="m-0">
+                        <button class="cc-tactile-btn cc-hover-surface cc-tap-target w-full h-11 rounded-xl bg-surface-container text-on-surface font-title-md text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer border-0"
+                                type="submit">
+                            <span>Probar con cuenta demo</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Chips discretos estilo Opción C (Visible solo en celular < lg) -->
+    <div class="relative z-10 flex lg:hidden flex-wrap items-center justify-center gap-2 mt-5 max-w-[440px]">
+        <span class="cc-glass-pill backdrop-blur-md text-[11px] font-medium text-on-surface-variant px-3 py-1.5 rounded-full inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px] text-secondary" aria-hidden="true">calendar_month</span>
+            <span>Calendario diario</span>
+        </span>
+        <span class="cc-glass-pill backdrop-blur-md text-[11px] font-medium text-on-surface-variant px-3 py-1.5 rounded-full inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px] text-secondary" aria-hidden="true">event_repeat</span>
+            <span>Pagos fijos</span>
+        </span>
+        <span class="cc-glass-pill backdrop-blur-md text-[11px] font-medium text-on-surface-variant px-3 py-1.5 rounded-full inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px] text-secondary" aria-hidden="true">pie_chart</span>
+            <span>50/30/20</span>
+        </span>
+    </div>
+</main>
+
+<script th:inline="javascript">
+    const initialMode = /*[[${registerMode != null and registerMode ? 'register' : 'login'}]]*/ 'login';
+    const BACKDROP_PAUSED_KEY = 'cuentaclara_login_bg_paused';
+
+    function switchAuthTab(mode) {
+        const isRegister = mode === 'register';
+        const form = document.getElementById('auth-form');
+        const track = document.getElementById('authTabTrack');
+        const tabLogin = document.getElementById('tabLogin');
+        const tabRegister = document.getElementById('tabRegister');
+        const fieldName = document.getElementById('fieldName');
+        const nameInput = document.getElementById('nameInput');
+        const obligationsSection = document.getElementById('registerObligationsSection');
+        const submitBtnLabel = document.getElementById('submitBtnLabel');
+        const passwordInput = document.getElementById('passwordInput');
+        const emailInput = document.getElementById('emailInput');
+        const submitBtn = document.getElementById('authSubmitBtn');
+        const greetingTitle = document.getElementById('authGreetingTitle');
+        const greetingSubtitle = document.getElementById('authGreetingSubtitle');
+
+        track.setAttribute('data-mode', isRegister ? 'register' : 'login');
+
+        if (isRegister) {
+            form.action = '/auth/register';
+            tabRegister.classList.remove('text-on-surface-variant');
+            tabRegister.classList.add('text-white');
+            tabRegister.setAttribute('aria-selected', 'true');
+            tabLogin.classList.remove('text-white');
+            tabLogin.classList.add('text-on-surface-variant');
+            tabLogin.setAttribute('aria-selected', 'false');
+
+            fieldName.setAttribute('data-open', 'true');
+            fieldName.setAttribute('aria-hidden', 'false');
+            fieldName.removeAttribute('inert');
+            obligationsSection.setAttribute('data-open', 'true');
+            obligationsSection.setAttribute('aria-hidden', 'false');
+            obligationsSection.removeAttribute('inert');
+
+            nameInput.required = true;
+            if (emailInput) emailInput.setAttribute('autocomplete', 'email');
+            if (passwordInput) {
+                passwordInput.setAttribute('autocomplete', 'new-password');
+                passwordInput.setAttribute('enterkeyhint', 'next');
+            }
+            if (submitBtn) submitBtn.setAttribute('data-loading-text', 'Creando cuenta...');
+            submitBtnLabel.textContent = 'Crear cuenta';
+            if (greetingTitle) greetingTitle.textContent = 'Configura tu mes en 1 minuto';
+            if (greetingSubtitle) greetingSubtitle.textContent = 'Crea tu cuenta y agrega tus pagos fijos si lo deseas.';
+        } else {
+            form.action = '/auth/login';
+            tabLogin.classList.remove('text-on-surface-variant');
+            tabLogin.classList.add('text-white');
+            tabLogin.setAttribute('aria-selected', 'true');
+            tabRegister.classList.remove('text-white');
+            tabRegister.classList.add('text-on-surface-variant');
+            tabRegister.setAttribute('aria-selected', 'false');
+
+            fieldName.setAttribute('data-open', 'false');
+            fieldName.setAttribute('aria-hidden', 'true');
+            fieldName.setAttribute('inert', '');
+            obligationsSection.setAttribute('data-open', 'false');
+            obligationsSection.setAttribute('aria-hidden', 'true');
+            obligationsSection.setAttribute('inert', '');
+
+            nameInput.required = false;
+            if (emailInput) emailInput.setAttribute('autocomplete', 'username');
+            if (passwordInput) {
+                passwordInput.setAttribute('autocomplete', 'current-password');
+                passwordInput.setAttribute('enterkeyhint', 'done');
+            }
+            if (submitBtn) submitBtn.setAttribute('data-loading-text', 'Ingresando...');
+            submitBtnLabel.textContent = 'Iniciar sesión';
+            if (greetingTitle) greetingTitle.textContent = 'Bienvenido de nuevo';
+            if (greetingSubtitle) greetingSubtitle.textContent = 'Ingresa para continuar gestionando tu mes.';
+        }
+
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            [submitBtnLabel, greetingTitle, greetingSubtitle].forEach(el => {
+                if (el && el.firstChild && el.firstChild.nodeType === Node.TEXT_NODE) {
+                    el.firstChild._ccOrigText = el.firstChild.nodeValue;
+                }
+            });
+            window.CuentaClaraTheme.refreshLocalization();
+        }
+    }
+
+    function addRegisterObligationRow() {
+        const list = document.getElementById('register-obligations-list');
+        const row = document.createElement('div');
+        row.className = 'cc-row-enter flex items-center gap-1.5';
+        row.innerHTML = `
+            <button type="button" onclick="this.parentElement.remove()" title="Eliminar deuda fija" aria-label="Eliminar deuda fija"
+                    class="cc-tactile-btn w-8 h-8 rounded-full bg-error-container text-error flex items-center justify-center flex-shrink-0 font-extrabold text-base leading-none border-0 cursor-pointer">
+                &minus;
+            </button>
+            <div class="grid grid-cols-12 gap-1.5 items-center flex-1">
+                <input type="text" name="obligationName" placeholder="Ej. Tarjeta o Deuda" aria-label="Nombre pago fijo"
+                       class="col-span-5 h-9 px-2.5 rounded-xl bg-surface-container-lowest text-xs font-semibold text-on-surface"/>
+                <input type="number" step="1000" name="obligationAmount" inputmode="numeric" placeholder="Monto $" aria-label="Monto pago fijo"
+                       class="col-span-4 h-9 px-2.5 rounded-xl bg-surface-container-lowest text-xs font-bold text-secondary"/>
+                <input type="number" min="1" max="31" name="obligationDueDay" inputmode="numeric" placeholder="Día (20)" title="Día del mes en que pagas (1-31)" aria-label="Día del mes"
+                       class="col-span-3 h-9 px-2 rounded-xl bg-surface-container-lowest text-xs font-bold text-primary text-center"/>
+                <input type="hidden" name="obligationCategory" value="Deudas y Préstamos"/>
+            </div>
+        `;
+        list.appendChild(row);
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
+    }
+
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('passwordInput');
+        const eyeIcon = document.getElementById('eyeIcon');
+        const btn = document.getElementById('togglePasswordBtn');
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        eyeIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+        if (btn) {
+            btn.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+            btn.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        }
+    }
+
+    function syncAppearanceControls() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const modeIcon = document.getElementById('loginModeIcon');
+        const modeLabel = document.getElementById('loginModeLabel');
+        if (modeIcon) modeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        if (modeLabel) {
+            const label = isDark ? 'Claro' : 'Oscuro';
+            modeLabel.textContent = label;
+            if (modeLabel.firstChild && modeLabel.firstChild.nodeType === Node.TEXT_NODE) {
+                modeLabel.firstChild._ccOrigText = label;
+            }
+        }
+        const activeTheme = (window.CuentaClaraTheme && window.CuentaClaraTheme.getTheme()) || 'vinotinto';
+        document.querySelectorAll('[data-login-theme]').forEach(btn => {
+            btn.classList.toggle('is-active', btn.getAttribute('data-login-theme') === activeTheme);
+        });
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
+    }
+
+    function toggleLoginMode() {
+        if (window.CuentaClaraTheme) {
+            window.CuentaClaraTheme.toggleDarkMode();
+        }
+        syncAppearanceControls();
+    }
+
+    function selectLoginTheme(themeName) {
+        if (window.CuentaClaraTheme) {
+            window.CuentaClaraTheme.setTheme(themeName);
+        }
+        syncAppearanceControls();
+    }
+
+    function applyBackdropMotionState(paused) {
+        const stage = document.getElementById('ccLoginStage');
+        const btn = document.getElementById('toggleBackdropMotionBtn');
+        const icon = document.getElementById('backdropMotionIcon');
+        if (stage) stage.classList.toggle('cc-bg-paused', paused);
+        if (icon) icon.textContent = paused ? 'play_circle' : 'pause_circle';
+        if (btn) {
+            const label = paused ? 'Reanudar animación de fondo' : 'Pausar animación de fondo';
+            btn.setAttribute('aria-label', label);
+            btn.setAttribute('title', label);
+        }
+    }
+
+    function toggleBackdropMotion() {
+        const stage = document.getElementById('ccLoginStage');
+        const nextPaused = !(stage && stage.classList.contains('cc-bg-paused'));
+        applyBackdropMotionState(nextPaused);
+        try { localStorage.setItem(BACKDROP_PAUSED_KEY, nextPaused ? '1' : '0'); } catch (_) {}
+    }
+
+    // Validación diferida accesible (:user-invalid + aria-describedby sincronizado)
+    (function setupAccessibleValidation() {
+        const supportsUserInvalid = CSS.supports && CSS.supports('selector(:user-invalid)');
+        const dirtySet = new WeakSet();
+        const linkError = (el, shown) => {
+            const errorId = el.dataset.error;
+            if (!errorId) return;
+            const ids = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== errorId);
+            if (shown) ids.push(errorId);
+            if (ids.length) el.setAttribute('aria-describedby', ids.join(' '));
+            else el.removeAttribute('aria-describedby');
+        };
+        const syncField = (el) => {
+            if (!el || !el.matches || !el.matches('#auth-form input[data-error]')) return;
+            let invalid = false;
+            if (supportsUserInvalid) {
+                invalid = el.matches(':user-invalid');
+            } else if (dirtySet.has(el)) {
+                invalid = !el.validity.valid;
+                el.classList.toggle('user-invalid-fallback', invalid);
+            }
+            el.setAttribute('aria-invalid', invalid ? 'true' : 'false');
+            linkError(el, invalid);
+        };
+        const form = document.getElementById('auth-form');
+        if (!form) return;
+        form.addEventListener('blur', (e) => {
+            if (e.target && e.target.value !== '') dirtySet.add(e.target);
+            syncField(e.target);
+        }, true);
+        form.addEventListener('input', (e) => syncField(e.target));
+        form.addEventListener('invalid', (e) => {
+            dirtySet.add(e.target);
+            syncField(e.target);
+        }, true);
+    })();
+
+    let googleInitializedClientId = null;
+
+    function renderGoogleSignInButton() {
+        const mount = document.getElementById('googleSignInMount');
+        if (!mount || !window.google || !window.google.accounts || !window.google.accounts.id) return;
+        const clientId = (mount.getAttribute('data-client-id') || '').trim();
+        if (!clientId) return;
+
+        if (googleInitializedClientId !== clientId) {
+            window.google.accounts.id.initialize({
+                client_id: clientId,
+                callback: handleGoogleCredentialResponse,
+                auto_prompt: false
+            });
+            googleInitializedClientId = clientId;
+        }
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const lang = (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.getLanguage === 'function')
+            ? window.CuentaClaraTheme.getLanguage()
+            : 'es-CO';
+        const containerWidth = mount.parentElement ? mount.parentElement.clientWidth : 340;
+        const btnWidth = Math.min(390, Math.max(240, Math.floor(containerWidth || 340)));
+
+        mount.innerHTML = '';
+        window.google.accounts.id.renderButton(mount, {
+            type: 'standard',
+            shape: 'pill',
+            theme: isDark ? 'filled_black' : 'outline',
+            text: 'continue_with',
+            size: 'large',
+            logo_alignment: 'left',
+            width: btnWidth,
+            locale: lang === 'en-US' ? 'en' : 'es'
+        });
+    }
+
+    function initGoogleSignIn() {
+        renderGoogleSignInButton();
+    }
+
+    function showClientAuthError(message) {
+        const box = document.getElementById('clientAuthError');
+        const textEl = document.getElementById('clientAuthErrorText');
+        if (!box || !textEl) return;
+        textEl.textContent = message;
+        if (textEl.firstChild && textEl.firstChild.nodeType === Node.TEXT_NODE) {
+            textEl.firstChild._ccOrigText = message;
+        }
+        box.classList.remove('hidden');
+        box.classList.add('flex');
+        if (window.CuentaClaraTheme && typeof window.CuentaClaraTheme.refreshLocalization === 'function') {
+            window.CuentaClaraTheme.refreshLocalization();
+        }
+    }
+    window.showClientAuthError = showClientAuthError;
+
+    function handleGoogleCredentialResponse(response) {
+        const consentCheckbox = document.getElementById('habeasData');
+        if (consentCheckbox && !consentCheckbox.checked) {
+            showClientAuthError('Debes aceptar la política de tratamiento de datos (Ley 1581 de 2012) antes de continuar con Google.');
+            consentCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            consentCheckbox.focus();
+            return;
+        }
+        const credentialInput = document.getElementById('googleCredentialInput');
+        const consentInput = document.getElementById('googleAiConsentInput');
+        const form = document.getElementById('google-gsi-form');
+        if (credentialInput && consentInput && form && response && response.credential) {
+            credentialInput.value = response.credential;
+            consentInput.value = consentCheckbox && consentCheckbox.checked ? 'true' : 'false';
+            form.submit();
+        }
+    }
+
+    switchAuthTab(initialMode);
+    syncAppearanceControls();
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+        renderGoogleSignInButton();
+    }
+    try {
+        if (localStorage.getItem(BACKDROP_PAUSED_KEY) === '1') {
+            applyBackdropMotionState(true);
+        }
+    } catch (_) {}
+    window.addEventListener('cuentaclara:theme-changed', syncAppearanceControls);
+    window.addEventListener('cuentaclara:mode-changed', () => {
+        syncAppearanceControls();
+        renderGoogleSignInButton();
+    });
+    window.addEventListener('cuentaclara:language-changed', renderGoogleSignInButton);
+    let gsiResizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(gsiResizeTimer);
+        gsiResizeTimer = setTimeout(renderGoogleSignInButton, 180);
+    });
+</script>
+</body>
+</html>
