@@ -342,7 +342,67 @@ public class RagIndexingAndCategorizationService implements TransactionService.D
             }
         }
 
+        // Caso C: PDFs generales (digital o escaneado) -> indexar además el contenido completo por páginas y ventanas con solapamiento
+        if ((doc.getSourceType() == DocumentSourceType.PDF_DIGITAL || doc.getSourceType() == DocumentSourceType.PDF_SCANNED)
+                && extraction.getRawExtractedText() != null
+                && !extraction.getRawExtractedText().isBlank()) {
+            List<PageSection> sections = splitByPageMarkers(extraction.getRawExtractedText());
+            for (PageSection pageSec : sections) {
+                List<String> windows = splitIntoOverlappingWindows(pageSec.text(), 600, 90);
+                for (String win : windows) {
+                    String pageCitation = TransactionService.buildCitationReference(doc, pageSec.pageNumber());
+                    chunks.add(new ChunkDraft(
+                            "DOCUMENT_CONTENT",
+                            pageSec.pageNumber(),
+                            pageCitation,
+                            "Contenido " + doc.getOriginalFilename() + " (Página " + pageSec.pageNumber() + "): " + win
+                    ));
+                }
+            }
+        }
+
         return chunks;
+    }
+
+    /**
+     * Re-vectoriza fragmentos existentes en `document_chunks` que pertenezcan a un modelo o versión
+     * distinta al proveedor activo, usando `content_text` almacenado sin requerir el PDF original.
+     */
+    @Transactional
+    public int reindexChunksForCurrentEmbeddingModel(UUID userId) {
+        String activeModel = embeddingProvider.modelName();
+        String activeVersion = embeddingProvider.modelVersion();
+
+        List<Map<String, Object>> staleChunks = jdbcTemplate.queryForList(
+                """
+                SELECT id, content_text
+                FROM document_chunks
+                WHERE user_id = ?
+                  AND (embedding IS NULL OR embedding_model <> ? OR embedding_version <> ?)
+                """,
+                userId, activeModel, activeVersion
+        );
+
+        int updated = 0;
+        for (Map<String, Object> row : staleChunks) {
+            UUID chunkId = (UUID) row.get("id");
+            String contentText = (String) row.get("content_text");
+            float[] vector = embeddingProvider.generateEmbedding(contentText != null ? contentText : "");
+            String vectorLiteral = embeddingProvider.toPgVectorLiteral(vector);
+
+            jdbcTemplate.update(
+                    """
+                    UPDATE document_chunks
+                    SET embedding = CAST(? AS vector),
+                        embedding_model = ?,
+                        embedding_version = ?
+                    WHERE id = ? AND user_id = ?
+                    """,
+                    vectorLiteral, activeModel, activeVersion, chunkId, userId
+            );
+            updated++;
+        }
+        return updated;
     }
 
     private void insertChunkWithVector(

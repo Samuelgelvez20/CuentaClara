@@ -65,35 +65,59 @@ public class PdfAndOcrExtractionService {
             List<PageText> pages = new ArrayList<>();
             StringBuilder fullText = new StringBuilder();
             PDFTextStripper stripper = new PDFTextStripper();
+            PDFRenderer lazyRenderer = null;
+            boolean usedDigital = false;
+            boolean usedOcr = false;
 
+            // Evaluar capa de texto página a página para soportar PDFs híbridos (texto + páginas escaneadas)
             for (int page = 1; page <= pageCount; page++) {
                 stripper.setStartPage(page);
                 stripper.setEndPage(page);
-                String pageText = stripper.getText(document) != null ? stripper.getText(document).trim() : "";
-                pages.add(new PageText(page, pageText));
-                if (!pageText.isBlank()) {
-                    fullText.append("[PÁGINA ").append(page).append("]\n").append(pageText).append("\n\n");
+                String digitalText = stripper.getText(document) != null ? stripper.getText(document).trim() : "";
+
+                String resolvedPageText;
+                if (digitalText.length() >= 20) {
+                    usedDigital = true;
+                    resolvedPageText = digitalText;
+                } else {
+                    if (lazyRenderer == null) {
+                        lazyRenderer = new PDFRenderer(document);
+                    }
+                    BufferedImage pageImage = lazyRenderer.renderImageWithDPI(page - 1, 200);
+                    String ocrText = runTesseractOrEmbeddedPayload(pageImage, pdfBytes);
+                    if (ocrText != null && !ocrText.isBlank()) {
+                        usedOcr = true;
+                        resolvedPageText = ocrText;
+                    } else {
+                        resolvedPageText = digitalText;
+                    }
                 }
+
+                pages.add(new PageText(page, resolvedPageText));
+                if (!resolvedPageText.isBlank()) {
+                    fullText.append("[PÁGINA ").append(page).append("]\n").append(resolvedPageText).append("\n\n");
+                }
+            }
+
+            if (fullText.toString().trim().isEmpty()) {
+                String fallbackText = defaultUnreadableFallback();
+                pages.set(0, new PageText(1, fallbackText));
+                fullText.append("[PÁGINA 1]\n").append(fallbackText).append("\n\n");
+                usedOcr = true;
             }
 
             DocumentSourceType resolvedType = requestedType;
             String method = "PDFBOX_TEXT";
-
-            // Si el PDF no tiene capa de texto digital, ejecutar OCR página por página con PDFRenderer + Tesseract
-            if (fullText.toString().trim().length() < 20) {
+            if (usedOcr && !usedDigital) {
                 resolvedType = requestedType == DocumentSourceType.STATEMENT_PDF
                         ? DocumentSourceType.STATEMENT_PDF
                         : DocumentSourceType.PDF_SCANNED;
                 method = "TESSERACT_OCR_PDF";
-                pages.clear();
-                fullText.setLength(0);
-                PDFRenderer renderer = new PDFRenderer(document);
-                for (int i = 0; i < pageCount; i++) {
-                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 200);
-                    String ocrPage = runTesseractOnBufferedImage(pageImage, pdfBytes);
-                    pages.add(new PageText(i + 1, ocrPage));
-                    fullText.append("[PÁGINA ").append(i + 1).append("]\n").append(ocrPage).append("\n\n");
-                }
+            } else if (usedOcr) {
+                resolvedType = requestedType == DocumentSourceType.STATEMENT_PDF
+                        ? DocumentSourceType.STATEMENT_PDF
+                        : DocumentSourceType.PDF_SCANNED;
+                method = "PDFBOX_HYBRID_OCR_PDF";
             }
 
             DianUblXmlParser.ParsedUblInvoice structured = textExtractor.extractFromRawText(fullText.toString());
@@ -124,6 +148,14 @@ public class PdfAndOcrExtractionService {
     }
 
     private String runTesseractOnBufferedImage(BufferedImage image, byte[] rawBytes) {
+        String extracted = runTesseractOrEmbeddedPayload(image, rawBytes);
+        if (extracted != null && !extracted.isBlank()) {
+            return extracted;
+        }
+        return defaultUnreadableFallback();
+    }
+
+    private String runTesseractOrEmbeddedPayload(BufferedImage image, byte[] rawBytes) {
         String embeddedTextChunk = extractPngTextCommentIfPresent(rawBytes);
 
         Path tessDir = Path.of(tessDataPath);
@@ -146,6 +178,10 @@ public class PdfAndOcrExtractionService {
         if (embeddedTextChunk != null && !embeddedTextChunk.isBlank()) {
             return embeddedTextChunk;
         }
+        return null;
+    }
+
+    private String defaultUnreadableFallback() {
         return "Comercio: Factura por confirmar\nFecha: " + java.time.LocalDate.now() + "\nTotal: 0";
     }
 

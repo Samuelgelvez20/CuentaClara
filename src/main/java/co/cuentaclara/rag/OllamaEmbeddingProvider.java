@@ -107,4 +107,9 @@ public class OllamaEmbeddingProvider implements EmbeddingProvider {
     public String modelVersion() {
         return version;
     }
+
+    @Override
+    public boolean isRealSemanticEmbeddingActive() {
+        return true;
+    }
 }

@@ -45,7 +45,7 @@ spring:
     resources:
       cache:
         cachecontrol:
-          max-age: 7d
+          no-cache: true
           must-revalidate: true
 
 server:
@@ -82,7 +82,7 @@ cuentaclara:
     ollama-embedding-model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
     daily-user-call-limit: ${AI_DAILY_USER_CALL_LIMIT:60}
     gemini-api-key: ${GEMINI_API_KEY:}
-    gemini-model: ${GEMINI_CHAT_MODEL:gemini-3.8-flash}
+    gemini-model: ${GEMINI_CHAT_MODEL:gemini-2.5-flash}
   worker:
     consumer-enabled: ${WORKER_CONSUMER_ENABLED:true}
     inline-async-fallback: ${WORKER_INLINE_ASYNC_FALLBACK:true}

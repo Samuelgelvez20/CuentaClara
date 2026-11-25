@@ -2,14 +2,23 @@ package co.cuentaclara.rag;
 
 import co.cuentaclara.chat.HybridSearchAndChatToolsService;
 import co.cuentaclara.chat.NaturalLanguageChatService;
+import co.cuentaclara.document.DocumentSourceType;
+import co.cuentaclara.document.ocr.PdfAndOcrExtractionService;
 import co.cuentaclara.document.ocr.StructuredInvoiceTextExtractor;
 import co.cuentaclara.report.GeminiFinancialAdvisorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -193,5 +202,91 @@ class GeminiRagAndTokenChunkingTest {
         assertThat(fallbackResp.hasEvidence()).isTrue();
         assertThat(fallbackResp.sqlComputedTotal()).isEqualByComparingTo("119000.00");
         assertThat(fallbackResp.answer()).contains("VETERINARIA HUELLITAS");
+    }
+
+    @Test
+    @DisplayName("Semantic recall activo permite fragmentos por similitud vectorial sin coincidencia literal exacta")
+    void shouldAllowPureSemanticMatchesOnlyWhenRealSemanticEmbeddingActive() {
+        UUID userId = UUID.randomUUID();
+        var semanticChunk = new HybridSearchAndChatToolsService.HybridChunkEvidence(
+                UUID.randomUUID(),
+                "DOCUMENT_CONTENT",
+                2,
+                "PDF:POL-10|PÁGINA:2",
+                "Cláusula de cobertura odontológica y urgencias ambulatorias incluidas.",
+                0.0161,
+                false,
+                0.78
+        );
+
+        HybridSearchAndChatToolsService tools = new HybridSearchAndChatToolsService(null, null) {
+            @Override
+            public SqlTransactionsToolResult consultarTransacciones(UUID uid, TransactionQueryFilters f) {
+                return new SqlTransactionsToolResult(BigDecimal.ZERO, BigDecimal.ZERO, 0, List.of());
+            }
+
+            @Override
+            public List<HybridChunkEvidence> buscarDocumentos(UUID uid, String queryText, int topK) {
+                return List.of(semanticChunk);
+            }
+        };
+
+        // 1. Con fallback offline local (isRealSemanticEmbeddingActive = false), se exige coincidencia léxica
+        NaturalLanguageChatService offlineChat = new NaturalLanguageChatService(tools, null);
+        offlineChat.setEmbeddingProvider(new EmbeddingProvider() {
+            @Override public float[] generateEmbedding(String text) { return new float[0]; }
+            @Override public String modelName() { return "local-semantic-v1"; }
+            @Override public String modelVersion() { return "v1"; }
+            @Override public boolean isRealSemanticEmbeddingActive() { return false; }
+        });
+        assertThat(offlineChat.askQuestion(userId, "¿Qué beneficios dentales cubre mi póliza?").hasEvidence()).isFalse();
+
+        // 2. Con modelo semántico real activo (OpenAI/Ollama), vectorScore >= 0.35 se acepta sin palabra exacta
+        NaturalLanguageChatService realSemanticChat = new NaturalLanguageChatService(tools, null);
+        realSemanticChat.setEmbeddingProvider(new EmbeddingProvider() {
+            @Override public float[] generateEmbedding(String text) { return new float[0]; }
+            @Override public String modelName() { return "text-embedding-3-small"; }
+            @Override public String modelVersion() { return "v1"; }
+            @Override public boolean isRealSemanticEmbeddingActive() { return true; }
+        });
+        var resp = realSemanticChat.askQuestion(userId, "¿Qué beneficios dentales cubre mi póliza?");
+        assertThat(resp.hasEvidence()).isTrue();
+        assertThat(resp.citations()).contains("PDF:POL-10|PÁGINA:2");
+    }
+
+    @Test
+    @DisplayName("OCR por página procesa PDF híbrido (página 1 digital + página 2 escaneada)")
+    void shouldRunOcrPerPageOnHybridPdf() throws Exception {
+        byte[] pdfBytes;
+        try (PDDocument doc = new PDDocument(); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            PDPage page1 = new PDPage();
+            doc.addPage(page1);
+            try (PDPageContentStream cs = new PDPageContentStream(doc, page1)) {
+                cs.beginText();
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 11);
+                cs.newLineAtOffset(50, 720);
+                cs.showText("Comercio: CLINICA DENTAL SONRISA NIT 900111222 Factura HYB-55 Fecha 2026-10-15");
+                cs.endText();
+            }
+            // Página 2 sin capa digital de texto (simula página escaneada)
+            doc.addPage(new PDPage());
+            doc.save(baos);
+            String trailerMarker = "\n%OCR_TEXT_PAYLOAD:Total: 250000 Impuesto: 0 Limpieza y ortodoncia";
+            byte[] raw = baos.toByteArray();
+            byte[] markerBytes = trailerMarker.getBytes(StandardCharsets.UTF_8);
+            pdfBytes = new byte[raw.length + markerBytes.length];
+            System.arraycopy(raw, 0, pdfBytes, 0, raw.length);
+            System.arraycopy(markerBytes, 0, pdfBytes, raw.length, markerBytes.length);
+        }
+
+        StructuredInvoiceTextExtractor extractor = new StructuredInvoiceTextExtractor(objectMapper, null);
+        PdfAndOcrExtractionService ocrService = new PdfAndOcrExtractionService(extractor, "/nonexistent-tessdata", "spa+eng");
+        var outcome = ocrService.extractFromPdfOrImage(pdfBytes, DocumentSourceType.PDF_DIGITAL);
+
+        assertThat(outcome.pageCount()).isEqualTo(2);
+        assertThat(outcome.extractionMethod()).isEqualTo("PDFBOX_HYBRID_OCR_PDF");
+        assertThat(outcome.resolvedSourceType()).isEqualTo(DocumentSourceType.PDF_SCANNED);
+        assertThat(outcome.pages().get(0).text()).contains("CLINICA DENTAL SONRISA");
+        assertThat(outcome.pages().get(1).text()).contains("Limpieza y ortodoncia");
     }
 }

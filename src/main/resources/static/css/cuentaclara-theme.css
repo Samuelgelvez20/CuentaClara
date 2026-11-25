@@ -386,7 +386,6 @@ body {
     background-color: var(--surface);
     min-height: 100dvh;
     overflow-wrap: break-word;
-    font-size-adjust: from-font;
 }
 
 .material-symbols-outlined {
@@ -407,6 +406,7 @@ body {
     word-wrap: normal;
     direction: ltr;
     -webkit-font-smoothing: antialiased;
+    font-size-adjust: none;
 }
 
 aside nav a,

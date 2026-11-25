@@ -79,6 +79,9 @@ class ArchitectureAndPerformanceIntegrationTest {
     private NaturalLanguageChatService chatService;
 
     @Autowired
+    private RagIndexingAndCategorizationService ragIndexingService;
+
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @Test
@@ -257,5 +260,32 @@ class ArchitectureAndPerformanceIntegrationTest {
         assertThat(chatResp.hasEvidence()).isTrue();
         assertThat(chatResp.sqlComputedTotal()).isEqualByComparingTo("59500.00");
         assertThat(chatMs).isLessThan(10_000L);
+
+        // 4. Verificar que buscarDocumentos filtra vectores por modelo activo (ignora el lote 'local') y que reindex los actualiza
+        RlsDataSourceConfig.runAsUser(userId, () -> {
+            List<HybridSearchAndChatToolsService.HybridChunkEvidence> matches =
+                    searchTools.buscarDocumentos(userId, "supermercado alimentos", 5);
+            assertThat(matches).noneMatch(m -> m.sourceReference().startsWith("BENCH-REF-") && !m.matchedLexically());
+
+            // Insertar un fragmento DOCUMENT_CONTENT de un modelo obsoleto sin coincidencia léxica para "vacaciones"
+            jdbcTemplate.update(
+                    """
+                    INSERT INTO document_chunks (
+                        user_id, document_id, chunk_order, chunk_type, page_number,
+                        source_reference, content_text, embedding_model, embedding_version, embedding
+                    ) VALUES (?, ?, 999, 'DOCUMENT_CONTENT', 3, 'PDF:DOC-OLD|PÁGINA:3',
+                              'Póliza viaje cobertura internacional.', 'legacy-model', 'v0', CAST(? AS vector))
+                    """,
+                    userId, docId, sampleVector
+            );
+            int updated = ragIndexingService.reindexChunksForCurrentEmbeddingModel(userId);
+            assertThat(updated).isGreaterThanOrEqualTo(1);
+
+            Integer legacyRemaining = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM document_chunks WHERE user_id = ? AND embedding_model = 'legacy-model'",
+                    Integer.class, userId
+            );
+            assertThat(legacyRemaining).isZero();
+        });
     }
 }

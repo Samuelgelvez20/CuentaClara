@@ -2,6 +2,7 @@ package co.cuentaclara.chat;
 
 import co.cuentaclara.profile.FinancialProfileService;
 import co.cuentaclara.rag.AiCostGuardAndCacheService;
+import co.cuentaclara.rag.EmbeddingProvider;
 import co.cuentaclara.report.GeminiFinancialAdvisorService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,6 +67,13 @@ public class NaturalLanguageChatService {
 
     @Autowired(required = false)
     private AiCostGuardAndCacheService costGuardAndCache;
+
+    private EmbeddingProvider embeddingProvider;
+
+    @Autowired(required = false)
+    public void setEmbeddingProvider(EmbeddingProvider embeddingProvider) {
+        this.embeddingProvider = embeddingProvider;
+    }
 
     public NaturalLanguageChatService(
             HybridSearchAndChatToolsService toolsService,
@@ -527,8 +535,13 @@ public class NaturalLanguageChatService {
         List<HybridSearchAndChatToolsService.HybridChunkEvidence> out = new ArrayList<>();
         String[] words = lowerQuestion.replaceAll("[¿?¡!.,;:()\"']", " ").split("\\s+");
 
+        boolean semanticRecallEnabled = embeddingProvider != null && embeddingProvider.isRealSemanticEmbeddingActive();
         for (var chunk : rawChunks) {
             if (chunk.matchedLexically()) {
+                out.add(chunk);
+                continue;
+            }
+            if (semanticRecallEnabled && chunk.vectorScore() >= 0.35) {
                 out.add(chunk);
                 continue;
             }

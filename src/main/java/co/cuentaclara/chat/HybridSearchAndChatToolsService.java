@@ -131,16 +131,21 @@ public class HybridSearchAndChatToolsService {
         }
         int safeTopK = Math.max(1, Math.min(topK, 15));
 
-        // 1. Búsqueda vectorial sobre pgvector (filtrada primero por user_id)
+        // 1. Búsqueda vectorial sobre pgvector (filtrada primero por user_id y exactamente el mismo modelo/versión activo)
         float[] queryEmbedding = embeddingProvider.generateEmbedding(queryText);
         String vectorLiteral = embeddingProvider.toPgVectorLiteral(queryEmbedding);
+        String activeModel = embeddingProvider.modelName();
+        String activeVersion = embeddingProvider.modelVersion();
 
         List<RankedChunk> vectorHits = jdbcTemplate.query(
                 """
                 SELECT id, chunk_type, page_number, source_reference, content_text,
                        (1 - (embedding <=> CAST(? AS vector))) AS vector_score
                 FROM document_chunks
-                WHERE user_id = ? AND embedding IS NOT NULL
+                WHERE user_id = ?
+                  AND embedding IS NOT NULL
+                  AND embedding_model = ?
+                  AND embedding_version = ?
                 ORDER BY embedding <=> CAST(? AS vector) ASC
                 LIMIT 20
                 """,
@@ -152,7 +157,7 @@ public class HybridSearchAndChatToolsService {
                         rs.getString("content_text"),
                         rs.getDouble("vector_score")
                 ),
-                vectorLiteral, userId, vectorLiteral
+                vectorLiteral, userId, activeModel, activeVersion, vectorLiteral
         );
 
         // 2. Búsqueda textual exacta/léxica (tsvector en español + ILIKE para NIT, CUFE y nombres de comercios)
@@ -194,8 +199,9 @@ public class HybridSearchAndChatToolsService {
             double rrfContribution = 1.0 / (RRF_K + rank);
             // Solo considerar aporte vectorial si tiene similitud positiva o vocabulario compartido
             if (hit.rawScore() > 0.10) {
-                fusedMap.computeIfAbsent(hit.id(), id -> new FusedAccumulator(hit))
-                        .addScore(rrfContribution, true);
+                FusedAccumulator acc = fusedMap.computeIfAbsent(hit.id(), id -> new FusedAccumulator(hit));
+                acc.addScore(rrfContribution, true);
+                acc.setVectorScore(hit.rawScore());
             }
         }
 
@@ -218,7 +224,8 @@ public class HybridSearchAndChatToolsService {
                         acc.chunk.sourceReference(),
                         acc.chunk.contentText(),
                         acc.rrfScore(),
-                        acc.matchedLexically
+                        acc.matchedLexically,
+                        acc.vectorScore
                 ))
                 .toList();
     }
@@ -246,6 +253,7 @@ public class HybridSearchAndChatToolsService {
         private final RankedChunk chunk;
         private double rrfScore = 0.0;
         private boolean matchedLexically = false;
+        private double vectorScore = 0.0;
 
         private FusedAccumulator(RankedChunk chunk) {
             this.chunk = chunk;
@@ -256,6 +264,10 @@ public class HybridSearchAndChatToolsService {
             if (!fromVector) {
                 this.matchedLexically = true;
             }
+        }
+
+        void setVectorScore(double score) {
+            this.vectorScore = Math.max(this.vectorScore, score);
         }
 
         double rrfScore() {
@@ -314,7 +326,19 @@ public class HybridSearchAndChatToolsService {
             String sourceReference,
             String contentText,
             double rrfScore,
-            boolean matchedLexically
+            boolean matchedLexically,
+            double vectorScore
     ) {
+        public HybridChunkEvidence(
+                UUID chunkId,
+                String chunkType,
+                Integer pageNumber,
+                String sourceReference,
+                String contentText,
+                double rrfScore,
+                boolean matchedLexically
+        ) {
+            this(chunkId, chunkType, pageNumber, sourceReference, contentText, rrfScore, matchedLexically, 0.0);
+        }
     }
 }

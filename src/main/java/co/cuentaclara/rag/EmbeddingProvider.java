@@ -13,6 +13,14 @@ public interface EmbeddingProvider {
 
     String modelVersion();
 
+    /**
+     * Indica si el proveedor activo está usando un modelo semántico real (OpenAI u Ollama)
+     * frente al vectorizador determinista local de respaldo para pruebas/offline.
+     */
+    default boolean isRealSemanticEmbeddingActive() {
+        return false;
+    }
+
     default String toPgVectorLiteral(float[] vector) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < vector.length; i++) {

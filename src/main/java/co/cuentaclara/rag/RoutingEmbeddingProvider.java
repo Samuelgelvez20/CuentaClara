@@ -1,6 +1,7 @@
 package co.cuentaclara.rag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ public class RoutingEmbeddingProvider implements EmbeddingProvider {
     private final OllamaEmbeddingProvider ollamaProvider;
     private final OpenAiCompatibleEmbeddingProvider localFallbackProvider;
     private final AiCostGuardAndCacheService costGuardAndCache;
+    private final AtomicBoolean fellBackToLocal = new AtomicBoolean(false);
 
     @Autowired
     public RoutingEmbeddingProvider(
@@ -54,13 +56,17 @@ public class RoutingEmbeddingProvider implements EmbeddingProvider {
         if ("ollama".equals(providerMode)) {
             try {
                 computed = ollamaProvider.generateEmbedding(normalized);
+                fellBackToLocal.set(false);
             } catch (Exception ex) {
                 log.warn("Ollama no disponible ({}), usando respaldo semántico local: {}", activeModel, ex.getMessage());
+                fellBackToLocal.set(true);
                 computed = localFallbackProvider.generateEmbedding(normalized);
             }
         } else if ("local".equals(providerMode)) {
+            fellBackToLocal.set(true);
             computed = localFallbackProvider.generateEmbedding(normalized);
         } else {
+            fellBackToLocal.set(!openAiProvider.isRealSemanticEmbeddingActive());
             computed = openAiProvider.generateEmbedding(normalized);
         }
 
@@ -80,5 +86,16 @@ public class RoutingEmbeddingProvider implements EmbeddingProvider {
     @Override
     public String modelVersion() {
         return "ollama".equals(providerMode) ? ollamaProvider.modelVersion() : openAiProvider.modelVersion();
+    }
+
+    @Override
+    public boolean isRealSemanticEmbeddingActive() {
+        if ("local".equals(providerMode)) {
+            return false;
+        }
+        if ("ollama".equals(providerMode)) {
+            return !fellBackToLocal.get();
+        }
+        return openAiProvider.isRealSemanticEmbeddingActive();
     }
 }

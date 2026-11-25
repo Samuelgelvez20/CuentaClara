@@ -82,6 +82,11 @@ public class OpenAiCompatibleEmbeddingProvider implements EmbeddingProvider {
         return version;
     }
 
+    @Override
+    public boolean isRealSemanticEmbeddingActive() {
+        return isLiveOpenAiKeyConfigured();
+    }
+
     private boolean isLiveOpenAiKeyConfigured() {
         return !apiKey.isBlank()
                 && apiKey.startsWith("sk-")

@@ -34,14 +34,14 @@ public class GeminiFinancialAdvisorService {
     public GeminiFinancialAdvisorService(
             ObjectMapper objectMapper,
             @Value("${cuentaclara.ai.gemini-api-key:}") String geminiApiKey,
-            @Value("${cuentaclara.ai.gemini-model:gemini-3.8-flash}") String geminiModel
+            @Value("${cuentaclara.ai.gemini-model:gemini-2.5-flash}") String geminiModel
     ) {
         this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         this.geminiApiKey = geminiApiKey != null ? geminiApiKey.trim() : "";
-        this.geminiModel = (geminiModel != null && !geminiModel.isBlank()) ? geminiModel.trim() : "gemini-3.8-flash";
+        this.geminiModel = (geminiModel != null && !geminiModel.isBlank()) ? geminiModel.trim() : "gemini-2.5-flash";
     }
 
     public boolean isGeminiConfigured() {
