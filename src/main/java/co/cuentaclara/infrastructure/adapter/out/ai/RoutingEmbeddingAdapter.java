@@ -23,21 +23,41 @@ public class RoutingEmbeddingAdapter implements EmbeddingPort {
     private final String providerMode;
     private final OpenAiEmbeddingAdapter openAiProvider;
     private final OllamaEmbeddingAdapter ollamaProvider;
+    private final GeminiEmbeddingAdapter geminiProvider;
     private final OpenAiEmbeddingAdapter localFallbackProvider;
     private final AiCacheAndCostGuardPort costGuardAndCache;
     private final AtomicBoolean fellBackToLocal = new AtomicBoolean(false);
+
+    public RoutingEmbeddingAdapter(
+            String providerMode,
+            OpenAiEmbeddingAdapter openAiProvider,
+            OllamaEmbeddingAdapter ollamaProvider,
+            AiCacheAndCostGuardPort costGuardAndCache,
+            ObjectMapper objectMapper
+    ) {
+        this(
+                providerMode,
+                openAiProvider,
+                ollamaProvider,
+                new GeminiEmbeddingAdapter("", "gemini-embedding-001", "v1", objectMapper),
+                costGuardAndCache,
+                objectMapper
+        );
+    }
 
     @Autowired
     public RoutingEmbeddingAdapter(
             @Value("${cuentaclara.ai.provider:openai}") String providerMode,
             OpenAiEmbeddingAdapter openAiProvider,
             OllamaEmbeddingAdapter ollamaProvider,
+            GeminiEmbeddingAdapter geminiProvider,
             AiCacheAndCostGuardPort costGuardAndCache,
             ObjectMapper objectMapper
     ) {
         this.providerMode = providerMode != null ? providerMode.trim().toLowerCase() : "openai";
         this.openAiProvider = openAiProvider;
         this.ollamaProvider = ollamaProvider;
+        this.geminiProvider = geminiProvider;
         this.localFallbackProvider = new OpenAiEmbeddingAdapter("", "local-semantic-v1", "v1", objectMapper);
         this.costGuardAndCache = costGuardAndCache;
     }
@@ -62,6 +82,9 @@ public class RoutingEmbeddingAdapter implements EmbeddingPort {
                 fellBackToLocal.set(true);
                 computed = localFallbackProvider.generateEmbedding(normalized);
             }
+        } else if ("gemini".equals(providerMode)) {
+            fellBackToLocal.set(!geminiProvider.isRealSemanticEmbeddingActive());
+            computed = geminiProvider.generateEmbedding(normalized);
         } else if ("local".equals(providerMode)) {
             fellBackToLocal.set(true);
             computed = localFallbackProvider.generateEmbedding(normalized);
@@ -78,6 +101,7 @@ public class RoutingEmbeddingAdapter implements EmbeddingPort {
     public String modelName() {
         return switch (providerMode) {
             case "ollama" -> ollamaProvider.modelName();
+            case "gemini" -> geminiProvider.modelName();
             case "local" -> "local-semantic-v1";
             default -> openAiProvider.modelName();
         };
@@ -85,7 +109,11 @@ public class RoutingEmbeddingAdapter implements EmbeddingPort {
 
     @Override
     public String modelVersion() {
-        return "ollama".equals(providerMode) ? ollamaProvider.modelVersion() : openAiProvider.modelVersion();
+        return switch (providerMode) {
+            case "ollama" -> ollamaProvider.modelVersion();
+            case "gemini" -> geminiProvider.modelVersion();
+            default -> openAiProvider.modelVersion();
+        };
     }
 
     @Override
@@ -95,6 +123,9 @@ public class RoutingEmbeddingAdapter implements EmbeddingPort {
         }
         if ("ollama".equals(providerMode)) {
             return !fellBackToLocal.get();
+        }
+        if ("gemini".equals(providerMode)) {
+            return geminiProvider.isRealSemanticEmbeddingActive();
         }
         return openAiProvider.isRealSemanticEmbeddingActive();
     }

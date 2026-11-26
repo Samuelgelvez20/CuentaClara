@@ -147,7 +147,7 @@ public class OpenAiEmbeddingAdapter implements EmbeddingPort {
         return normalizeL2(vec);
     }
 
-    private static float[] normalizeL2(float[] vector) {
+    public static float[] normalizeL2(float[] vector) {
         double sumSq = 0.0;
         for (float v : vector) {
             sumSq += (double) v * v;

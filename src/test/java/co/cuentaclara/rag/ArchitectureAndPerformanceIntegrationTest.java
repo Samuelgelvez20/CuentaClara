@@ -6,6 +6,7 @@ import co.cuentaclara.domain.port.in.RagMaintenanceUseCase;
 import co.cuentaclara.domain.port.out.EmbeddingPort;
 import co.cuentaclara.domain.port.out.HybridVectorSearchPort;
 import co.cuentaclara.infrastructure.adapter.out.ai.AiCostGuardAndCacheAdapter;
+import co.cuentaclara.infrastructure.adapter.out.ai.GeminiEmbeddingAdapter;
 import co.cuentaclara.infrastructure.adapter.out.ai.OllamaEmbeddingAdapter;
 import co.cuentaclara.infrastructure.adapter.out.ai.OpenAiEmbeddingAdapter;
 import co.cuentaclara.infrastructure.adapter.out.ai.RoutingEmbeddingAdapter;
@@ -141,6 +142,14 @@ class ArchitectureAndPerformanceIntegrationTest {
             assertThat(costGuard.tryConsumeDailyAiCall(uid)).isTrue();
             assertThat(costGuard.tryConsumeDailyAiCall(uid)).isFalse();
             assertThat(costGuard.getRemainingDailyCalls(uid)).isZero();
+
+            GeminiEmbeddingAdapter gemini = new GeminiEmbeddingAdapter("", "gemini-embedding-001", "v1", objectMapper);
+            RoutingEmbeddingAdapter geminiRouter = new RoutingEmbeddingAdapter(
+                    "gemini", openAi, ollama, gemini, costGuard, objectMapper
+            );
+            assertThat(geminiRouter.modelName()).isEqualTo("gemini-embedding-001");
+            assertThat(geminiRouter.isRealSemanticEmbeddingActive()).isFalse();
+            assertThat(geminiRouter.generateEmbedding("Factura EPM servicios publicos")).hasSize(1536);
         } finally {
             mockOllama.stop(0);
         }

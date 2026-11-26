@@ -1,0 +1,20 @@
+{
+  "name": "CuentaClara — Finanzas Personales",
+  "short_name": "CuentaClara",
+  "description": "Controla tus facturas, gastos diarios, presupuestos 50/30/20 y consultas IA desde cualquier lugar.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#faf7f8",
+  "theme_color": "#5d1832",
+  "lang": "es-CO",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

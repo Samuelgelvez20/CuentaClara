@@ -6,7 +6,7 @@ spring:
 
   # Datasource principal de la aplicación: usa el rol SIN privilegios de propietario para garantizar RLS (RNF-01)
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5440}/${DB_NAME:cuentaclara}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5440}/${DB_NAME:cuentaclara}?sslmode=${DB_SSLMODE:disable}
     username: ${DB_APP_USER:cuentaclara_app}
     password: ${DB_APP_PASSWORD:app_secret_dev}
     driver-class-name: org.postgresql.Driver
@@ -14,7 +14,7 @@ spring:
   # Flyway corre con el usuario propietario para crear tablas, índices y políticas RLS
   flyway:
     enabled: true
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5440}/${DB_NAME:cuentaclara}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5440}/${DB_NAME:cuentaclara}?sslmode=${DB_SSLMODE:disable}
     user: ${DB_ADMIN_USER:cuentaclara_owner}
     password: ${DB_ADMIN_PASSWORD:owner_secret_dev}
     locations: classpath:db/migration
@@ -57,6 +57,7 @@ springdoc:
     try-it-out-enabled: true
 
 server:
+  port: ${PORT:${SERVER_PORT:8080}}
   forward-headers-strategy: framework
   compression:
     enabled: true
@@ -91,6 +92,8 @@ cuentaclara:
     daily-user-call-limit: ${AI_DAILY_USER_CALL_LIMIT:60}
     gemini-api-key: ${GEMINI_API_KEY:}
     gemini-model: ${GEMINI_CHAT_MODEL:gemini-2.5-flash}
+    gemini-embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
+    gemini-embedding-version: ${GEMINI_EMBEDDING_VERSION:v1}
   worker:
     consumer-enabled: ${WORKER_CONSUMER_ENABLED:true}
     inline-async-fallback: ${WORKER_INLINE_ASYNC_FALLBACK:true}

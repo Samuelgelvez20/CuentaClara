@@ -63,6 +63,8 @@ public class SecurityConfig {
                                 "/api/auth/firebase",
                                 "/css/**",
                                 "/js/**",
+                                "/icons/**",
+                                "/manifest.json",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
