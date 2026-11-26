@@ -1,8 +1,15 @@
 package co.cuentaclara.rag;
 
-import co.cuentaclara.chat.HybridSearchAndChatToolsService;
-import co.cuentaclara.chat.NaturalLanguageChatService;
-import co.cuentaclara.security.rls.RlsDataSourceConfig;
+import co.cuentaclara.domain.model.HybridChunkEvidence;
+import co.cuentaclara.domain.port.in.ChatAssistantUseCase;
+import co.cuentaclara.domain.port.in.RagMaintenanceUseCase;
+import co.cuentaclara.domain.port.out.EmbeddingPort;
+import co.cuentaclara.domain.port.out.HybridVectorSearchPort;
+import co.cuentaclara.infrastructure.adapter.out.ai.AiCostGuardAndCacheAdapter;
+import co.cuentaclara.infrastructure.adapter.out.ai.OllamaEmbeddingAdapter;
+import co.cuentaclara.infrastructure.adapter.out.ai.OpenAiEmbeddingAdapter;
+import co.cuentaclara.infrastructure.adapter.out.ai.RoutingEmbeddingAdapter;
+import co.cuentaclara.infrastructure.security.rls.RlsDataSourceConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import java.io.OutputStream;
@@ -70,16 +77,16 @@ class ArchitectureAndPerformanceIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private EmbeddingProvider primaryEmbeddingProvider;
+    private EmbeddingPort primaryEmbeddingProvider;
 
     @Autowired
-    private HybridSearchAndChatToolsService searchTools;
+    private HybridVectorSearchPort searchTools;
 
     @Autowired
-    private NaturalLanguageChatService chatService;
+    private ChatAssistantUseCase chatService;
 
     @Autowired
-    private RagIndexingAndCategorizationService ragIndexingService;
+    private RagMaintenanceUseCase ragIndexingService;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
@@ -109,11 +116,11 @@ class ArchitectureAndPerformanceIntegrationTest {
 
         try {
             String baseUrl = "http://localhost:" + mockOllama.getAddress().getPort();
-            OllamaEmbeddingProvider ollama = new OllamaEmbeddingProvider(objectMapper, baseUrl, "nomic-embed-text", "v1");
-            OpenAiCompatibleEmbeddingProvider openAi = new OpenAiCompatibleEmbeddingProvider("", "text-embedding-3-small", "v1", objectMapper);
-            AiCostGuardAndCacheService costGuard = new AiCostGuardAndCacheService(2);
+            OllamaEmbeddingAdapter ollama = new OllamaEmbeddingAdapter(objectMapper, baseUrl, "nomic-embed-text", "v1");
+            OpenAiEmbeddingAdapter openAi = new OpenAiEmbeddingAdapter("", "text-embedding-3-small", "v1", objectMapper);
+            AiCostGuardAndCacheAdapter costGuard = new AiCostGuardAndCacheAdapter(2);
 
-            RoutingEmbeddingProvider router = new RoutingEmbeddingProvider(
+            RoutingEmbeddingAdapter router = new RoutingEmbeddingAdapter(
                     "ollama", openAi, ollama, costGuard, objectMapper
             );
             assertThat(router.modelName()).isEqualTo("ollama:nomic-embed-text");
@@ -263,7 +270,7 @@ class ArchitectureAndPerformanceIntegrationTest {
 
         // 4. Verificar que buscarDocumentos filtra vectores por modelo activo (ignora el lote 'local') y que reindex los actualiza
         RlsDataSourceConfig.runAsUser(userId, () -> {
-            List<HybridSearchAndChatToolsService.HybridChunkEvidence> matches =
+            List<HybridChunkEvidence> matches =
                     searchTools.buscarDocumentos(userId, "supermercado alimentos", 5);
             assertThat(matches).noneMatch(m -> m.sourceReference().startsWith("BENCH-REF-") && !m.matchedLexically());
 

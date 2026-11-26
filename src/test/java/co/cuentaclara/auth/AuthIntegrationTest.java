@@ -167,4 +167,35 @@ class AuthIntegrationTest {
                 .andReturn();
         assertThat(regRes.getResponse().getContentAsString()).contains("const initialMode = \"register\";");
     }
+
+    @Test
+    @DisplayName("Swagger / OpenAPI expone endpoints REST /api/** con esquema JWT bearerAuth y Swagger UI accesible")
+    void shouldExposeOpenApiSpecAndSwaggerUi() throws Exception {
+        MvcResult apiDocsResult = mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info.title").value("CuentaClara API"))
+                .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
+                .andReturn();
+
+        JsonNode apiDocs = objectMapper.readTree(apiDocsResult.getResponse().getContentAsString());
+        JsonNode paths = apiDocs.path("paths");
+        assertThat(paths.has("/api/auth/login")).isTrue();
+        assertThat(paths.has("/api/documents")).isTrue();
+        assertThat(paths.has("/api/documents/{documentId}")).isTrue();
+        assertThat(paths.has("/api/chat")).isTrue();
+        assertThat(paths.has("/api/transactions")).isTrue();
+        assertThat(paths.has("/api/transactions/manual")).isTrue();
+        assertThat(paths.has("/api/profile")).isTrue();
+        assertThat(paths.has("/api/reports")).isTrue();
+        assertThat(paths.has("/api/reports/generate")).isTrue();
+        assertThat(paths.has("/recommendations")).isFalse();
+
+        mockMvc.perform(get("/swagger-ui.html"))
+                .andExpect(status().is3xxRedirection());
+
+        MvcResult swaggerUiResult = mockMvc.perform(get("/swagger-ui/index.html"))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertThat(swaggerUiResult.getResponse().getContentAsString()).contains("swagger-ui");
+    }
 }

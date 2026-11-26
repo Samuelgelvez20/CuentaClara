@@ -48,6 +48,14 @@ spring:
           no-cache: true
           must-revalidate: true
 
+springdoc:
+  paths-to-match: /api/**
+  swagger-ui:
+    path: /swagger-ui.html
+    persist-authorization: true
+    display-request-duration: true
+    try-it-out-enabled: true
+
 server:
   forward-headers-strategy: framework
   compression:

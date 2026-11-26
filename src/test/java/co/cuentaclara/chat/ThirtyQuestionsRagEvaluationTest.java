@@ -1,13 +1,18 @@
 package co.cuentaclara.chat;
 
-import co.cuentaclara.document.DocumentIngestionService;
-import co.cuentaclara.profile.BudgetBlock;
-import co.cuentaclara.profile.FinancialProfileService;
-import co.cuentaclara.profile.PaymentFrequency;
-import co.cuentaclara.security.rls.RlsDataSourceConfig;
-import co.cuentaclara.transaction.TransactionService;
-import co.cuentaclara.user.User;
-import co.cuentaclara.user.UserRepository;
+import co.cuentaclara.domain.model.BudgetBlock;
+import co.cuentaclara.domain.model.ChatAnswerResponse;
+import co.cuentaclara.domain.model.ConfirmDocumentCommand;
+import co.cuentaclara.domain.model.ManualExpenseCommand;
+import co.cuentaclara.domain.model.PaymentFrequency;
+import co.cuentaclara.domain.model.QuestionnaireCommand;
+import co.cuentaclara.domain.model.User;
+import co.cuentaclara.domain.port.in.ChatAssistantUseCase;
+import co.cuentaclara.domain.port.in.DocumentIngestionUseCase;
+import co.cuentaclara.domain.port.in.FinancialProfileUseCase;
+import co.cuentaclara.domain.port.in.TransactionUseCase;
+import co.cuentaclara.domain.port.out.UserRepositoryPort;
+import co.cuentaclara.infrastructure.security.rls.RlsDataSourceConfig;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -56,19 +61,19 @@ class ThirtyQuestionsRagEvaluationTest {
     }
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryPort userRepository;
 
     @Autowired
-    private FinancialProfileService profileService;
+    private FinancialProfileUseCase profileService;
 
     @Autowired
-    private DocumentIngestionService ingestionService;
+    private DocumentIngestionUseCase ingestionService;
 
     @Autowired
-    private TransactionService transactionService;
+    private TransactionUseCase transactionService;
 
     @Autowired
-    private NaturalLanguageChatService chatService;
+    private ChatAssistantUseCase chatService;
 
     record EvaluationQuestion(
             String question,
@@ -94,7 +99,7 @@ class ThirtyQuestionsRagEvaluationTest {
             try {
                 profileService.saveOrUpdateQuestionnaire(
                         userId,
-                        new FinancialProfileService.QuestionnaireRequest(
+                        new QuestionnaireCommand(
                                 new BigDecimal("4000000.00"),
                                 PaymentFrequency.MONTHLY,
                                 "30",
@@ -140,7 +145,7 @@ class ThirtyQuestionsRagEvaluationTest {
                 // 9. Gasto Manual de Arriendo ($1.200.000, Vivienda)
                 transactionService.registerManualExpense(
                         userId,
-                        new TransactionService.ManualExpenseRequest(
+                        new ManualExpenseCommand(
                                 "Inmobiliaria Los Robles",
                                 LocalDate.of(2026, 10, 3),
                                 new BigDecimal("1200000.00"),
@@ -163,7 +168,7 @@ class ThirtyQuestionsRagEvaluationTest {
                 transactionService.confirmExtractedDocument(
                         userId,
                         statementDoc.document().getId(),
-                        new TransactionService.ConfirmDocumentRequest(
+                        new ConfirmDocumentCommand(
                                 "Bancolombia Extracto Octubre", null, null, null,
                                 LocalDate.of(2026, 10, 31),
                                 BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
@@ -212,7 +217,7 @@ class ThirtyQuestionsRagEvaluationTest {
         int correctCount = RlsDataSourceConfig.runAsUser(userId, () -> {
             int passed = 0;
             for (EvaluationQuestion eq : thirtyQuestions) {
-                NaturalLanguageChatService.ChatAnswerResponse resp = chatService.askQuestion(userId, eq.question());
+                ChatAnswerResponse resp = chatService.askQuestion(userId, eq.question());
                 if (eq.shouldHaveEvidence()) {
                     String normalizedAnswer = resp.answer().replace(".", ",");
                     String normalizedExpected = eq.expectedSubstringInAnswer().replace(".", ",");
@@ -297,7 +302,7 @@ class ThirtyQuestionsRagEvaluationTest {
         transactionService.confirmExtractedDocument(
                 userId,
                 uploaded.document().getId(),
-                new TransactionService.ConfirmDocumentRequest(
+                new ConfirmDocumentCommand(
                         merchant, nit, invoiceNumber, cufe,
                         LocalDate.parse(date),
                         new BigDecimal(subtotal),

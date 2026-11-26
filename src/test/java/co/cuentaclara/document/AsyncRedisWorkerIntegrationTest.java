@@ -1,6 +1,8 @@
 package co.cuentaclara.document;
 
-import co.cuentaclara.security.jwt.JwtTokenService;
+import co.cuentaclara.infrastructure.adapter.in.async.DocumentAsyncWorkerAdapter;
+import co.cuentaclara.infrastructure.adapter.out.document.RedisDocumentJobQueueAdapter;
+import co.cuentaclara.infrastructure.security.jwt.JwtTokenService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -79,7 +81,10 @@ class AsyncRedisWorkerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private DocumentIngestionWorker ingestionWorker;
+    private RedisDocumentJobQueueAdapter jobQueueAdapter;
+
+    @Autowired
+    private DocumentAsyncWorkerAdapter ingestionWorker;
 
     private static final String SAMPLE_XML_API = """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -147,11 +152,11 @@ class AsyncRedisWorkerIntegrationTest {
 
         UUID apiDocId = UUID.fromString(objectMapper.readTree(apiUpload.getResponse().getContentAsString())
                 .at("/document/id").asText());
-        assertThat(ingestionWorker.getQueueDepth()).isEqualTo(1L);
+        assertThat(jobQueueAdapter.getQueueDepth()).isEqualTo(1L);
 
         // 2. Worker consume el job real desde Redis
         assertThat(ingestionWorker.consumeNextQueuedJob()).isTrue();
-        assertThat(ingestionWorker.getQueueDepth()).isEqualTo(0L);
+        assertThat(jobQueueAdapter.getQueueDepth()).isEqualTo(0L);
 
         mockMvc.perform(get("/api/documents/" + apiDocId)
                         .header("Authorization", "Bearer " + token))

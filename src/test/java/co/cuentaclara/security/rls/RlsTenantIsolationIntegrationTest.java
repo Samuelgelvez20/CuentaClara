@@ -1,5 +1,8 @@
 package co.cuentaclara.security.rls;
 
+import co.cuentaclara.infrastructure.security.rls.RlsDataSourceConfig;
+import co.cuentaclara.infrastructure.security.rls.TenantContext;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;

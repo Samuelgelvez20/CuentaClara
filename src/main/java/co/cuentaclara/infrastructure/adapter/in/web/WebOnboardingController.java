@@ -1,0 +1,401 @@
+package co.cuentaclara.infrastructure.adapter.in.web;
+
+import co.cuentaclara.domain.model.AuthResponse;
+import co.cuentaclara.domain.model.BudgetBlock;
+import co.cuentaclara.domain.model.GoogleAuthResult;
+import co.cuentaclara.domain.model.ObligationInput;
+import co.cuentaclara.domain.model.PaymentFrequency;
+import co.cuentaclara.domain.model.QuestionnaireCommand;
+import co.cuentaclara.domain.port.in.AuthUseCase;
+import co.cuentaclara.domain.port.in.FinancialProfileUseCase;
+import co.cuentaclara.domain.port.in.MonthlyReportUseCase;
+import co.cuentaclara.domain.port.out.TenantExecutionPort;
+import co.cuentaclara.infrastructure.adapter.in.AuthCookieSupport;
+import co.cuentaclara.infrastructure.security.jwt.AuthenticatedUserPrincipal;
+import co.cuentaclara.infrastructure.security.jwt.JwtTokenService;
+import jakarta.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+public class WebOnboardingController {
+
+    private final AuthUseCase authUseCase;
+    private final JwtTokenService jwtTokenService;
+    private final FinancialProfileUseCase profileUseCase;
+    private final MonthlyReportUseCase reportUseCase;
+    private final TenantExecutionPort tenantExecutionPort;
+    private final String googleClientId;
+    private final String firebaseProjectId;
+    private final String firebaseApiKey;
+    private final String firebaseAuthDomain;
+    private final String firebaseAppId;
+
+    public WebOnboardingController(
+            AuthUseCase authUseCase,
+            JwtTokenService jwtTokenService,
+            FinancialProfileUseCase profileUseCase,
+            MonthlyReportUseCase reportUseCase,
+            TenantExecutionPort tenantExecutionPort,
+            @Value("${cuentaclara.security.google-client-id:}") String googleClientId,
+            @Value("${cuentaclara.security.firebase.project-id:}") String firebaseProjectId,
+            @Value("${cuentaclara.security.firebase.api-key:}") String firebaseApiKey,
+            @Value("${cuentaclara.security.firebase.auth-domain:}") String firebaseAuthDomain,
+            @Value("${cuentaclara.security.firebase.app-id:}") String firebaseAppId
+    ) {
+        this.authUseCase = authUseCase;
+        this.jwtTokenService = jwtTokenService;
+        this.profileUseCase = profileUseCase;
+        this.reportUseCase = reportUseCase;
+        this.tenantExecutionPort = tenantExecutionPort;
+        this.googleClientId = googleClientId != null ? googleClientId.trim() : "";
+        this.firebaseProjectId = firebaseProjectId != null ? firebaseProjectId.trim() : "";
+        this.firebaseApiKey = firebaseApiKey != null ? firebaseApiKey.trim() : "";
+        this.firebaseAuthDomain = (firebaseAuthDomain != null && !firebaseAuthDomain.isBlank())
+                ? firebaseAuthDomain.trim()
+                : (!this.firebaseProjectId.isEmpty() ? this.firebaseProjectId + ".firebaseapp.com" : "");
+        this.firebaseAppId = firebaseAppId != null ? firebaseAppId.trim() : "";
+    }
+
+    private void populateExternalAuthAttributes(Model model) {
+        boolean firebaseEnabled = !firebaseProjectId.isEmpty() && !firebaseApiKey.isEmpty();
+        model.addAttribute("firebaseEnabled", firebaseEnabled);
+        model.addAttribute("firebaseProjectId", firebaseProjectId);
+        model.addAttribute("firebaseApiKey", firebaseApiKey);
+        model.addAttribute("firebaseAuthDomain", firebaseAuthDomain);
+        model.addAttribute("firebaseAppId", firebaseAppId);
+        model.addAttribute("googleClientId", googleClientId);
+    }
+
+    @GetMapping("/")
+    public String index(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
+        return "redirect:/dashboard";
+    }
+
+    @GetMapping("/auth/login")
+    public String loginPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam(value = "mode", required = false) String mode,
+            Model model
+    ) {
+        if (principal != null) {
+            return "redirect:/dashboard";
+        }
+        model.addAttribute("registerMode", "register".equalsIgnoreCase(mode));
+        populateExternalAuthAttributes(model);
+        return "auth/login";
+    }
+
+    @GetMapping("/auth/register")
+    public String registerPage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            Model model
+    ) {
+        if (principal != null) {
+            return "redirect:/dashboard";
+        }
+        model.addAttribute("registerMode", true);
+        populateExternalAuthAttributes(model);
+        return "auth/login";
+    }
+
+    @PostMapping("/auth/firebase")
+    public String handleFirebaseSignIn(
+            @RequestParam(value = "idToken", required = false) String firebaseIdToken,
+            @RequestParam(value = "aiConsentAccepted", defaultValue = "false") boolean aiConsentAccepted,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            GoogleAuthResult result = authUseCase.loginWithFirebaseIdToken(
+                    firebaseIdToken,
+                    aiConsentAccepted
+            );
+            AuthResponse auth = result.authResponse();
+            AuthCookieSupport.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+
+            if (result.newUser()) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "¡Conectado con Firebase Auth (" + auth.email() + ")! Configura aquí tu ingreso y tus deudas o pagos de cada mes para tu calendario."
+                );
+                return "redirect:/profile";
+            }
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "¡Bienvenido(a) de nuevo, " + auth.fullName() + "! Iniciaste sesión con Google vía Firebase."
+            );
+            return "redirect:/dashboard";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "No se pudo autenticar con Firebase: " + ex.getMessage());
+            return "redirect:/auth/login";
+        }
+    }
+
+    @PostMapping("/auth/google")
+    public String handleGoogleSignIn(
+            @RequestParam(value = "credential", required = false) String googleIdTokenCredential,
+            @RequestParam(value = "aiConsentAccepted", defaultValue = "false") boolean aiConsentAccepted,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            GoogleAuthResult result = authUseCase.loginWithGoogleIdToken(
+                    googleIdTokenCredential,
+                    aiConsentAccepted
+            );
+            AuthResponse auth = result.authResponse();
+            AuthCookieSupport.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+
+            if (result.newUser()) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "¡Conectado con tu cuenta de Google (" + auth.email() + ")! Configura aquí tu ingreso y tus deudas o pagos de cada mes para tu calendario."
+                );
+                return "redirect:/profile";
+            }
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "¡Bienvenido(a) de nuevo, " + auth.fullName() + "! Iniciaste sesión con tu cuenta de Google."
+            );
+            return "redirect:/dashboard";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "No se pudo iniciar sesión con Google: " + ex.getMessage());
+            return "redirect:/auth/login";
+        }
+    }
+
+    @PostMapping("/auth/demo")
+    public String handleDemoLogin(
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        String demoEmail = "demo.profesional@cuentaclara.co";
+        String demoPass = "UBL2.1-Demo-2026";
+        AuthResponse auth;
+        try {
+            auth = authUseCase.login(demoEmail, demoPass);
+        } catch (Exception ex) {
+            auth = authUseCase.register("Camila Morales (Demo)", demoEmail, demoPass, true);
+        }
+        AuthCookieSupport.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+        final var userId = auth.userId();
+        final String currentMonthStr = java.time.YearMonth.now().toString();
+        tenantExecutionPort.runAsUser(userId, () -> {
+            reportUseCase.simulateFirstMonthAndGenerateReport(userId, "2026-10");
+            if (!"2026-10".equals(currentMonthStr)) {
+                reportUseCase.simulateFirstMonthAndGenerateReport(userId, currentMonthStr);
+            }
+        });
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "¡Entorno Demo activado! Tu calendario está sincronizado con el mes y día de hoy."
+        );
+        return "redirect:/dashboard";
+    }
+
+    @PostMapping("/auth/register")
+    public String handleRegisterForm(
+            @RequestParam String fullName,
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam(defaultValue = "false") boolean aiConsentAccepted,
+            @RequestParam(required = false) BigDecimal initialNetIncome,
+            @RequestParam(value = "obligationName", required = false) List<String> obligationNames,
+            @RequestParam(value = "obligationAmount", required = false) List<BigDecimal> obligationAmounts,
+            @RequestParam(value = "obligationDueDay", required = false) List<Integer> obligationDueDays,
+            @RequestParam(value = "obligationCategory", required = false) List<String> obligationCategories,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            AuthResponse auth = authUseCase.register(fullName, email, password, aiConsentAccepted);
+            AuthCookieSupport.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+
+            // Si al crear la cuenta indicó sus ingresos o deudas/pagos mensuales con su día de pago, guardarlos de inmediato
+            final var userId = auth.userId();
+            tenantExecutionPort.runAsUser(userId, () -> {
+                List<ObligationInput> obList = buildDynamicObligations(
+                        obligationNames, obligationAmounts, obligationDueDays, obligationCategories
+                );
+                BigDecimal income = (initialNetIncome != null && initialNetIncome.compareTo(BigDecimal.ZERO) > 0)
+                        ? initialNetIncome
+                        : new BigDecimal("3500000.00");
+                if (initialNetIncome != null || !obList.isEmpty()) {
+                    profileUseCase.saveOrUpdateQuestionnaire(
+                            userId,
+                            new QuestionnaireCommand(
+                                    income,
+                                    PaymentFrequency.MONTHLY,
+                                    "30",
+                                    50, 30, 20,
+                                    "Organizar mis gastos y pagar mis compromisos a tiempo",
+                                    BigDecimal.ZERO,
+                                    obList
+                            )
+                    );
+                }
+            });
+
+            if (obligationNames != null && !obligationNames.isEmpty()) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "¡Bienvenido(a)! Tus pagos y deudas mensuales quedaron marcados automáticamente en tu calendario cada mes."
+                );
+                return "redirect:/dashboard";
+            }
+            return "redirect:/profile";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/auth/register";
+        }
+    }
+
+    @PostMapping("/auth/login")
+    public String handleLoginForm(
+            @RequestParam String email,
+            @RequestParam String password,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            AuthResponse auth = authUseCase.login(email, password);
+            AuthCookieSupport.attachAuthCookie(response, auth.token(), jwtTokenService.getExpirationSeconds());
+            return "redirect:/dashboard";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/auth/login";
+        }
+    }
+
+    @PostMapping("/auth/logout")
+    public String handleLogout(HttpServletResponse response) {
+        AuthCookieSupport.attachAuthCookie(response, "", 0);
+        return "redirect:/auth/login";
+    }
+
+    @GetMapping("/profile")
+    public String profilePage(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            Model model
+    ) {
+        model.addAttribute("user", principal);
+        model.addAttribute("frequencies", PaymentFrequency.values());
+        profileUseCase.getCurrentProfileAndBudget(principal.userId())
+                .ifPresent(data -> {
+                    model.addAttribute("profileData", data);
+                    model.addAttribute("profile", data.profile());
+                    model.addAttribute("obligations", data.obligations());
+                    model.addAttribute("initialBudget", data.initialBudget());
+                    model.addAttribute("recommendations", data.preliminaryRecommendations());
+                });
+        return "profile/questionnaire";
+    }
+
+    @PostMapping("/profile")
+    public String handleProfileForm(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam BigDecimal netIncome,
+            @RequestParam PaymentFrequency paymentFrequency,
+            @RequestParam(defaultValue = "30") String paymentDays,
+            @RequestParam(defaultValue = "50") int needsPct,
+            @RequestParam(defaultValue = "30") int wantsPct,
+            @RequestParam(defaultValue = "20") int savingsPct,
+            @RequestParam(required = false) String financialGoals,
+            @RequestParam(required = false) BigDecimal totalDebts,
+            @RequestParam(required = false) BigDecimal housingAmount,
+            @RequestParam(defaultValue = "5") Integer housingDueDay,
+            @RequestParam(required = false) BigDecimal utilitiesAmount,
+            @RequestParam(defaultValue = "18") Integer utilitiesDueDay,
+            @RequestParam(required = false) BigDecimal foodAmount,
+            @RequestParam(defaultValue = "15") Integer foodDueDay,
+            @RequestParam(value = "obligationName", required = false) List<String> obligationNames,
+            @RequestParam(value = "obligationAmount", required = false) List<BigDecimal> obligationAmounts,
+            @RequestParam(value = "obligationDueDay", required = false) List<Integer> obligationDueDays,
+            @RequestParam(value = "obligationCategory", required = false) List<String> obligationCategories,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            List<ObligationInput> obligations = new ArrayList<>();
+            if (housingAmount != null && housingAmount.compareTo(BigDecimal.ZERO) > 0) {
+                obligations.add(new ObligationInput(
+                        "Vivienda / Arriendo", "Vivienda", BudgetBlock.NEEDS, housingAmount, housingDueDay, true
+                ));
+            }
+            if (utilitiesAmount != null && utilitiesAmount.compareTo(BigDecimal.ZERO) > 0) {
+                obligations.add(new ObligationInput(
+                        "Servicios Públicos / Internet", "Servicios", BudgetBlock.NEEDS, utilitiesAmount, utilitiesDueDay, true
+                ));
+            }
+            if (foodAmount != null && foodAmount.compareTo(BigDecimal.ZERO) > 0) {
+                obligations.add(new ObligationInput(
+                        "Alimentación prioritaria", "Alimentación", BudgetBlock.NEEDS, foodAmount, foodDueDay, true
+                ));
+            }
+            obligations.addAll(buildDynamicObligations(
+                    obligationNames, obligationAmounts, obligationDueDays, obligationCategories
+            ));
+
+            profileUseCase.saveOrUpdateQuestionnaire(
+                    principal.userId(),
+                    new QuestionnaireCommand(
+                            netIncome,
+                            paymentFrequency,
+                            paymentDays,
+                            needsPct,
+                            wantsPct,
+                            savingsPct,
+                            financialGoals,
+                            totalDebts,
+                            obligations
+                    )
+            );
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Perfil financiero y fechas de tus pagos/deudas mensuales actualizados en tu calendario.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/profile";
+    }
+
+    private List<ObligationInput> buildDynamicObligations(
+            List<String> names,
+            List<BigDecimal> amounts,
+            List<Integer> dueDays,
+            List<String> categories
+    ) {
+        List<ObligationInput> result = new ArrayList<>();
+        if (names == null || amounts == null) {
+            return result;
+        }
+        int count = Math.min(names.size(), amounts.size());
+        for (int i = 0; i < count; i++) {
+            String name = names.get(i);
+            BigDecimal amount = amounts.get(i);
+            if (name != null && !name.isBlank() && amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
+                int day = (dueDays != null && i < dueDays.size() && dueDays.get(i) != null) ? dueDays.get(i) : 5;
+                String cat = (categories != null && i < categories.size() && categories.get(i) != null && !categories.get(i).isBlank())
+                        ? categories.get(i)
+                        : "Deudas y Préstamos";
+                result.add(new ObligationInput(
+                        name.trim(), cat.trim(), BudgetBlock.NEEDS, amount, day, true
+                ));
+            }
+        }
+        return result;
+    }
+}

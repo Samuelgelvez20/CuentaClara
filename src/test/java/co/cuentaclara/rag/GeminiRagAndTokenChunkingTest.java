@@ -1,11 +1,19 @@
 package co.cuentaclara.rag;
 
-import co.cuentaclara.chat.HybridSearchAndChatToolsService;
-import co.cuentaclara.chat.NaturalLanguageChatService;
-import co.cuentaclara.document.DocumentSourceType;
-import co.cuentaclara.document.ocr.PdfAndOcrExtractionService;
-import co.cuentaclara.document.ocr.StructuredInvoiceTextExtractor;
-import co.cuentaclara.report.GeminiFinancialAdvisorService;
+import co.cuentaclara.application.service.ChatAssistantApplicationService;
+import co.cuentaclara.application.service.RagIndexingApplicationService;
+import co.cuentaclara.domain.model.DocumentSourceType;
+import co.cuentaclara.domain.model.HybridChunkEvidence;
+import co.cuentaclara.domain.model.SqlTransactionsToolResult;
+import co.cuentaclara.domain.model.TransactionEvidenceRow;
+import co.cuentaclara.domain.model.TransactionQueryFilters;
+import co.cuentaclara.domain.port.out.EmbeddingPort;
+import co.cuentaclara.domain.port.out.HybridVectorSearchPort;
+import co.cuentaclara.domain.port.out.TransactionRunnerPort;
+import co.cuentaclara.infrastructure.adapter.out.ai.GeminiFinancialAdvisorAdapter;
+import co.cuentaclara.infrastructure.adapter.out.document.parser.PdfAndOcrExtractionService;
+import co.cuentaclara.infrastructure.adapter.out.document.parser.StructuredInvoiceTextExtractor;
+import co.cuentaclara.infrastructure.adapter.out.persistence.JacksonJsonAdapter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
@@ -27,28 +35,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GeminiRagAndTokenChunkingTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JacksonJsonAdapter jsonAdapter = new JacksonJsonAdapter(objectMapper);
+    private final TransactionRunnerPort passthroughTx = new TransactionRunnerPort() {
+        @Override
+        public <T> T runInTransaction(java.util.function.Supplier<T> action) {
+            return action.get();
+        }
+
+        @Override
+        public <T> T runInReadOnlyTransaction(java.util.function.Supplier<T> action) {
+            return action.get();
+        }
+    };
 
     @Test
     @DisplayName("Bloque 3 (RF-07): Chunking por tokens (~500-800 tokens) con superposición contextual")
     void shouldSplitLongTextIntoOverlappingTokenChunks() {
-        EmbeddingProvider dummyEmbedding = new EmbeddingProvider() {
-            @Override
-            public float[] generateEmbedding(String text) {
-                return new float[0];
-            }
-
-            @Override
-            public String modelName() {
-                return "stub";
-            }
-
-            @Override
-            public String modelVersion() {
-                return "v1";
-            }
-        };
-        RagIndexingAndCategorizationService ragService = new RagIndexingAndCategorizationService(
-                null, null, dummyEmbedding, objectMapper
+        RagIndexingApplicationService ragService = new RagIndexingApplicationService(
+                null, null, null, null, passthroughTx
         );
 
         // Construir extracto extenso (~1.400 tokens)
@@ -78,7 +82,7 @@ class GeminiRagAndTokenChunkingTest {
     @Test
     @DisplayName("Bloque 3 (RF-04): StructuredInvoiceTextExtractor usa fallback JSON de Gemini en recibos no convencionales")
     void shouldRecoverUnstructuredReceiptViaGeminiJsonFallback() {
-        GeminiFinancialAdvisorService stubGemini = new GeminiFinancialAdvisorService(objectMapper, "fake-key", "gemini-2.5-flash") {
+        GeminiFinancialAdvisorAdapter stubGemini = new GeminiFinancialAdvisorAdapter(objectMapper, "fake-key", "gemini-2.5-flash") {
             @Override
             protected String callGemini(String systemInstruction, String userText, double temperature, boolean jsonMode) {
                 assertThat(jsonMode).isTrue();
@@ -117,7 +121,7 @@ class GeminiRagAndTokenChunkingTest {
     @DisplayName("Bloque 3 (RF-12, RNF-06): NaturalLanguageChatService integra Gemini para filtros abiertos (año 2025, comercio libre), rechaza sin evidencia y hace fallback si Gemini falla")
     void shouldIntegrateGeminiQueryUnderstandingGroundedSynthesisAndFallback() {
         UUID userId = UUID.randomUUID();
-        var vetRow = new HybridSearchAndChatToolsService.TransactionEvidenceRow(
+        var vetRow = new TransactionEvidenceRow(
                 UUID.randomUUID(),
                 "VETERINARIA HUELLITAS S.A.S.",
                 "901444555",
@@ -132,7 +136,7 @@ class GeminiRagAndTokenChunkingTest {
                 "XML:VET-778|COMERCIO:VETERINARIA HUELLITAS S.A.S."
         );
 
-        HybridSearchAndChatToolsService tools = new HybridSearchAndChatToolsService(null, null) {
+        HybridVectorSearchPort tools = new HybridVectorSearchPort() {
             @Override
             public SqlTransactionsToolResult consultarTransacciones(UUID uid, TransactionQueryFilters f) {
                 if ("2025-03".equals(f.yearMonth())
@@ -155,7 +159,7 @@ class GeminiRagAndTokenChunkingTest {
         };
 
         AtomicInteger geminiCalls = new AtomicInteger(0);
-        GeminiFinancialAdvisorService stubGemini = new GeminiFinancialAdvisorService(objectMapper, "fake-key", "gemini-2.5-flash") {
+        GeminiFinancialAdvisorAdapter stubGemini = new GeminiFinancialAdvisorAdapter(objectMapper, "fake-key", "gemini-2.5-flash") {
             @Override
             protected String callGemini(String systemInstruction, String userText, double temperature, boolean jsonMode) {
                 geminiCalls.incrementAndGet();
@@ -171,7 +175,9 @@ class GeminiRagAndTokenChunkingTest {
             }
         };
 
-        NaturalLanguageChatService chatService = new NaturalLanguageChatService(tools, null, stubGemini, objectMapper, true);
+        ChatAssistantApplicationService chatService = new ChatAssistantApplicationService(
+                tools, null, stubGemini, jsonAdapter, null, null, passthroughTx, true
+        );
 
         // 1. Consulta abierta con año 2025 y comercio no incluido en listas fijas -> Gemini extrae filtros + redacta grounded
         var okResponse = chatService.askQuestion(userId, "¿Cuánto pagué en Huellitas en marzo 2025?");
@@ -188,7 +194,7 @@ class GeminiRagAndTokenChunkingTest {
         assertThat(noEvidence.answer()).contains("No tengo evidencia");
 
         // 3. Si Gemini lanza excepción HTTP 429 al sintetizar -> fallback limpio determinista
-        GeminiFinancialAdvisorService failingSynthGemini = new GeminiFinancialAdvisorService(objectMapper, "fake-key", "gemini-2.5-flash") {
+        GeminiFinancialAdvisorAdapter failingSynthGemini = new GeminiFinancialAdvisorAdapter(objectMapper, "fake-key", "gemini-2.5-flash") {
             @Override
             protected String callGemini(String systemInstruction, String userText, double temperature, boolean jsonMode) {
                 if (jsonMode) {
@@ -197,7 +203,9 @@ class GeminiRagAndTokenChunkingTest {
                 throw new IllegalStateException("HTTP 429 Rate limit");
             }
         };
-        NaturalLanguageChatService fallbackChat = new NaturalLanguageChatService(tools, null, failingSynthGemini, objectMapper, true);
+        ChatAssistantApplicationService fallbackChat = new ChatAssistantApplicationService(
+                tools, null, failingSynthGemini, jsonAdapter, null, null, passthroughTx, true
+        );
         var fallbackResp = fallbackChat.askQuestion(userId, "¿Cuánto pagué en Huellitas en marzo 2025?");
         assertThat(fallbackResp.hasEvidence()).isTrue();
         assertThat(fallbackResp.sqlComputedTotal()).isEqualByComparingTo("119000.00");
@@ -208,7 +216,7 @@ class GeminiRagAndTokenChunkingTest {
     @DisplayName("Semantic recall activo permite fragmentos por similitud vectorial sin coincidencia literal exacta")
     void shouldAllowPureSemanticMatchesOnlyWhenRealSemanticEmbeddingActive() {
         UUID userId = UUID.randomUUID();
-        var semanticChunk = new HybridSearchAndChatToolsService.HybridChunkEvidence(
+        var semanticChunk = new HybridChunkEvidence(
                 UUID.randomUUID(),
                 "DOCUMENT_CONTENT",
                 2,
@@ -219,7 +227,7 @@ class GeminiRagAndTokenChunkingTest {
                 0.78
         );
 
-        HybridSearchAndChatToolsService tools = new HybridSearchAndChatToolsService(null, null) {
+        HybridVectorSearchPort tools = new HybridVectorSearchPort() {
             @Override
             public SqlTransactionsToolResult consultarTransacciones(UUID uid, TransactionQueryFilters f) {
                 return new SqlTransactionsToolResult(BigDecimal.ZERO, BigDecimal.ZERO, 0, List.of());
@@ -231,24 +239,26 @@ class GeminiRagAndTokenChunkingTest {
             }
         };
 
-        // 1. Con fallback offline local (isRealSemanticEmbeddingActive = false), se exige coincidencia léxica
-        NaturalLanguageChatService offlineChat = new NaturalLanguageChatService(tools, null);
-        offlineChat.setEmbeddingProvider(new EmbeddingProvider() {
+        EmbeddingPort offlineEmbedding = new EmbeddingPort() {
             @Override public float[] generateEmbedding(String text) { return new float[0]; }
             @Override public String modelName() { return "local-semantic-v1"; }
             @Override public String modelVersion() { return "v1"; }
             @Override public boolean isRealSemanticEmbeddingActive() { return false; }
-        });
+        };
+        ChatAssistantApplicationService offlineChat = new ChatAssistantApplicationService(
+                tools, null, null, jsonAdapter, null, offlineEmbedding, passthroughTx, false
+        );
         assertThat(offlineChat.askQuestion(userId, "¿Qué beneficios dentales cubre mi póliza?").hasEvidence()).isFalse();
 
-        // 2. Con modelo semántico real activo (OpenAI/Ollama), vectorScore >= 0.35 se acepta sin palabra exacta
-        NaturalLanguageChatService realSemanticChat = new NaturalLanguageChatService(tools, null);
-        realSemanticChat.setEmbeddingProvider(new EmbeddingProvider() {
+        EmbeddingPort realSemanticEmbedding = new EmbeddingPort() {
             @Override public float[] generateEmbedding(String text) { return new float[0]; }
             @Override public String modelName() { return "text-embedding-3-small"; }
             @Override public String modelVersion() { return "v1"; }
             @Override public boolean isRealSemanticEmbeddingActive() { return true; }
-        });
+        };
+        ChatAssistantApplicationService realSemanticChat = new ChatAssistantApplicationService(
+                tools, null, null, jsonAdapter, null, realSemanticEmbedding, passthroughTx, false
+        );
         var resp = realSemanticChat.askQuestion(userId, "¿Qué beneficios dentales cubre mi póliza?");
         assertThat(resp.hasEvidence()).isTrue();
         assertThat(resp.citations()).contains("PDF:POL-10|PÁGINA:2");

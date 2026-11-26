@@ -1,14 +1,15 @@
 package co.cuentaclara.security;
 
-import co.cuentaclara.auth.GoogleIdTokenVerifierService;
-import co.cuentaclara.document.DocumentEntity;
-import co.cuentaclara.document.DocumentRepository;
-import co.cuentaclara.document.DocumentSourceType;
-import co.cuentaclara.document.DocumentStatus;
-import co.cuentaclara.document.TempFileLifecycleAndRetryService;
-import co.cuentaclara.security.jwt.JwtTokenService;
-import co.cuentaclara.security.rls.RlsDataSourceConfig;
-import co.cuentaclara.user.UserRepository;
+import co.cuentaclara.domain.model.Document;
+import co.cuentaclara.domain.model.DocumentSourceType;
+import co.cuentaclara.domain.model.DocumentStatus;
+import co.cuentaclara.domain.port.out.DocumentRepositoryPort;
+import co.cuentaclara.domain.port.out.UserRepositoryPort;
+import co.cuentaclara.infrastructure.adapter.in.async.DocumentAsyncWorkerAdapter;
+import co.cuentaclara.infrastructure.adapter.out.document.LocalTempFileStorageAdapter;
+import co.cuentaclara.infrastructure.adapter.out.security.GoogleTokenVerifierAdapter;
+import co.cuentaclara.infrastructure.security.jwt.JwtTokenService;
+import co.cuentaclara.infrastructure.security.rls.RlsDataSourceConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -77,13 +78,16 @@ class SecurityHardeningAndCleanupIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryPort userRepository;
 
     @Autowired
-    private DocumentRepository documentRepository;
+    private DocumentRepositoryPort documentRepository;
 
     @Autowired
-    private TempFileLifecycleAndRetryService lifecycleService;
+    private LocalTempFileStorageAdapter tempFileStorageAdapter;
+
+    @Autowired
+    private DocumentAsyncWorkerAdapter workerAdapter;
 
     @Autowired
     private JwtTokenService jwtTokenService;
@@ -124,7 +128,7 @@ class SecurityHardeningAndCleanupIntegrationTest {
         String expectedClientId = "test-client.apps.googleusercontent.com";
         String sampleSignedLikeJwt = "aaa.bbb.ccc";
 
-        GoogleIdTokenVerifierService validVerifier = new GoogleIdTokenVerifierService(null, objectMapper, expectedClientId) {
+        GoogleTokenVerifierAdapter validVerifier = new GoogleTokenVerifierAdapter(null, objectMapper, expectedClientId) {
             @Override
             protected JsonNode fetchTokenInfo(String idTokenCredential) {
                 try {
@@ -148,7 +152,7 @@ class SecurityHardeningAndCleanupIntegrationTest {
         assertThat(verified.email()).isEqualTo("verified.user@gmail.com");
         assertThat(verified.fullName()).isEqualTo("Usuario Verificado");
 
-        GoogleIdTokenVerifierService wrongAudienceVerifier = new GoogleIdTokenVerifierService(null, objectMapper, expectedClientId) {
+        GoogleTokenVerifierAdapter wrongAudienceVerifier = new GoogleTokenVerifierAdapter(null, objectMapper, expectedClientId) {
             @Override
             protected JsonNode fetchTokenInfo(String idTokenCredential) {
                 try {
@@ -251,7 +255,7 @@ class SecurityHardeningAndCleanupIntegrationTest {
         Path orphanFile = Files.writeString(userDir.resolve("orphan.tmp"), "stale");
 
         UUID indexedDocId = RlsDataSourceConfig.runAsUser(userId, () -> {
-            DocumentEntity indexed = new DocumentEntity();
+            Document indexed = new Document();
             indexed.setUserId(userId);
             indexed.setOriginalFilename("indexed.xml");
             indexed.setMimeType("application/xml");
@@ -263,7 +267,7 @@ class SecurityHardeningAndCleanupIntegrationTest {
             indexed.setTempFileDeleted(false);
             indexed = documentRepository.save(indexed);
 
-            DocumentEntity awaiting = new DocumentEntity();
+            Document awaiting = new Document();
             awaiting.setUserId(userId);
             awaiting.setOriginalFilename("awaiting.xml");
             awaiting.setMimeType("application/xml");
@@ -274,7 +278,7 @@ class SecurityHardeningAndCleanupIntegrationTest {
             awaiting.setTempFilePath(activeFile.toString());
             documentRepository.save(awaiting);
 
-            DocumentEntity errorDoc = new DocumentEntity();
+            Document errorDoc = new Document();
             errorDoc.setUserId(userId);
             errorDoc.setOriginalFilename("retryable.pdf");
             errorDoc.setMimeType("application/pdf");
@@ -289,7 +293,7 @@ class SecurityHardeningAndCleanupIntegrationTest {
             return indexed.getId();
         });
 
-        var stats = lifecycleService.cleanupOrphanedTempFiles(Duration.ZERO, Duration.ZERO, Duration.ofHours(24));
+        var stats = tempFileStorageAdapter.cleanupOrphanedTempFiles(Duration.ZERO, Duration.ZERO, Duration.ofHours(24));
         assertThat(stats.deletedFiles()).isEqualTo(2);
         assertThat(Files.exists(indexedFile)).isFalse();
         assertThat(Files.exists(orphanFile)).isFalse();
@@ -300,7 +304,7 @@ class SecurityHardeningAndCleanupIntegrationTest {
                 documentRepository.findById(indexedDocId).orElseThrow().isTempFileDeleted());
         assertThat(indexedFlagSynced).isTrue();
 
-        int requeued = lifecycleService.retryPendingAndFailedDocuments(Duration.ZERO, Duration.ofMinutes(5));
+        int requeued = workerAdapter.retryPendingAndFailedDocuments(Duration.ZERO, Duration.ofMinutes(5));
         assertThat(requeued).isEqualTo(1);
     }
 }

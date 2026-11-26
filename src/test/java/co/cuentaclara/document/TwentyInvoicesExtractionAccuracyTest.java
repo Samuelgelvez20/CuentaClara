@@ -1,7 +1,9 @@
 package co.cuentaclara.document;
 
-import co.cuentaclara.document.ocr.PdfAndOcrExtractionService;
-import co.cuentaclara.document.xml.DianUblXmlParser;
+import co.cuentaclara.domain.model.DocumentSourceType;
+import co.cuentaclara.domain.model.ParsedUblInvoice;
+import co.cuentaclara.infrastructure.adapter.out.document.parser.PdfAndOcrExtractionService;
+import co.cuentaclara.infrastructure.adapter.out.document.parser.DianUblXmlParser;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -104,7 +106,7 @@ class TwentyInvoicesExtractionAccuracyTest {
         int correctFields = 0;
 
         for (ExpectedInvoiceCase tc : twentyCases) {
-            DianUblXmlParser.ParsedUblInvoice extracted;
+            ParsedUblInvoice extracted;
             if ("XML".equals(tc.format())) {
                 byte[] xmlBytes = buildSyntheticUblXml(tc);
                 extracted = ublXmlParser.parse(xmlBytes);

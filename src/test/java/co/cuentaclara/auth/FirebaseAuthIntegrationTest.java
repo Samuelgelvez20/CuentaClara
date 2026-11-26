@@ -1,6 +1,7 @@
 package co.cuentaclara.auth;
 
-import co.cuentaclara.user.UserRepository;
+import co.cuentaclara.domain.port.out.UserRepositoryPort;
+import co.cuentaclara.infrastructure.adapter.out.security.FirebaseTokenVerifierAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
@@ -87,8 +88,8 @@ class FirebaseAuthIntegrationTest {
 
         @Bean
         @Primary
-        FirebaseIdTokenVerifierService testFirebaseVerifier(ObjectMapper objectMapper) {
-            return new FirebaseIdTokenVerifierService(null, objectMapper, TEST_FIREBASE_PROJECT) {
+        FirebaseTokenVerifierAdapter testFirebaseVerifier(ObjectMapper objectMapper) {
+            return new FirebaseTokenVerifierAdapter(null, objectMapper, TEST_FIREBASE_PROJECT) {
                 @Override
                 protected JwksResponse fetchJwks() {
                     RSAPublicKey pub = (RSAPublicKey) rsaKeyPair.getPublic();
@@ -114,10 +115,10 @@ class FirebaseAuthIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private FirebaseIdTokenVerifierService firebaseVerifier;
+    private FirebaseTokenVerifierAdapter firebaseVerifier;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryPort userRepository;
 
     @Test
     @DisplayName("Firebase Auth: renderiza botón modular en login, verifica RS256 JWKS, sincroniza PostgreSQL y emite cookie JWT")

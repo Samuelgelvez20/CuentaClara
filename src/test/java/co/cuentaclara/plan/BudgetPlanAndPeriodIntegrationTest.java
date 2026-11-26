@@ -1,8 +1,9 @@
 package co.cuentaclara.plan;
 
-import co.cuentaclara.report.MonthlyAnalysisAndReportService;
-import co.cuentaclara.security.jwt.JwtTokenService;
-import co.cuentaclara.security.rls.RlsDataSourceConfig;
+import co.cuentaclara.domain.model.PlanDecisionRequest;
+import co.cuentaclara.domain.port.in.MonthlyReportUseCase;
+import co.cuentaclara.infrastructure.security.jwt.JwtTokenService;
+import co.cuentaclara.infrastructure.security.rls.RlsDataSourceConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -61,7 +62,7 @@ class BudgetPlanAndPeriodIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private MonthlyAnalysisAndReportService reportService;
+    private MonthlyReportUseCase reportService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -168,7 +169,7 @@ class BudgetPlanAndPeriodIntegrationTest {
                 reportService.updateSuggestedPlanDecision(
                         userId,
                         monthlyClosure.suggestedNextPlan().getId(),
-                        new MonthlyAnalysisAndReportService.PlanDecisionRequest("ACCEPTED", null, null, null, null)
+                        new PlanDecisionRequest("ACCEPTED", null, null, null, null)
                 ));
         String v2Status = RlsDataSourceConfig.runAsUser(userId, () -> jdbcTemplate.queryForObject(
                 "SELECT status FROM budget_plans WHERE id = ?",
